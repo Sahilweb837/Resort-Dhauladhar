@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <!-- stylesheet linked here -->
+  <link rel="stylesheet" href="./style.css">
+  <!-- google fonts linked here -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Agu+Display:MORF@0..60&family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Edu+AU+VIC+WA+NT+Arrows:wght@400..700&family=Inconsolata:wght@200..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&family=Outfit:wght@100..900&family=Parkinsans:wght@300..800&family=Quicksand:wght@300..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+    rel="stylesheet">
+
+  <!-- cdn linked here -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+  <!-- AOS CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- navbar -->
+  <header class="site-header">
+
+    <!-- TOP INFO -->
+    <div class="top-info">
+      <span id="weather"><i class="fa-solid fa-cloud-sun"></i> Dharamshala weather...</span>
+
+      <div class="header-contact">
+        <span><i class="fa-solid fa-phone"></i> +91 80915-08200</span>
+        <span><i class="fa-solid fa-envelope"></i> reservation@dhauladharheightsresort.com</span>
+      </div>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+
+      <!-- LEFT LINKS (3) -->
+      <ul class="nav-left">
+        <li><a href="index.php">THE RESORT</a></li>
+        <li><a href="about.php">ABOUT</a></li>
+        <li><a href="rooms.html">ROOMS</a></li>
+      </ul>
+
+      <!-- CENTER LOGO -->
+      <div class="nav-logo">
+        <a href="index.php">
+          <img src="./images/dhr_logo_full_white_720.png" alt="Logo">
+        </a>
+      </div>
+
+      <!-- RIGHT LINKS (3) -->
+      <ul class="nav-right">
+        <li class="nav-dropdown">
+          <a href="#">EVENTS <i class="fa-solid fa-chevron-down"></i></a>
+          <ul class="nav-dropdown-menu">
+            <li>
+              <a href="destination-wedding.php">
+                <i class="fa-solid fa-heart"></i> Destination Wedding
+              </a>
+            </li>
+            <li>
+              <a href="events.html">
+                <i class="fa-solid fa-champagne-glasses"></i> Event Venues
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li><a href="blog.php">BLOG</a></li>
+        <li><a href="contact.html">CONTACT</a></li>
+      </ul>
+
+      <!-- MOBILE MENU -->
+      <div class="menu-btn" id="menuOpen">
+        <i class="fa-solid fa-bars"></i>
+      </div>
+
+    </nav>
+  </header>
+
+  <div class="overlay-menu" id="overlayMenu">
+    <div class="overlay-right">
+      <span class="close-btn" id="menuClose"><i class="fa-solid fa-xmark"></i></span>
+
+      <ul class="overlay-links">
+        <li><a href="index.php">THE RESORT</a></li>
+        <li><a href="about.php">ABOUT</a></li>
+        <li><a href="rooms.html"> ROOMS</a></li>
+        <li><a href="destination-wedding.php">DESTINATION WEDDING</a></li>
+        <li><a href="events.html"> EVENT VENUES</a></li>
+        <li><a href="blog.php"> BLOG</a></li>
+        <li><a href="contact.html"> CONTACT</a></li>
+      </ul>
+
+      <!-- <a href="#" class="overlay-book">BOOK YOUR STAY</a> -->
+    </div>
+  </div>
+
+  <!----------------------- hero section ---------------------->
+  <div class="common-hero about-hero">
+    <h1 data-aos="fade-down" data-aos-duration="1200">Our Hotel Gallery</h1>
+    <div class="hero-links" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="300">
+      <a href="index.php">THE RESORT</a>
+      <a href="gallery.html">/ Gallery</a>
+    </div>
+  </div>
+
+
+  <section class="editorial-gallery">
+
+    <!-- FILTER BUTTONS -->
+    <div class="editorial-filters">
+      <button class="rect-btn active" data-filter="all">All</button>
+      <button class="rect-btn" data-filter="room">Rooms</button>
+      <button class="rect-btn" data-filter="resort">Resort</button>
+      <button class="rect-btn" data-filter="wedding">Wedding</button>
+      <!-- <button class="rect-btn" data-filter="video">Videos</button> -->
+    </div>
+
+    <!-- MASONRY GRID -->
+    <div class="editorial-grid">
+
+      <!-- ROOMS -->
+      <div class="editorial-item room">
+        <img src="./images/executiveelite.jpg">
+      </div>
+
+      <div class="editorial-item room">
+        <img src="./images/DSC00176-Edit-scaled.jpg">
+      </div>
+
+      <div class="editorial-item room">
+        <img src="./images/DSC01124-HDR-2-scaled.jpg">
+      </div>
+
+      <div class="editorial-item room">
+        <img src="./images/DSC03083-copy-scaled.jpg">
+      </div>
+
+      <div class="editorial-item room">
+        <img src="./images/twinbebbed.jpg">
+      </div>
+
+      <div class="editorial-item room">
+        <img src="./images/presidentialmain.jpg">
+      </div>
+
+      <div class="editorial-item room">
+        <img src="./images/DSC01195-HDR-scaled.jpg">
+      </div>
+
+      <div class="editorial-item room">
+        <img src="./images/DSC00821-HDR-2-1-scaled.jpg">
+      </div>
+
+ 
+      <!-- WEDDING -->
+      <div class="editorial-item wedding">
+        <img src="./images/DSC09149-scaled.jpg" alt="weddingImg-1">
+      </div>
+
+      <div class="editorial-item wedding">
+        <img src="./images/DSC09631-scaled.jpg" alt="weddingImg-2">
+      </div>
+
+      <div class="editorial-item wedding">
+        <img src="./images/IMG_3817-scaled.jpg" alt="weddingImg-3">
+      </div>
+
+      <div class="editorial-item wedding">
+        <img src="./images/IMG_6445-scaled.jpg" alt="weddingImg-4">
+      </div>
+
+      <div class="editorial-item wedding">
+        <img src="./images/PHOTO-2024-01-20-20-04-51.jpg" alt="weddingImg-5">
+      </div>
+
+      <div class="editorial-item wedding">
+        <img src="./images/PHOTO-2024-01-20-20-04-47-2.jpg" alt="weddingImg-6">
+      </div>
+
+      <div class="editorial-item wedding">
+        <img src="./images/PHOTO-2024-01-20-20-04-52.jpg" alt="weddingImg-7">
+      </div>
+
+      <div class="editorial-item wedding">
+        <img src="./images/WhatsApp-Image-2026-02-19-at-11.35.01-AM-1.jpeg" alt="weddingImg-8">
+      </div>
+
+      <!-- RESORT -->
+      <div class="editorial-item resort">
+        <img src="./images/PANO_0001-Pano-2-1-scaled.jpg" alt="resortImg-1">
+      </div>
+
+      <div class="editorial-item resort">
+        <img src="./images/DJI_0158-1-scaled3.jpg" alt="resortImg-2">
+      </div>
+
+      <div class="editorial-item resort">
+        <img src="./images/DSC00213-scaled.jpg" alt="resortImg-3">
+      </div>
+
+      <div class="editorial-item resort">
+        <img src="./images/DSC00214-scaled.jpg" alt="resortImg-4">
+      </div>
+
+      <div class="editorial-item resort">
+        <img src="./images/DSC00210-scaled.jpg" alt="resortImg-5">
+      </div>
+
+      <div class="editorial-item resort">
+        <img src="./images/DSC00219-scaled.jpg" alt="resortImg-6">
+      </div>
+
+      <div class="editorial-item resort">
+        <img src="./images/DSC09998-scaled.jpg" alt="resortImg-7">
+      </div>
+
+      <div class="editorial-item resort">
+        <img src="./images/WhatsApp-Image-2026-02-19-at-11.34.59-AM-4.jpeg" alt="resortImg-8">
+      </div>
+
+      <!-- VIDEOS -->
+      <!-- <div class="editorial-item video">
+      <video src="./videos/wedding.mp4" muted></video>
+      <span class="play-icon">ply</span>
+    </div>
+
+    <div class="editorial-item video">
+      <video src="./videos/resort.mp4" muted></video>
+      <span class="play-icon">play</span>
+    </div>
+
+  </div> -->
+    </div>
+  </section>
+
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox">
+    <span class="close">&times;</span>
+    <img class="lightbox-img">
+  </div>
+
+
+    <!-- Footer -->
+   <footer class="hf-footer">
+
+        <!-- MAIN FOOTER -->
+        <div class="hf-main">
+
+            <!-- CONTACT -->
+            <div class="hf-col hf-contact hf-overlay" data-aos="fade-up" data-aos-delay="0">
+
+                <h3>CONTACT INFO</h3>
+
+                <ul>
+                    <li><i class="fas fa-phone"></i> +91 80915-08200 <br>+91 70188-41900</li>
+                    <li><i class="fas fa-envelope"></i> reservation@dhauladhar<br>heightsresort.com</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Dhauladhar Heights Resort
+
+                        Tea Garden Road, Kunal Pathri,
+                        Dharamshala, Himachal Pradesh 176217</li>
+                </ul>
+
+                <div class="hf-social">
+
+                    <!-- Facebook -->
+                    <a href="https://www.facebook.com/dhauladharheightsresort" target="_blank"
+                        rel="noopener noreferrer">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+
+                    <!-- Instagram -->
+                    <a href="https://www.instagram.com/dhauladhar_heights_resort" target="_blank"
+                        rel="noopener noreferrer">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+
+                    <!-- YouTube -->
+                    <a href="https://www.youtube.com/@dhauladharheightsresort" target="_blank"
+                        rel="noopener noreferrer">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+
+                    <!-- LinkedIn -->
+                    <a href="https://www.linkedin.com/company/dhauladhar-heights-resort" target="_blank"
+                        rel="noopener noreferrer">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+
+
+                </div>
+
+            </div>
+
+            <!-- LINKS -->
+            <div class="hf-col hf-links" data-aos="fade-up" data-aos-delay="100">
+                <h3>USEFUL LINKS</h3>
+                <ul>
+                    <li><a class="is-active" href="./about.php">About </a></li>
+                    <li><a href="./rooms.html">Rooms & Suites</a></li>
+                    <li><a href="./contact.html">Reservations</a></li>
+                    <li><a href="./blog.php">News & Blogs</a></li>
+                    <li><a href="./contact.html">Contact Us</a></li>
+                    <li><a href="./privacypolicy.html">Privacy Policy</a></li>
+
+                </ul>
+            </div>
+
+            <!-- GALLERY -->
+            <div class="hf-col hf-gallery" data-aos="zoom-in" data-aos-delay="200">
+                <h3>GALLERY</h3>
+                <a href="gallery.html">
+                    <div class="hf-gallery-grid">
+
+                        <img src="./images/DSC09149-scaled.jpg" alt="gallery">
+                        <img src="./images/sangeet1.jpg" alt="gallery">
+                        <img src="./images/PHOTO-2024-01-20-20-04-52.jpg" alt="gallery">
+                        <img src="./images/DSC09631-scaled.jpg" alt="gallery">
+                        <img src="./images/aboutbanner - Copy.jpg" alt="gallery">
+                        <img src="./images/PHOTO-2024-01-20-20-04-47-2.jpg" alt="gallery">
+                    </div>
+                </a>
+            </div>
+
+            <!-- NEWSLETTER -->
+            <div class="hf-col hf-newsletter" data-aos="fade-left" data-aos-delay="300">
+                <h3>NEWSLETTER</h3>
+                <p>Subscribe our Newsletter</p>
+                <input type="email" placeholder="Enter Email">
+                <button>SUBSCRIBE NOW</button>
+            </div>
+
+        </div>
+
+        <!-- COPYRIGHT -->
+        <div class="hf-bottom">
+                      © 2026, Hotel Dhauladhar Heights Resort. All Rights Reserved. <br><small>A Unit of NASV Warehouses & Constructions Pvt. Ltd.</small> 
+
+        </div>
+
+    </footer>
+    
+ <!-- FLOATING BUTTONS -->
+<div class="floating-btns">
+    <!-- WHATSAPP (DIRECT CHAT) -->
+    <a href="https://wa.me/917018841900?text=Hello%20I%20want%20to%20book%20a%20room"
+       target="_blank"
+       class="float-btn whatsapp-btn">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <!-- CALL (DIRECT CALL) -->
+    <a href="tel:+917018841900" class="float-btn call-btn">
+        <i class="fa-solid fa-phone"></i>
+    </a>
+
+    
+<!-- weather Btn -->
+  <a id="weather4phone" class="float-btn weather-btn">
+   <i class="fa-solid fa-cloud-sun"></i>
+
+   <span class="weather-text" id="weatherText">
+      Loading...
+   </span>
+</a>
+
+  <div id="weatherPopup" class="weather-popup" aria-hidden="true">
+    <div class="weather-popup-header">
+      <i class="fa-solid fa-cloud-sun"></i>
+      Current weather
+    </div>
+    <div id="weatherPopupContent" class="weather-popup-content">Loading...</div>
+  </div>
+
+</div>
+  <!-- aos -->
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <!-- javascript -->
+  <script src="script.js"></script>
+</body>
+
+</html>

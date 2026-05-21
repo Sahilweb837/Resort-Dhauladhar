@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- stylesheet linked here -->
+  <link rel="stylesheet" href="./style.css">
+
+  <!-- google fonts linked here -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Agu+Display:MORF@0..60&family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Edu+AU+VIC+WA+NT+Arrows:wght@400..700&family=Inconsolata:wght@200..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&family=Outfit:wght@100..900&family=Parkinsans:wght@300..800&family=Quicksand:wght@300..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+    rel="stylesheet">
+
+  <!-- cdn linked here -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- AOS CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <title>Hotel Dhauladhar</title>
+</head>
+
+<body>
+
+  <!-- navbar -->
+  <header class="site-header">
+
+    <!-- TOP INFO -->
+    <div class="top-info">
+    <span id="weather"><i class="fa-solid fa-cloud-sun"></i> Dharamshala weather...</span>
+
+      <div class="header-contact">
+        <span><i class="fa-solid fa-phone"></i> +91 80915-08200</span>
+        <span><i class="fa-solid fa-envelope"></i> reservation@dhauladharheightsresort.com</span>
+      </div>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+
+      <!-- LEFT LINKS (3) -->
+      <ul class="nav-left">
+        <li><a href="index.php">THE RESORT</a></li>
+        <li><a href="about.php">ABOUT</a></li>
+        <li><a href="rooms.html">ROOMS</a></li>
+      </ul>
+
+      <!-- CENTER LOGO -->
+    <div class="nav-logo">
+        <a href="index.php">
+          <img src="./images/dhr_logo_full_white_720.png" alt="Logo">
+        </a>
+      </div>
+      <!-- RIGHT LINKS (3) -->
+      <ul class="nav-right">
+        <li class="nav-dropdown">
+          <a href="#">EVENTS <i class="fa-solid fa-chevron-down"></i></a>
+          <ul class="nav-dropdown-menu">
+            <li>
+              <a href="destination-wedding.php">
+                <i class="fa-solid fa-heart"></i> Destination Wedding
+              </a>
+            </li>
+            <li>
+              <a href="events.html">
+                <i class="fa-solid fa-champagne-glasses"></i> Event Venues
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li><a href="blog.php">BLOG</a></li>
+        <li><a href="contact.html">CONTACT</a></li>
+      </ul>
+
+      <!-- MOBILE MENU -->
+      <div class="menu-btn" id="menuOpen">
+        <i class="fa-solid fa-bars"></i>
+      </div>
+
+    </nav>
+  </header>
+
+  <div class="overlay-menu" id="overlayMenu">
+    <div class="overlay-right">
+      <span class="close-btn" id="menuClose"><i class="fa-solid fa-xmark"></i></span>
+
+      <ul class="overlay-links">
+        <li><a href="index.php">THE RESORT</a></li>
+        <li><a href="about.php">ABOUT</a></li>
+        <li><a href="rooms.html"> ROOMS</a></li>
+        <li><a href="destination-wedding.php">DESTINATION WEDDING</a></li>
+        <li><a href="events.html"> EVENT VENUES</a></li>
+        <li><a href="blog.php"> BLOG</a></li>
+        <li><a href="contact.html"> CONTACT</a></li>
+      </ul>
+
+      <!-- <a href="#" class="overlay-book">BOOK YOUR STAY</a> -->
+    </div>
+  </div>
+  <!----------------------- hero section ---------------------->
+  <div class="common-hero contact-hero">
+    <h1 data-aos="fade-down" data-aos-duration="1200">Contact</h1>
+    <div class="hero-links" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="300">
+      <a href="index.php">THE RESORT</a>
+      <a href="contact.html">/ Contact</a>
+    </div>
+  </div>
+  
+   <!-- ------------------contact form ------------------ -->
+<section class="contact-section contactpage">
+  <div class="contact-wrapper">
+
+    <!-- LEFT IMAGE -->
+    <div class="contact-information" data-aos="zoom-in" data-aos-duration="1000">
+      <div class="contactimage">
+        <img src="./images/aboutbanner - Copy.jpg" alt="reception area">
+      </div>
+    </div>
+
+    <!-- RIGHT FORM -->
+    <div class="contact-form" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="200">
+      <h3>GET IN TOUCH</h3>
+
+      <form id="contactForm">
+
+        <div class="input-group">
+          <input type="text" name="user_name" required>
+          <label>Your Name</label>
+        </div>
+
+        <div class="input-group">
+          <input type="email" name="user_email" required>
+          <label>Email Address</label>
+        </div>
+
+         <div class="input-group">
+          <input type="phone" name="phone_number" required>
+          <label>Phone Number</label>
+        </div>
+
+        <div class="input-group">
+          <textarea name="message" required></textarea>
+          <label>Your Message</label>
+        </div>
+
+        <button type="submit" class="rect-btn">SEND MESSAGE</button>
+      </form>
+    </div>
+
+  </div>
+</section>
+
+<!-- Location Details -->
+<section class="dh-contact-area">
+
+  <div class="dh-contact-top">
+    <small>CONTACT US</small>
+    <h2>CONTACT WITH <span>US</span></h2>
+
+    <p>
+      Get in touch with Dhauladhar Heights for bookings, inquiries, or assistance. 
+      Our friendly team is here to provide seamless support and ensure your stay is unforgettable.
+    </p>
+  </div>
+
+  <div class="dh-box-wrapper">
+
+    <!-- CALL -->
+    <div class="dh-contact-card">
+      <div class="dh-icon"><i class="fas fa-phone-alt"></i></div>
+      <h3>Call Us Now</h3>
+      <p>
+        +91 70188-41900<br>
+        +91 80915-08200
+      </p>
+    </div>
+
+    <!-- EMAIL -->
+    <div class="dh-contact-card">
+      <div class="dh-icon"><i class="fas fa-envelope"></i></div>
+      <h3>Email Us</h3>
+      <p>
+        reservation@dhauladharheights<br>
+        resort.com
+      </p>
+    </div>
+
+    <!-- LOCATION -->
+    <div class="dh-contact-card">
+      <div class="dh-icon"><i class="fas fa-location-dot"></i></div>
+      <h3>Find us</h3>
+      <p>
+        Dhauladhar Heights Resort<br>
+        Tea Garden Road, Kunal Pathri,<br>
+        Dharamshala, Himachal Pradesh 176217
+      </p>
+    </div>
+
+  </div>
+
+</section>
+    <div class="map-wrapper">
+
+      <!-- DHARAMSHALA MAP -->
+     <iframe
+  class="hotel-map"
+  src="https://maps.google.com/maps?q=Dhauladhar%20Heights%20Resort%20Dharamshala&t=&z=15&ie=UTF8&iwloc=&output=embed"
+  loading="lazy"
+  allowfullscreen>
+</iframe>
+    </div>
+
+    <div class="map-features">
+
+      <div class="feature">
+        <i class="fa-solid fa-mountain-sun"></i>
+        <h4>Mountain Views</h4>
+        <p>Breathtaking Dhauladhar range</p>
+      </div>
+
+      <div class="feature">
+        <i class="fa-solid fa-car"></i>
+        <h4>Parking</h4>
+        <p>Spacious on-site parking</p>
+      </div>
+
+      <div class="feature">
+        <i class="fa-solid fa-location-crosshairs"></i>
+        <h4>Prime Location</h4>
+        <p>Close to McLeod Ganj</p>
+      </div>
+
+      <div class="feature">
+        <i class="fa-solid fa-plane"></i>
+        <h4>Airport Access</h4>
+        <p>20 min from Kangra Airport</p>
+      </div>
+
+    </div>
+
+  
+  </div>
+
+  <!----------------------------------footer---------------------- -->
+   <footer class="hf-footer">
+
+        <!-- MAIN FOOTER -->
+        <div class="hf-main">
+
+            <!-- CONTACT -->
+            <div class="hf-col hf-contact hf-overlay" data-aos="fade-up" data-aos-delay="0">
+
+                <h3>CONTACT INFO</h3>
+
+                <ul>
+                    <li><i class="fas fa-phone"></i> +91 80915-08200 <br>+91 70188-41900</li>
+                    <li><i class="fas fa-envelope"></i> reservation@dhauladhar<br>heightsresort.com</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Dhauladhar Heights Resort
+
+                        Tea Garden Road, Kunal Pathri,
+                        Dharamshala, Himachal Pradesh 176217</li>
+                </ul>
+
+                <div class="hf-social">
+
+                    <!-- Facebook -->
+                    <a href="https://www.facebook.com/dhauladharheightsresort" target="_blank"
+                        rel="noopener noreferrer">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+
+                    <!-- Instagram -->
+                    <a href="https://www.instagram.com/dhauladhar_heights_resort" target="_blank"
+                        rel="noopener noreferrer">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+
+                    <!-- YouTube -->
+                    <a href="https://www.youtube.com/@dhauladharheightsresort" target="_blank"
+                        rel="noopener noreferrer">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+
+                  <!-- LinkedIn -->
+                    <a href="https://www.linkedin.com/company/dhauladhar-heights-resort/" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+
+
+                </div>
+
+            </div>
+
+            <!-- LINKS -->
+            <div class="hf-col hf-links" data-aos="fade-up" data-aos-delay="100">
+                <h3>USEFUL LINKS</h3>
+                <ul>
+                    <li><a class="is-active" href="./about.php">About </a></li>
+                    <li><a href="./rooms.html">Rooms & Suites</a></li>
+                    <li><a href="./contact.html">Reservations</a></li>
+                    <li><a href="./blog.php">News & Blogs</a></li>
+                    <li><a href="./contact.html">Contact Us</a></li>
+                    <li><a href="./privacypolicy.html">Privacy Policy</a></li>
+                </ul>
+            </div>
+
+            <!-- GALLERY -->
+            <div class="hf-col hf-gallery" data-aos="zoom-in" data-aos-delay="200">
+                <h3>GALLERY</h3>
+                <a href="gallery.html">
+                    <div class="hf-gallery-grid">
+
+                        <img src="./images/DSC09149-scaled.jpg" alt="gallery">
+                        <img src="./images/sangeet1.jpg" alt="gallery">
+                        <img src="./images/PHOTO-2024-01-20-20-04-52.jpg" alt="gallery">
+                        <img src="./images/DSC09631-scaled.jpg" alt="gallery">
+                        <img src="./images/aboutbanner - Copy.jpg" alt="gallery">
+                        <img src="./images/PHOTO-2024-01-20-20-04-47-2.jpg" alt="gallery">
+                    </div>
+                </a>
+            </div>
+
+            <!-- NEWSLETTER -->
+            <div class="hf-col hf-newsletter" data-aos="fade-left" data-aos-delay="300">
+                <h3>NEWSLETTER</h3>
+                <p>Subscribe our Newsletter</p>
+                <input type="email" placeholder="Enter Email">
+                <button>SUBSCRIBE NOW</button>
+            </div>
+
+        </div>
+
+        <!-- COPYRIGHT -->
+        <div class="hf-bottom">
+                      © 2026, Hotel Dhauladhar Heights Resort. All Rights Reserved. <br><small>A Unit of NASV Warehouses & Constructions Pvt. Ltd.</small> 
+
+        </div>
+
+    </footer>
+
+ <!-- FLOATING BUTTONS -->
+<div class="floating-btns">
+    <!-- WHATSAPP (DIRECT CHAT) -->
+    <a href="https://wa.me/917018841900?text=Hello%20I%20want%20to%20book%20a%20room"
+       target="_blank"
+       class="float-btn whatsapp-btn">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <!-- CALL (DIRECT CALL) -->
+    <a href="tel:+917018841900" class="float-btn call-btn">
+        <i class="fa-solid fa-phone"></i>
+    </a>
+
+    
+<!-- weather Btn -->
+  <a id="weather4phone" class="float-btn weather-btn">
+   <i class="fa-solid fa-cloud-sun"></i>
+
+   <span class="weather-text" id="weatherText">
+      Loading...
+   </span>
+</a>
+
+  <div id="weatherPopup" class="weather-popup" aria-hidden="true">
+    <div class="weather-popup-header">
+      <i class="fa-solid fa-cloud-sun"></i>
+      Current weather
+    </div>
+    <div id="weatherPopupContent" class="weather-popup-content">Loading...</div>
+  </div>
+
+</div>
+
+  
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+  <!-- AOS JS  -->
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>

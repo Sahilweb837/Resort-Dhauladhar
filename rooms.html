@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- stylesheet linked here -->
+  <link rel="stylesheet" href="./style.css">
+
+  <!-- google fonts linked here -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Agu+Display:MORF@0..60&family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Edu+AU+VIC+WA+NT+Arrows:wght@400..700&family=Inconsolata:wght@200..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&family=Outfit:wght@100..900&family=Parkinsans:wght@300..800&family=Quicksand:wght@300..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+    rel="stylesheet">
+
+  <!-- cdn linked here -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+
+  <!-- AOS CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <title>Luxury Rooms & Suites in Dharamshala | Dhauladhar Heights Resort</title>
+  
+</head>
+
+<body>
+
+    <!-- navbar -->
+<header class="site-header">
+
+  <!-- TOP INFO -->
+  <div class="top-info">
+    <span id="weather"><i class="fa-solid fa-cloud-sun"></i> Dharamshala weather...</span>
+    <div class="header-contact">
+      <span><i class="fa-solid fa-phone"></i> +91 80915-08200</span>
+      <span><i class="fa-solid fa-envelope"></i> reservation@dhauladharheightsresort.com</span>
+    </div>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+
+    <!-- LEFT LINKS (3) -->
+    <ul class="nav-left">
+      <li><a href="index.php">THE RESORT</a></li>
+      <li><a href="about.php">ABOUT</a></li>
+      <li><a href="rooms.html">ROOMS</a></li>
+    </ul>
+
+    <!-- CENTER LOGO -->
+    <div class="nav-logo">
+      <a href="index.php">
+        <img src="./images/dhr_logo_full_white_720.png" alt="Logo">
+      </a>
+    </div>
+
+    <!-- RIGHT LINKS (3) -->
+    <ul class="nav-right">
+      <li class="nav-dropdown">
+        <a href="#">EVENTS <i class="fa-solid fa-chevron-down"></i></a>
+        <ul class="nav-dropdown-menu">
+          <li>
+            <a href="destination-wedding.php">
+              <i class="fa-solid fa-heart"></i> Destination Wedding
+            </a>
+          </li>
+          <li>
+            <a href="events.html">
+              <i class="fa-solid fa-champagne-glasses"></i> Event Venues
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li><a href="blog.php">BLOG</a></li>
+      <li><a href="contact.html">CONTACT</a></li>
+    </ul>
+
+    <!-- MOBILE MENU -->
+    <div class="menu-btn" id="menuOpen">
+      <i class="fa-solid fa-bars"></i>
+    </div>
+
+  </nav>
+</header>
+
+<div class="overlay-menu" id="overlayMenu">
+  <div class="overlay-right">
+    <span class="close-btn" id="menuClose"><i class="fa-solid fa-xmark"></i></span>
+
+    <ul class="overlay-links">
+      <li><a href="index.php">THE RESORT</a></li>
+      <li><a href="about.php">ABOUT</a></li>
+      <li><a href="rooms.html"> ROOMS</a></li>
+      <li><a href="destination-wedding.php">DESTINATION WEDDING</a></li>
+      <li><a href="events.html"> EVENT VENUES</a></li>
+      <li><a href="blog.php"> BLOG</a></li>
+      <li><a href="contact.html"> CONTACT</a></li>
+    </ul>
+
+    <!-- <a href="#" class="overlay-book">BOOK YOUR STAY</a> -->
+  </div>
+</div>
+  <!-- room, wedding ,resort, boquet -->
+
+
+  <!----------------------- hero section ---------------------->
+  <div class="common-hero roomshero">
+    <h1 data-aos="fade-down" data-aos-duration="1200">Rooms</h1>
+    <div class="hero-links" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="300">
+      <a href="index.php">THE RESORT</a>
+      <a href="rooms.html">/ Find room</a>
+    </div>
+  </div>
+
+  <!-- ------------------Avaliablity section------------------- -->
+ <section class="availability">
+        <div class="availability-box" data-aos="zoom-in">
+            <!-- Check In -->
+            <div class="field">
+                <label>Check In</label>
+                <input type="date" id="checkIn">
+            </div>
+
+            <!-- Check Out -->
+            <div class="field">
+                <label>Check Out</label>
+                <input type="date" id="checkOut">
+            </div>
+
+        
+
+            <!-- <button type="button" class="hero-btn cta-btn" id="bookBtn">Book Now</button> -->
+  <button type="button" class="hero-btn cta-btn rect-btn disabled-btn" id="bookBtn">
+  Book Now
+</button>
+
+
+
+        </div>
+    </section>
+
+  <section class="title-section">
+            <!-- <div class="bg-logo"></div> -->
+
+            <div class="title-wrapper">
+                <span class="line" data-aos="fade-up" data-aos-duration="3000"></span>
+
+                <div class="logo-circle" data-aos="fade-up" data-aos-duration="3000">
+               <img src="./images/dhr_logo_icon.png" alt="logo">
+                </div>
+
+                <span class="line" data-aos="fade-up" data-aos-duration="3000"></span>
+            </div>
+
+            <h2 data-aos="fade-up" data-aos-duration="3000">Luxury Rooms with Breathtaking <br> Mountain Views</h2>
+            <p class="utilitesp" data-aos="fade-up" data-aos-duration="3000">
+               Experience comfort and elegance in beautifully appointed rooms and suites at Dhauladhar Heights Resort, offering panoramic views of the majestic Dhauladhar mountain range, modern amenities including high‑speed Wi‑Fi, smart TV, minibar and private balconies, plus thoughtful touches for a relaxing hill‑station stay in Dharamshala.
+            </p>
+        </section>
+
+<!-- room card 1 -->
+ <div class="roomscontainer">
+        <section class="room-section">
+            <div class="room-content" data-aos="fade-up"  data-aos-delay="200">
+                <h2 class="room-heading">Executive Room with Modern Comforts</h2>
+                
+                <ul class="room-features">
+                    <li>40 ROOMS</li>
+                </ul>
+                
+                <p class="room-description">
+                  A perfect blend of comfort and functionality, our Executive Rooms are ideal for business and leisure travelers. Enjoy modern interiors, premium amenities, and a relaxing atmosphere after a day exploring Dharamshala.
+                </p>
+                
+                <a href="room-details.html?room=executive-room" class="discover-button rect-btn">
+                    Discover More <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="room-image">
+                <div class="image-overlay-text">
+                    <img src="./images/Executive room .jpg" alt="Executive Room">
+                </div>
+            </div>
+        </section>
+        
+    </div>
+
+<!-- room card 2 -->
+ <div class="roomscontainer">
+        <section class="room-section rowreverse">
+            <div class="room-content"  data-aos="fade-up"  data-aos-delay="200">
+                <h2 class="room-heading">Executive Suite with Spacious Living Area</h2>
+                
+                <ul class="room-features">
+                    <li>24 ROOMS</li>
+                </ul>
+                
+                <p class="room-description">
+                  Designed for those who prefer extra space and luxury, the Executive Suite offers a separate living area, elegant décor, and scenic views, making your stay both comfortable and memorable.
+                </p>
+                
+                <a href="room-details.html?room=executive-suite" class="discover-button rect-btn">
+                    Discover More <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="room-image">
+                <div class="image-overlay-text">
+                    <img src="./images/executivesuite.jpg" alt="Executive Suite">
+                </div>
+            </div>
+        </section>
+        
+    </div>
+
+    <!-- room card 3 -->
+ <div class="roomscontainer">
+        <section class="room-section">
+            <div class="room-content" data-aos="fade-up"  data-aos-delay="200">
+                <h2 class="room-heading">Presidential Suite Offering Ultimate Luxury Stay</h2>
+                
+                <ul class="room-features">
+                    <li>2 ROOMS </li>
+                </ul>
+                
+                <p class="room-description">
+                 Experience the finest luxury in Dharamshala with our Presidential Suite. Featuring spacious living areas, premium furnishings, and unmatched comfort, it’s perfect for guests seeking an exclusive and indulgent stay.
+                </p>
+                <a href="room-details.html?room=presidential-suite" class="discover-button rect-btn">
+                    Discover More <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="room-image">
+                <div class="image-overlay-text">
+                    <img src="./images/presidentialmain.jpg" alt="Presidential Suite">
+                </div>
+            </div>
+        </section>        
+    </div>
+
+    <!-- room card 4 -->
+ <div class="roomscontainer">
+        <section class="room-section rowreverse">
+            <div class="room-content"  data-aos="fade-up"  data-aos-delay="200">
+                <h2 class="room-heading">Twin Bedded Room for Comfortable Shared Stay</h2>
+                
+                <ul class="room-features">
+                    <li>4 ROOMS</li>
+                </ul>
+                
+                <p class="room-description">
+                  Our Twin Bedded Rooms are ideal for friends or colleagues traveling together. With two comfortable beds, modern amenities, and a peaceful ambiance, these rooms ensure a restful stay.
+                </p>
+                
+                <a href="room-details.html?room=twin-bed" class="discover-button rect-btn">
+                    Discover More <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="room-image">
+                <div class="image-overlay-text">
+                    <img src="./images/DSC00821-HDR-2-1-scaled.jpg" alt="twin beded rooms">
+                </div>
+            </div>
+        </section>
+        
+    </div>
+
+    <!-- room card 5 -->
+ <div class="roomscontainer ">
+        <section class="room-section ">
+            <div class="room-content"  data-aos="fade-up"  data-aos-delay="200">
+                <h2 class="room-heading">Deluxe Room with Elegant Interior Design</h2>
+                
+                <ul class="room-features">
+                    <li>3 ROOMS </li>
+                </ul>
+                
+                <p class="room-description">
+                   Relax in style in our Deluxe Rooms, thoughtfully designed with warm interiors and modern comforts. Perfect for couples and families, these rooms offer a cozy retreat with beautiful surroundings.
+                </p>
+                
+                <a href="room-details.html?room=deluxe-room" class="discover-button rect-btn">
+                    Discover More <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="room-image">
+                <div class="image-overlay-text">
+                    <img src="./images/deluxemain.jpg" alt="Deluxe Room ">
+                </div>
+            </div>
+        </section>
+        
+    </div>
+
+
+ <!-- FAQ SECTION -->
+<section class="faq-section">
+  <h2>Rooms & Suites – Frequently Asked Questions</h2>
+
+  <div class="faq-item">
+    <button class="faq-question">
+      What types of rooms and suites are available at Dhauladhar Heights Resort?
+      <span>+</span>
+    </button>
+    <div class="faq-answer">
+      <p>
+        Dhauladhar Heights Resort offers a wide selection of luxury accommodations including Executive Rooms, Deluxe Rooms, Twin Bedded Rooms, Executive Suites, and Presidential Suites, all designed with modern amenities and elegant interiors for a comfortable stay in Dharamshala.
+      </p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-question">
+      Do the rooms offer views of the Dhauladhar mountains?
+      <span>+</span>
+    </button>
+    <div class="faq-answer">
+      <p>
+        Yes, many rooms and suites at our luxury resort in Dharamshala feature breathtaking views of the majestic Dhauladhar mountain range, lush tea gardens, and peaceful Himalayan surroundings.
+      </p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-question">
+      What amenities are included in the resort rooms?
+      <span>+</span>
+    </button>
+    <div class="faq-answer">
+      <p>
+        Our rooms include modern amenities such as high-speed Wi-Fi, smart TVs, comfortable bedding, premium toiletries, room service, spacious bathrooms, and elegant furnishings to ensure a relaxing and luxurious stay experience.
+      </p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-question">
+      Is breakfast included with room bookings?
+      <span>+</span>
+    </button>
+    <div class="faq-answer">
+      <p>
+        Breakfast inclusion depends on the room package selected during booking. Guests can choose from room-only, breakfast-inclusive, or customized stay packages based on their travel preferences.
+      </p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-question">
+      Are the rooms suitable for families and group stays?
+      <span>+</span>
+    </button>
+    <div class="faq-answer">
+      <p>
+        Absolutely. Our spacious rooms and suites are ideal for couples, families, corporate travelers, and group stays, offering comfort, privacy, and easy access to all resort facilities in Dharamshala.
+      </p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-question">
+      How can I book rooms at Dhauladhar Heights Resort Dharamshala?
+      <span>+</span>
+    </button>
+    <div class="faq-answer">
+      <p>
+        You can book your stay directly through our official website or contact our reservations team for the best room rates, exclusive offers, and personalized assistance for your Dharamshala vacation.
+      </p>
+    </div>
+  </div>
+</section>
+
+   <!----------------------------------footer---------------------- -->
+     <footer class="hf-footer">
+
+        <!-- MAIN FOOTER -->
+        <div class="hf-main">
+
+            <!-- CONTACT -->
+            <div class="hf-col hf-contact hf-overlay" data-aos="fade-up" data-aos-delay="0">
+
+                <h3>CONTACT INFO</h3>
+
+                <ul>
+                    <li><i class="fas fa-phone"></i> +91 80915-08200 <br>+91 70188-41900</li>
+                    <li><i class="fas fa-envelope"></i> reservation@dhauladhar<br>heightsresort.com</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Dhauladhar Heights Resort
+
+                        Tea Garden Road, Kunal Pathri,
+                        Dharamshala, Himachal Pradesh 176217</li>
+                </ul>
+
+                <div class="hf-social">
+
+                    <!-- Facebook -->
+                    <a href="https://www.facebook.com/dhauladharheightsresort" target="_blank"
+                        rel="noopener noreferrer">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+
+                    <!-- Instagram -->
+                    <a href="https://www.instagram.com/dhauladhar_heights_resort" target="_blank"
+                        rel="noopener noreferrer">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+
+                    <!-- YouTube -->
+                    <a href="https://www.youtube.com/@dhauladharheightsresort" target="_blank"
+                        rel="noopener noreferrer">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+
+                    <!-- LinkedIn -->
+                    <a href="https://www.linkedin.com/company/dhauladhar-heights-resort/" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+
+
+                </div>
+
+            </div>
+
+            <!-- LINKS -->
+            <div class="hf-col hf-links" data-aos="fade-up" data-aos-delay="100">
+                <h3>USEFUL LINKS</h3>
+                <ul>
+                   <li><a class="is-active" href="./about.php">About </a></li>
+                    <li><a href="./rooms.html">Rooms & Suites</a></li>
+                    <li><a href="./contact.html">Reservations</a></li>
+                    <li><a href="./blog.php">News & Blogs</a></li>
+                    <li><a href="./contact.html">Contact Us</a></li>
+                    <li><a href="./privacypolicy.html">Privacy Policy</a></li>
+                </ul>
+            </div>
+
+            <!-- GALLERY -->
+            <div class="hf-col hf-gallery" data-aos="zoom-in" data-aos-delay="200">
+                <h3>GALLERY</h3>
+                <a href="gallery.html">
+                    <div class="hf-gallery-grid">
+
+                        <img src="./images/DSC09149-scaled.jpg" alt="gallery">
+                        <img src="./images/sangeet1.jpg" alt="gallery">
+                        <img src="./images/PHOTO-2024-01-20-20-04-52.jpg" alt="gallery">
+                        <img src="./images/DSC09631-scaled.jpg" alt="gallery">
+                        <img src="./images/aboutbanner - Copy.jpg" alt="gallery">
+                        <img src="./images/PHOTO-2024-01-20-20-04-47-2.jpg" alt="gallery">
+                    </div>
+                </a>
+            </div>
+
+            <!-- NEWSLETTER -->
+            <div class="hf-col hf-newsletter" data-aos="fade-left" data-aos-delay="300">
+                <h3>NEWSLETTER</h3>
+                <p>Subscribe our Newsletter</p>
+                <input type="email" placeholder="Enter Email">
+                <button>SUBSCRIBE NOW</button>
+            </div>
+
+        </div>
+
+        <!-- COPYRIGHT -->
+        <div class="hf-bottom">
+                      © 2026, Hotel Dhauladhar Heights Resort. All Rights Reserved. <br><small>A Unit of NASV Warehouses & Constructions Pvt. Ltd.</small> 
+
+        </div>
+
+    </footer>
+ <!-- FLOATING BUTTONS -->
+<div class="floating-btns">
+
+    <!-- WHATSAPP (DIRECT CHAT) -->
+    <a href="https://wa.me/917018841900?text=Hello%20I%20want%20to%20book%20a%20room"
+       target="_blank"
+       class="float-btn whatsapp-btn">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <!-- CALL (DIRECT CALL) -->
+    <a href="tel:+917018841900" class="float-btn call-btn">
+        <i class="fa-solid fa-phone"></i>
+    </a>
+    
+<!-- weather Btn -->
+  <a id="weather4phone" class="float-btn weather-btn">
+   <i class="fa-solid fa-cloud-sun"></i>
+
+   <span class="weather-text" id="weatherText">
+      Loading...
+   </span>
+</a>
+
+  <div id="weatherPopup" class="weather-popup" aria-hidden="true">
+    <div class="weather-popup-header">
+      <i class="fa-solid fa-cloud-sun"></i>
+      Current weather
+    </div>
+    <div id="weatherPopupContent" class="weather-popup-content">Loading...</div>
+  </div>
+
+</div>
+
+  <!-- AOS JS  -->
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
