@@ -125,13 +125,13 @@ include __DIR__ . '/includes/header.php';
             <div class="blog-share">
                 <h4>Share this post:</h4>
                 <div class="share-buttons">
-                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); ?>" target="_blank" class="share-facebook">
+                    <a href="https://www.facebook.com/dhauladharheightsresort" target="_blank" class="share-facebook">
                         <i class="fab fa-facebook-f"></i> Facebook
                     </a>
                   <a href="https://www.instagram.com/dhauladhar_heights_resort" target="_blank" class="share-twitter" rel="noopener noreferrer">
     <i class="fab fa-instagram"></i> Instagram
 </a>
-                    <a href="https://www.linkedin.com/shareArticle?mini=true&url=<?php echo urlencode('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); ?>&title=<?php echo urlencode($blog['title']); ?>" target="_blank" class="share-linkedin">
+                    <a href="https://www.linkedin.com/company/dhauladhar-heights-resort" target="_blank" class="share-linkedin">
                         <i class="fab fa-linkedin-in"></i> LinkedIn
                     </a>
                 </div>
