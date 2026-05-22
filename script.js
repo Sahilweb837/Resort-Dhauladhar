@@ -946,7 +946,7 @@ roomHero.style.backgroundImage = `url(${room.image})`;
 
       <p class="room-description">${room.desc}</p>
 
-      <a href="contact.html" class="discover-button rect-btn">
+      <a href="https://asiatech.in/booking_engine/index3?token=NTc3MQ==" class="discover-button rect-btn">
         BOOK now
       </a>
     </div>

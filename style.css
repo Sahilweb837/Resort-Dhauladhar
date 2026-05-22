@@ -450,10 +450,10 @@ h2 {
   transform: translate(-50%, -50%) scale(1);
 }
 
- .feedback-next:hover{
+ .feedback-next,
+.feedback-prev {
   color: var(--white-color);
- }
-
+}
 /* ======================HERO SECTIONS ====================== */
 .hero-container {
   width: 100%;

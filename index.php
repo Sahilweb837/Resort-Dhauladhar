@@ -169,9 +169,11 @@ $baseUrl = getBaseUrl();
 
 
             <!-- <button type="button" class="hero-btn cta-btn" id="bookBtn">Book Now</button> -->
-            <button type="button" class="hero-btn cta-btn rect-btn disabled-btn" id="bookBtn">
-                Book Now
-            </button>
+          <a href="https://asiatech.in/booking_engine/index3?token=NTc3MQ==" 
+   class="hero-btn cta-btn rect-btn disabled-btn" 
+   id="bookBtn">
+   Book Now
+</a>
 
 
 
