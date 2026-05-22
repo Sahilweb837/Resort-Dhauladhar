@@ -449,7 +449,7 @@ $baseUrl = getBaseUrl();
     <!-- card -4 -->
 <div class="facility-card rowreverse" data-aos="fade-left" data-aos-offset="300" data-aos-easing="ease-in-sine">
     <div class="facility-image">
-        <img src="./images/DJI_0175-scaled.jpg" alt="Kids Zone at Dhauladhar Heights Resort Dharamshala">
+        <img src="./images/Kidszone.png" alt="Kids Zone at Dhauladhar Heights Resort Dharamshala">
     </div>
 
     <div class="facility-content">
