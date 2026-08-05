@@ -722,37 +722,59 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!roomTitle || !slideImage) return;
 
   const roomsData = {
-    "double-suite-room": {
-      title: "Double Suite Room",
+    "executive-room": {
+      title: "Executive Room with Modern Comforts",
+      images: [
+        "./images/Executive Room.jpg",
+        "./images/DSC00821-HDR-2-1-scaled.jpg",
+        "./images/DSC00176-Edit.jpg"
+      ],
+      description: "A perfect blend of comfort and functionality, our Executive Rooms are ideal for business and leisure travelers. Enjoy modern interiors, premium amenities, and a relaxing atmosphere after a day exploring Dharamshala.",
+      count: "24 Rooms"
+    },
+
+    "executive-suite": {
+      title: "Executive Suite with Spacious Living Area",
+      images: [
+        "./images/executivesuite.jpg",
+        "./images/DSC03083 copy.jpg",
+        "./images/DSC03289.jpg"
+      ],
+      description: "Designed for those who prefer extra space and luxury, the Executive Suite offers a separate living area, elegant décor, and scenic views, making your stay both comfortable and memorable.",
+      count: "40 Suites"
+    },
+
+    "presidential-suite": {
+      title: "Presidential Suite Offering Ultimate Luxury Stay",
+      images: [
+        "./images/presidentialmain.jpg",
+        "./images/DSC00821-HDR-2-1-scaled.jpg",
+        "./images/executivesuite.jpg"
+      ],
+      description: "Experience the finest luxury in Dharamshala with our Presidential Suite. Featuring spacious living areas, premium furnishings, and unmatched comfort, it’s perfect for guests seeking an exclusive and indulgent stay.",
+      count: "02 Suites"
+    },
+
+    "twin-bed": {
+      title: "Twin Bedded Room for Comfortable Shared Stay",
       images: [
         "./images/DSC00821-HDR-2-1-scaled.jpg",
         "./images/DSC00176-Edit.jpg",
-        "./images/DSC03083 copy.jpg"
+        "./images/Executive Room.jpg"
       ],
-      description: "Luxury double suite room with king bed, balcony and premium amenities.",
-      price: "$560 / Night"
+      description: "Our Twin Bedded Rooms are ideal for friends or colleagues traveling together. With two comfortable beds, modern amenities, and a peaceful ambiance, these rooms ensure a restful stay.",
+      count: "04 Rooms"
     },
 
-    "delux-family-room": {
-      title: "Delux Family Room",
+    "deluxe-room": {
+      title: "Deluxe Room with Elegant Interior",
       images: [
         "./images/deluxemain.jpg",
         "./images/DSC03289.jpg",
-        "./images/DSC03289.jpg"
+        "./images/DSC03083 copy.jpg"
       ],
-      description: "Spacious family room with 2 king beds, perfect for families.",
-      price: "$560 / Night"
-    },
-
-    "superior-bed-room": {
-      title: "Superior Bed Room",
-      images: [
-        "./images/DSC03083 copy.jpg",
-        "./images/DSC03289.jpg",
-        "./images/DSC03289.jpg"
-      ],
-      description: "Elegant superior room with modern interiors and comfort.",
-      price: "$560 / Night"
+      description: "Relax in style in our Deluxe Rooms, thoughtfully designed with warm interiors and modern comforts. Perfect for couples and families, these rooms offer a cozy retreat with beautiful surroundings.",
+      count: "03 Rooms"
     }
   };
 

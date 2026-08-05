@@ -159,45 +159,13 @@ function getAllBlogs($limit = null, $offset = 0, $status = null, $category = nul
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
             $results = $stmt->fetchAll();
-            if (!empty($results)) {
-                return $results;
-            }
+            return is_array($results) ? $results : [];
         }
     } catch (Throwable $e) {
         // Silent catch
     }
 
-    $defaults = getDefaultSampleBlogs();
-    if ($status) {
-        $defaults = array_values(array_filter($defaults, function($b) use ($status) {
-            return $b['status'] === $status;
-        }));
-    }
-    if ($category) {
-        $catClean = strtolower(str_replace(' ', '-', $category));
-        $defaults = array_values(array_filter($defaults, function($b) use ($catClean) {
-            return strtolower(str_replace(' ', '-', $b['category'])) === $catClean;
-        }));
-    }
-    if ($author) {
-        $authClean = strtolower(str_replace(' ', '-', $author));
-        $defaults = array_values(array_filter($defaults, function($b) use ($authClean) {
-            return strtolower(str_replace(' ', '-', $b['author'] ?? 'Admin')) === $authClean;
-        }));
-    }
-    if ($search) {
-        $searchClean = strtolower($search);
-        $defaults = array_values(array_filter($defaults, function($b) use ($searchClean) {
-            return strpos(strtolower($b['title']), $searchClean) !== false ||
-                   strpos(strtolower($b['content']), $searchClean) !== false ||
-                   strpos(strtolower($b['excerpt'] ?? ''), $searchClean) !== false;
-        }));
-    }
-
-    if ($limit) {
-        return array_slice($defaults, $offset, $limit);
-    }
-    return $defaults;
+    return [];
 }
 
 function getBlogById($id) {
@@ -213,9 +181,6 @@ function getBlogById($id) {
         // Silent catch
     }
 
-    foreach (getDefaultSampleBlogs() as $b) {
-        if ($b['id'] == $id) return $b;
-    }
     return false;
 }
 
@@ -235,11 +200,6 @@ function getBlogBySlug($slug) {
         // Silent catch
     }
 
-    foreach (getDefaultSampleBlogs() as $b) {
-        if ($b['slug'] === $slug || $b['slug'] === $cleanSlug || (string)$b['id'] === (string)$slug) {
-            return $b;
-        }
-    }
     return false;
 }
 
@@ -389,14 +349,13 @@ function getBlogCount($status = null, $category = null, $author = null, $search 
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
             $count = $stmt->fetchColumn();
-            if ($count > 0) return $count;
+            return $count !== false ? (int)$count : 0;
         }
     } catch (Throwable $e) {
         // Silent catch
     }
 
-    $blogs = getAllBlogs(null, 0, $status, $category, $author, $search);
-    return count($blogs);
+    return 0;
 }
 
 function getRecentBlogs($limit = 5) {
@@ -406,13 +365,13 @@ function getRecentBlogs($limit = 5) {
             $limit = intval($limit);
             $stmt = $pdo->query("SELECT * FROM blogs WHERE status = 'published' ORDER BY created_at DESC LIMIT $limit");
             $results = $stmt->fetchAll();
-            if (!empty($results)) return $results;
+            return is_array($results) ? $results : [];
         }
     } catch (Throwable $e) {
         // Silent catch
     }
 
-    return array_slice(getDefaultSampleBlogs(), 0, $limit);
+    return [];
 }
 
 function getPopularBlogs($limit = 5) {
@@ -422,13 +381,13 @@ function getPopularBlogs($limit = 5) {
             $limit = intval($limit);
             $stmt = $pdo->query("SELECT * FROM blogs WHERE status = 'published' ORDER BY views DESC LIMIT $limit");
             $results = $stmt->fetchAll();
-            if (!empty($results)) return $results;
+            return is_array($results) ? $results : [];
         }
     } catch (Throwable $e) {
         // Silent catch
     }
 
-    return array_slice(getDefaultSampleBlogs(), 0, $limit);
+    return [];
 }
 
 function createSlug($string) {
@@ -1174,9 +1133,6 @@ function ensureBlogTableColumns() {
             if ($stmtCol->rowCount() == 0) {
                 $pdo->exec("ALTER TABLE blogs ADD COLUMN content_format VARCHAR(20) DEFAULT 'html' AFTER sections");
             }
-            
-            // Always run seedDefaultBlogs (uses INSERT IGNORE so existing posts remain untouched while missing default posts are inserted)
-            seedDefaultBlogs($pdo);
         }
         
         // Sync physical PHP directories for all blogs

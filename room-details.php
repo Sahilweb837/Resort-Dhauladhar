@@ -101,9 +101,26 @@ include __DIR__ . '/includes/header.php';
     </div>
   </div>
 
-  <!-- selected room details content (rendered dynamically via JS / PHP) -->
+  <!-- selected room details content (rendered dynamically via PHP & JS) -->
   <div class="roomscontainer">
     <section class="room-section" id="roomDetails">
+      <div class="room-content" data-aos="fade-left">
+        <h2 class="room-heading" id="roomTitle"><?php echo htmlspecialchars($activeRoom['name']); ?></h2>
+        <p class="room-description" id="roomDescription">
+          <?php echo htmlspecialchars($activeRoom['desc']); ?>
+        </p>
+      </div>
+      <div class="room-image">
+        <div class="image-overlay-text">
+          <img id="slideImage" src="<?php echo $baseUrl; ?>/images/<?php 
+            if ($activeKey === 'executive-suite') echo 'executivesuite.jpg';
+            elseif ($activeKey === 'presidential-suite') echo 'presidentialmain.jpg';
+            elseif ($activeKey === 'twin-bed') echo 'DSC00821-HDR-2-1-scaled.jpg';
+            elseif ($activeKey === 'deluxe-room') echo 'deluxemain.jpg';
+            else echo 'Executive Room.jpg';
+          ?>" alt="<?php echo htmlspecialchars($activeRoom['name']); ?>">
+        </div>
+      </div>
     </section>
   </div>
 
