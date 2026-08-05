@@ -17,7 +17,7 @@ $baseUrl = getBaseUrl();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- stylesheet linked here -->
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="<?php echo $baseUrl; ?>/style.css">
 
     <!-- google fonts linked here -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

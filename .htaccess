@@ -15,29 +15,29 @@ RewriteRule ^ - [L]
 RewriteRule ^rooms/?$ rooms.php [L,QSA]
 
 # Clean URL for Room Details with category & room: /rooms/category-slug/room-slug
-RewriteRule ^rooms/([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)/?$ room-details.php?category=$1&room=$2 [L,QSA]
+RewriteRule ^rooms/([^/]+)/([^/]+)/?$ room-details.php?category=$1&room=$2 [L,QSA]
 
 # Clean URL for Room Details: /rooms/room-slug or /room/room-slug
-RewriteRule ^rooms/([a-zA-Z0-9-]+)/?$ room-details.php?room=$1 [L,QSA]
-RewriteRule ^room/([a-zA-Z0-9-]+)/?$ room-details.php?room=$1 [L,QSA]
+RewriteRule ^rooms/([^/]+)/?$ room-details.php?room=$1 [L,QSA]
+RewriteRule ^room/([^/]+)/?$ room-details.php?room=$1 [L,QSA]
 
 # Clean URL for Blog listing: /blog or /blog/
 RewriteRule ^blog/?$ blog.php [L,QSA]
 
 # Clean URL for Blog Category filter: /blog/category/category-slug
-RewriteRule ^blog/category/([a-zA-Z0-9-]+)/?$ blog.php?category=$1 [L,QSA]
+RewriteRule ^blog/category/([^/]+)/?$ blog.php?category=$1 [L,QSA]
 
 # Clean URL for Blog Author filter: /blog/author/author-slug
-RewriteRule ^blog/author/([a-zA-Z0-9-]+)/?$ blog.php?author=$1 [L,QSA]
+RewriteRule ^blog/author/([^/]+)/?$ blog.php?author=$1 [L,QSA]
 
 # Clean URL for Blog Search: /blog/search/keyword
-RewriteRule ^blog/search/([a-zA-Z0-9-]+)/?$ blog.php?search=$1 [L,QSA]
+RewriteRule ^blog/search/([^/]+)/?$ blog.php?search=$1 [L,QSA]
 
 # Clean URL for Blog Details with category & post slug: /blog/category-slug/blog-slug
-RewriteRule ^blog/([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)/?$ blog-detail.php?category=$1&slug=$2 [L,QSA]
+RewriteRule ^blog/([^/]+)/([^/]+)/?$ blog-detail.php?category=$1&slug=$2 [L,QSA]
 
 # Clean URL for Blog Details with post slug: /blog/blog-slug
-RewriteRule ^blog/([a-zA-Z0-9-]+)/?$ blog-detail.php?slug=$1 [L,QSA]
+RewriteRule ^blog/([^/]+)/?$ blog-detail.php?slug=$1 [L,QSA]
 
 # Set default index
 DirectoryIndex index.php index.html
