@@ -275,4 +275,4 @@ include __DIR__ . '/includes/footer.php';
     console.log('Base URL: <?php echo $baseUrl; ?>');
 </script>
 
-<script src="script.js"></script>
+<script src="<?php echo $baseUrl; ?>/script.js"></script>

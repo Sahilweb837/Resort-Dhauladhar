@@ -107,5 +107,5 @@ DirectoryIndex index.php index.html
 Options -Indexes
 
 # ---- Handle 404 Errors ----
-ErrorDocument 404 /index.php
-ErrorDocument 500 /index.php
+ErrorDocument 404 /404.php
+ErrorDocument 500 /404.php

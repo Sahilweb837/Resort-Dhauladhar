@@ -212,11 +212,13 @@ function getBlogById($id) {
 
 function getBlogBySlug($slug) {
     if (empty($slug)) return false;
+    $cleanSlug = createSlug($slug);
+    
     try {
         $pdo = getDB();
         if ($pdo) {
-            $stmt = $pdo->prepare("SELECT * FROM blogs WHERE (slug = ? OR id = ?) AND status = 'published'");
-            $stmt->execute([$slug, $slug]);
+            $stmt = $pdo->prepare("SELECT * FROM blogs WHERE (slug = ? OR slug = ? OR id = ? OR LOWER(slug) = LOWER(?)) AND status = 'published'");
+            $stmt->execute([$slug, $cleanSlug, $slug, $slug]);
             $blog = $stmt->fetch();
             if ($blog) return $blog;
         }
@@ -225,7 +227,9 @@ function getBlogBySlug($slug) {
     }
 
     foreach (getDefaultSampleBlogs() as $b) {
-        if ($b['slug'] === $slug || (string)$b['id'] === (string)$slug) return $b;
+        if ($b['slug'] === $slug || $b['slug'] === $cleanSlug || (string)$b['id'] === (string)$slug) {
+            return $b;
+        }
     }
     return false;
 }
@@ -258,6 +262,11 @@ function createBlog($data) {
         ]);
 
         if ($result) {
+            $newId = $pdo->lastInsertId();
+            $newBlog = getBlogById($newId);
+            if ($newBlog) {
+                syncBlogPhysicalPages($newBlog);
+            }
             generateSitemapXML();
         }
         return $result;
@@ -299,6 +308,10 @@ function updateBlog($id, $data) {
         ]);
 
         if ($result) {
+            $updatedBlog = getBlogById($id);
+            if ($updatedBlog) {
+                syncBlogPhysicalPages($updatedBlog);
+            }
             generateSitemapXML();
         }
         return $result;
@@ -312,10 +325,13 @@ function deleteBlog($id) {
         $pdo = getDB();
         if (!$pdo) return false;
         
-        // Get blog to delete image
+        // Get blog to delete image & physical pages
         $blog = getBlogById($id);
-        if ($blog && !empty($blog['featured_image'])) {
-            deleteImage($blog['featured_image']);
+        if ($blog) {
+            if (!empty($blog['featured_image'])) {
+                deleteImage($blog['featured_image']);
+            }
+            removeBlogPhysicalPages($blog);
         }
         
         $stmt = $pdo->prepare("DELETE FROM blogs WHERE id = ?");
@@ -413,6 +429,75 @@ function createSlug($string) {
     $string = preg_replace('/[^a-z0-9-]/', '-', $string);
     $string = preg_replace('/-+/', '-', $string);
     return trim($string, '-');
+}
+
+/**
+ * Generate physical PHP pages for a blog post to support direct file loading
+ * Creates blog/{category_slug}/{blog_slug}/index.php AND blog/{blog_slug}/index.php
+ */
+function syncBlogPhysicalPages($blog) {
+    if (empty($blog) || empty($blog['slug'])) return false;
+    
+    $projectRoot = rtrim(str_replace('\\', '/', dirname(__DIR__)), '/');
+    $slug = createSlug($blog['slug']);
+    $catSlug = !empty($blog['category']) ? createSlug($blog['category']) : 'general';
+    
+    $dirs = [
+        $projectRoot . '/blog/' . $slug,
+        $projectRoot . '/blog/' . $catSlug . '/' . $slug
+    ];
+    
+    foreach ($dirs as $dir) {
+        if (!file_exists($dir)) {
+            @mkdir($dir, 0777, true);
+        }
+        
+        $relativeProjectSubpath = str_replace($projectRoot, '', str_replace('\\', '/', $dir));
+        $depth = substr_count(trim($relativeProjectSubpath, '/'), '/');
+        $relPath = str_repeat('../', max(1, $depth + 1)) . 'blog-detail.php';
+        
+        $fileContent = "<?php\n";
+        $fileContent .= "\$_GET['category'] = " . var_export($catSlug, true) . ";\n";
+        $fileContent .= "\$_GET['slug'] = " . var_export($slug, true) . ";\n";
+        $fileContent .= "require_once __DIR__ . '/" . $relPath . "';\n";
+        
+        $filePath = $dir . '/index.php';
+        @file_put_contents($filePath, $fileContent);
+    }
+    return true;
+}
+
+/**
+ * Remove physical PHP pages for a blog post
+ */
+function removeBlogPhysicalPages($blog) {
+    if (empty($blog) || empty($blog['slug'])) return;
+    $projectRoot = rtrim(str_replace('\\', '/', dirname(__DIR__)), '/');
+    $slug = createSlug($blog['slug']);
+    $catSlug = !empty($blog['category']) ? createSlug($blog['category']) : 'general';
+    
+    $targets = [
+        $projectRoot . '/blog/' . $slug . '/index.php',
+        $projectRoot . '/blog/' . $catSlug . '/' . $slug . '/index.php'
+    ];
+    
+    foreach ($targets as $file) {
+        if (file_exists($file)) {
+            @unlink($file);
+            $dir = dirname($file);
+            @rmdir($dir);
+        }
+    }
+}
+
+/**
+ * Sync physical PHP pages for all published blogs
+ */
+function syncAllBlogPhysicalPages() {
+    $blogs = getAllBlogs(null, 0, 'published');
+    foreach ($blogs as $b) {
+        syncBlogPhysicalPages($b);
+    }
 }
 
 /**
@@ -762,9 +847,11 @@ function getReviewerImageUrl($imagePath) {
 function incrementBlogViews($blogId) {
     try {
         $pdo = getDB();
-        $stmt = $pdo->prepare("UPDATE blogs SET views = views + 1 WHERE id = ?");
-        $stmt->execute([$blogId]);
-    } catch (PDOException $e) {
+        if ($pdo) {
+            $stmt = $pdo->prepare("UPDATE blogs SET views = views + 1 WHERE id = ?");
+            $stmt->execute([$blogId]);
+        }
+    } catch (Throwable $e) {
         error_log("Error incrementing blog views: " . $e->getMessage());
     }
 }
@@ -1041,12 +1128,12 @@ function ensureBlogTableColumns() {
                 $pdo->exec("ALTER TABLE blogs ADD COLUMN content_format VARCHAR(20) DEFAULT 'html' AFTER sections");
             }
             
-            // Check if 0 rows in blogs table
-            $countStmt = $pdo->query("SELECT COUNT(*) FROM blogs");
-            if ($countStmt->fetchColumn() == 0) {
-                seedDefaultBlogs($pdo);
-            }
+            // Always run seedDefaultBlogs (uses INSERT IGNORE so existing posts remain untouched while missing default posts are inserted)
+            seedDefaultBlogs($pdo);
         }
+        
+        // Sync physical PHP directories for all blogs
+        syncAllBlogPhysicalPages();
     } catch (Throwable $e) {
         // Silent catch for DB connection error
     }
