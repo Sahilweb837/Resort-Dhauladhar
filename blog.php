@@ -148,23 +148,6 @@ include __DIR__ . '/includes/header.php';
                 </form>
             </div>
 
-            <!-- BLOG CATEGORIES -->
-            <div class="sidebar-card">
-                <h3>Blog Categories</h3>
-                <ul class="category">
-                    <?php foreach ($categories as $cat): ?>
-                        <?php 
-                        $cName = is_array($cat) ? $cat['name'] : $cat;
-                        $cSlug = createSlug($cName);
-                        $cCount = getBlogCount('published', $cSlug);
-                        ?>
-                        <a href="<?php echo $baseUrl; ?>/blog/category/<?php echo $cSlug; ?>">
-                            <li><?php echo htmlspecialchars($cName); ?> <span><?php echo $cCount; ?></span></li>
-                        </a>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-            
             <!-- POPULAR POSTS -->
             <div class="sidebar-card">
                 <h3>Popular Posts</h3>
@@ -173,6 +156,7 @@ include __DIR__ . '/includes/header.php';
                         <?php 
                         $popularImageUrl = getBlogImageUrl($popular['featured_image']);
                         $popularUrl = getBlogUrl($popular);
+                        $popDate = !empty($popular['created_at']) ? date('M d, Y', strtotime($popular['created_at'])) : date('M d, Y');
                         ?>
                         <a href="<?php echo $popularUrl; ?>" class="post" style="text-decoration: none; display: flex; gap: 15px;">
                             <img src="<?php echo $popularImageUrl; ?>" 
@@ -180,7 +164,7 @@ include __DIR__ . '/includes/header.php';
                                  onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
                             <div>
                                 <p><?php echo htmlspecialchars($popular['title']); ?></p>
-                                <span><?php echo date('M d, Y', strtotime($popular['created_at'])); ?></span>
+                                <span><?php echo $popDate; ?></span>
                             </div>
                         </a>
                     <?php endforeach; ?>
@@ -189,26 +173,46 @@ include __DIR__ . '/includes/header.php';
                 <?php endif; ?>
             </div>
             
-            <!-- ROOM CATEGORIES - SEO Clean URLs -->
-            <div class="sidebar-card">
-                    <h3>Rooms Category</h3>
-                    <ul class="category">
-                        <a href="<?php echo getRoomUrl('executive-room'); ?>">
-                            <li>Executive Room<span>24</span></li>
-                        </a>
-                        <a href="<?php echo getRoomUrl('executive-suite'); ?>">
-                            <li>Executive Suite<span>40</span></li>
-                        </a>
-                        <a href="<?php echo getRoomUrl('presidential-suite'); ?>">
-                            <li>Presidential Suite<span>02</span></li>
-                        </a>
-                        <a href="<?php echo getRoomUrl('twin-bed'); ?>">
-                            <li>Twin Bed<span>04</span></li>
-                        </a>
-                        <a href="<?php echo getRoomUrl('deluxe-room'); ?>">
-                            <li>Deluxe Room<span>03</span></li>
-                        </a>
-                    </ul>
+            <!-- ROOM CATEGORIES - Extended Room Details -->
+            <div class="sidebar-card rooms-sidebar-card">
+                <h3><i class="fa-solid fa-bed"></i> Room Categories</h3>
+                <div class="room-category-list">
+                    <a href="<?php echo getRoomUrl('executive-room'); ?>" class="room-category-item">
+                        <div class="room-cat-info">
+                            <span class="room-name">Executive Room</span>
+                            <span class="room-sub">Modern Comforts & Mountain View</span>
+                        </div>
+                        <span class="room-count">24 Rooms</span>
+                    </a>
+                    <a href="<?php echo getRoomUrl('executive-suite'); ?>" class="room-category-item">
+                        <div class="room-cat-info">
+                            <span class="room-name">Executive Suite</span>
+                            <span class="room-sub">Spacious Living & Private Balcony</span>
+                        </div>
+                        <span class="room-count">40 Suites</span>
+                    </a>
+                    <a href="<?php echo getRoomUrl('presidential-suite'); ?>" class="room-category-item">
+                        <div class="room-cat-info">
+                            <span class="room-name">Presidential Suite</span>
+                            <span class="room-sub">Penthouse Luxury & Panoramic Vista</span>
+                        </div>
+                        <span class="room-count">02 Suites</span>
+                    </a>
+                    <a href="<?php echo getRoomUrl('twin-bed'); ?>" class="room-category-item">
+                        <div class="room-cat-info">
+                            <span class="room-name">Twin Bedded Room</span>
+                            <span class="room-sub">Shared Stay & Premium Amenities</span>
+                        </div>
+                        <span class="room-count">04 Rooms</span>
+                    </a>
+                    <a href="<?php echo getRoomUrl('deluxe-room'); ?>" class="room-category-item">
+                        <div class="room-cat-info">
+                            <span class="room-name">Deluxe Room</span>
+                            <span class="room-sub">Cozy Retreat & Elegant Interior</span>
+                        </div>
+                        <span class="room-count">03 Rooms</span>
+                    </a>
+                </div>
             </div>	
         </aside>
     </div>

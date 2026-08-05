@@ -2,9 +2,18 @@
 // Include database connection FIRST
 require_once __DIR__ . '/db.php';
 
-// Start session if not started
+// Start session if not started with persistent session settings
 if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
-    ini_set('session.cookie_path', '/');
+    @ini_set('session.cookie_lifetime', 2592000); // 30 days
+    @ini_set('session.gc_maxlifetime', 2592000); // 30 days
+    if (function_exists('session_set_cookie_params')) {
+        @session_set_cookie_params([
+            'lifetime' => 2592000,
+            'path' => '/',
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+    }
     session_start();
 }
 
@@ -422,13 +431,28 @@ function getPopularBlogs($limit = 5) {
     return array_slice(getDefaultSampleBlogs(), 0, $limit);
 }
 
-// ==================== HELPER FUNCTIONS ====================
-
 function createSlug($string) {
     $string = strtolower($string);
     $string = preg_replace('/[^a-z0-9-]/', '-', $string);
     $string = preg_replace('/-+/', '-', $string);
     return trim($string, '-');
+}
+
+/**
+ * Helper to recursively delete a directory and all its contents
+ */
+function deleteDirectoryRecursive($dir) {
+    if (!file_exists($dir)) return true;
+    if (!is_dir($dir)) return @unlink($dir);
+    $items = scandir($dir);
+    if ($items === false) return false;
+    foreach ($items as $item) {
+        if ($item === '.' || $item === '..') continue;
+        if (!deleteDirectoryRecursive($dir . '/' . $item)) {
+            return false;
+        }
+    }
+    return @rmdir($dir);
 }
 
 /**
@@ -438,9 +462,28 @@ function createSlug($string) {
 function syncBlogPhysicalPages($blog) {
     if (empty($blog) || empty($blog['slug'])) return false;
     
+    // If status is draft or not published, remove physical pages
+    if (isset($blog['status']) && $blog['status'] !== 'published') {
+        removeBlogPhysicalPages($blog);
+        return true;
+    }
+    
     $projectRoot = rtrim(str_replace('\\', '/', dirname(__DIR__)), '/');
     $slug = createSlug($blog['slug']);
     $catSlug = !empty($blog['category']) ? createSlug($blog['category']) : 'general';
+    
+    // Ensure category index landing page exists
+    $catDir = $projectRoot . '/blog/' . $catSlug;
+    if (!file_exists($catDir)) {
+        @mkdir($catDir, 0777, true);
+    }
+    $catIndexFile = $catDir . '/index.php';
+    if (!file_exists($catIndexFile)) {
+        $catFileContent = "<?php\n";
+        $catFileContent .= "\$_GET['category'] = " . var_export($catSlug, true) . ";\n";
+        $catFileContent .= "require_once __DIR__ . '/../blog.php';\n";
+        @file_put_contents($catIndexFile, $catFileContent);
+    }
     
     $dirs = [
         $projectRoot . '/blog/' . $slug,
@@ -468,7 +511,7 @@ function syncBlogPhysicalPages($blog) {
 }
 
 /**
- * Remove physical PHP pages for a blog post
+ * Remove physical PHP pages and directories for a blog post
  */
 function removeBlogPhysicalPages($blog) {
     if (empty($blog) || empty($blog['slug'])) return;
@@ -476,16 +519,20 @@ function removeBlogPhysicalPages($blog) {
     $slug = createSlug($blog['slug']);
     $catSlug = !empty($blog['category']) ? createSlug($blog['category']) : 'general';
     
-    $targets = [
-        $projectRoot . '/blog/' . $slug . '/index.php',
-        $projectRoot . '/blog/' . $catSlug . '/' . $slug . '/index.php'
+    $dirs = [
+        $projectRoot . '/blog/' . $catSlug . '/' . $slug,
+        $projectRoot . '/blog/' . $slug
     ];
     
-    foreach ($targets as $file) {
-        if (file_exists($file)) {
-            @unlink($file);
-            $dir = dirname($file);
-            @rmdir($dir);
+    foreach ($dirs as $dir) {
+        deleteDirectoryRecursive($dir);
+        // If parent category folder is now empty, remove it too
+        $parentDir = dirname($dir);
+        if (basename($parentDir) !== 'blog' && file_exists($parentDir) && is_dir($parentDir)) {
+            $files = array_diff(scandir($parentDir), ['.', '..']);
+            if (empty($files)) {
+                @rmdir($parentDir);
+            }
         }
     }
 }
