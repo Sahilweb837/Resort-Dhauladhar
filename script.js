@@ -36,10 +36,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // Header scroll effect
   const updateHeaderScroll = () => {
     if (header) {
-      header.classList.toggle("is-scrolled", window.scrollY > 30);
+      if (window.scrollY > 20) {
+        header.classList.add("is-scrolled");
+      } else {
+        header.classList.remove("is-scrolled");
+      }
     }
   };
-  window.addEventListener("scroll", updateHeaderScroll);
+  window.addEventListener("scroll", updateHeaderScroll, { passive: true });
+  window.addEventListener("DOMContentLoaded", updateHeaderScroll);
   updateHeaderScroll();
 
   //  AUTO CLOSE

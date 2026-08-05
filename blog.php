@@ -65,6 +65,7 @@ include __DIR__ . '/includes/header.php';
 </div>
 
 <section class="blog-cards">
+    <h1 class="mobile-blog-page-title"><?php echo $heroTitle; ?></h1>
     <div class="blog-layout">
         <div class="blog-left">
             <?php if (empty($blogsPaginated)): ?>
@@ -83,6 +84,7 @@ include __DIR__ . '/includes/header.php';
                         $catName = $blog['category'] ?? 'General';
                         $catSlug = createSlug($catName);
                         $catUrl = $baseUrl . '/blog/category/' . $catSlug;
+                        $formattedDate = !empty($blog['created_at']) ? date('F d, Y', strtotime($blog['created_at'])) : date('F d, Y');
                         ?>
                         <article class="blog-card" data-aos="fade-up">
                             <div class="blog-img">
@@ -95,7 +97,7 @@ include __DIR__ . '/includes/header.php';
                             
                             <div class="blog-content">
                                 <div class="meta">
-                                    <span><i class="fas fa-calendar"></i> <?php echo date('F d, Y', strtotime($blog['created_at'])); ?></span>
+                                    <span><i class="fas fa-calendar"></i> <?php echo $formattedDate; ?></span>
                                     <span><a href="<?php echo $catUrl; ?>" style="color: inherit; text-decoration: none;"><i class="fas fa-folder"></i> <?php echo htmlspecialchars($catName); ?></a></span>
                                 </div>
                                 

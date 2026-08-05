@@ -116,10 +116,13 @@ include __DIR__ . '/includes/header.php';
 <section class="blog-detail">
     <div class="blog-detail-container">
         <div class="blog-main">
+            <?php 
+            $blogFormattedDate = !empty($blog['created_at']) ? date('F d, Y', strtotime($blog['created_at'])) : date('F d, Y');
+            ?>
             <div class="blog-header">
                 <h2><?php echo htmlspecialchars($blog['title']); ?></h2>
                 <div class="blog-meta">
-                    <span><i class="fas fa-calendar"></i> <?php echo date('F d, Y', strtotime($blog['created_at'])); ?></span>
+                    <span><i class="fas fa-calendar"></i> <?php echo $blogFormattedDate; ?></span>
                     <span><i class="fas fa-user"></i> <?php echo htmlspecialchars($blog['author'] ?? 'Admin'); ?></span>
                     <span><i class="fas fa-tag"></i> <?php echo htmlspecialchars($blog['category'] ?? 'General'); ?></span>
                  </div>
