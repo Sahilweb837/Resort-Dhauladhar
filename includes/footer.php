@@ -65,15 +65,14 @@
             <!-- GALLERY -->
             <div class="hf-col hf-gallery" data-aos="zoom-in" data-aos-delay="200">
                 <h3>GALLERY</h3>
-                <a href="gallery.html">
+                <a href="<?php echo getBaseUrl(); ?>/gallery.html">
                     <div class="hf-gallery-grid">
-
-                        <img src="./images/DSC09149-scaled.jpg" alt="gallery">
-                        <img src="./images/sangeet1.jpg" alt="gallery">
-                        <img src="./images/PHOTO-2024-01-20-20-04-52.jpg" alt="gallery">
-                        <img src="./images/DSC09631-scaled.jpg" alt="gallery">
-                        <img src="./images/aboutbanner - Copy.jpg" alt="gallery">
-                        <img src="./images/PHOTO-2024-01-20-20-04-47-2.jpg" alt="gallery">
+                        <img src="<?php echo getBaseUrl(); ?>/images/DSC09149-scaled.jpg" alt="gallery">
+                        <img src="<?php echo getBaseUrl(); ?>/images/sangeet1.jpg" alt="gallery">
+                        <img src="<?php echo getBaseUrl(); ?>/images/PHOTO-2024-01-20-20-04-52.jpg" alt="gallery">
+                        <img src="<?php echo getBaseUrl(); ?>/images/DSC09631-scaled.jpg" alt="gallery">
+                        <img src="<?php echo getBaseUrl(); ?>/images/aboutbanner - Copy.jpg" alt="gallery">
+                        <img src="<?php echo getBaseUrl(); ?>/images/PHOTO-2024-01-20-20-04-47-2.jpg" alt="gallery">
                     </div>
                 </a>
             </div>

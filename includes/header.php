@@ -4,26 +4,32 @@ if (session_status() === PHP_SESSION_NONE) {
     ini_set('session.cookie_path', '/');
     session_start();
 }
+require_once __DIR__ . '/functions.php';
+$baseUrl = getBaseUrl();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./style.css">
+    <title><?php echo htmlspecialchars($pageTitle ?? 'Hotel Dhauladhar Heights Resort'); ?></title>
+    <?php if (!empty($pageMetaDescription)): ?>
+        <meta name="description" content="<?php echo htmlspecialchars($pageMetaDescription); ?>">
+    <?php endif; ?>
+    <?php if (!empty($pageMetaKeywords)): ?>
+        <meta name="keywords" content="<?php echo htmlspecialchars($pageMetaKeywords); ?>">
+    <?php endif; ?>
+    <?php if (!empty($extraHead)) echo $extraHead; ?>
+
+    <link rel="stylesheet" href="<?php echo $baseUrl; ?>/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Agu+Display:MORF@0..60&family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Edu+AU+VIC+WA+NT+Arrows:wght@400..700&family=Inconsolata:wght@200..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&family=Outfit:wght@100..900&family=Parkinsans:wght@300..800&family=Quicksand:wght@300..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-    <title>Hotel Dhauladhar</title>
 </head>
 <body>
-
-<?php
-$baseUrl = getBaseUrl();
-?>
 <header class="site-header">
     <!-- TOP INFO -->
     <div class="top-info">

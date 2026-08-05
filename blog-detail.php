@@ -47,17 +47,12 @@ $blogCanonicalUrl = getBlogUrl($blog);
 $metaDesc = !empty($blog['meta_description']) ? $blog['meta_description'] : (!empty($blog['excerpt']) ? $blog['excerpt'] : substr(strip_tags($blog['content']), 0, 160));
 $metaKeys = !empty($blog['meta_keywords']) ? $blog['meta_keywords'] : 'Dhauladhar Heights Resort, Dharamshala, ' . ($blog['category'] ?? 'Blog');
 
-include __DIR__ . '/includes/header.php';
+$pageTitle = $blog['title'] . ' - Hotel Dhauladhar Heights Resort';
+$pageMetaDescription = $metaDesc;
+$pageMetaKeywords = $metaKeys;
 
+ob_start();
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($blog['title']); ?> - Hotel Dhauladhar Heights Resort</title>
-    <meta name="description" content="<?php echo htmlspecialchars($metaDesc); ?>">
-    <meta name="keywords" content="<?php echo htmlspecialchars($metaKeys); ?>">
     <link rel="canonical" href="<?php echo $blogCanonicalUrl; ?>">
 
     <!-- Open Graph / Facebook -->
@@ -95,19 +90,18 @@ include __DIR__ . '/includes/header.php';
         "name": "Hotel Dhauladhar Heights Resort",
         "logo": {
           "@type": "ImageObject",
-          "url": "<?php echo $baseUrl; ?>/images/logo.png"
+          "url": "<?php echo $baseUrl; ?>/images/dhr_logo_full_white_720.png"
         }
       },
       "datePublished": "<?php echo date('c', strtotime($blog['created_at'])); ?>",
       "dateModified": "<?php echo date('c', strtotime($blog['updated_at'] ?? $blog['created_at'])); ?>"
     }
     </script>
+<?php
+$extraHead = ob_get_clean();
 
-    <link rel="stylesheet" href="<?php echo $baseUrl; ?>/style.css">
-    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-</head>
-<body>
+include __DIR__ . '/includes/header.php';
+?>
 
 <!----------------------- hero section ---------------------->
 <div class="common-hero blog" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('<?php echo $featuredImageUrl; ?>'); background-size: cover; background-position: center;">
