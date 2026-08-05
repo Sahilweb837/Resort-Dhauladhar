@@ -198,11 +198,12 @@ function getBlogById($id) {
 }
 
 function getBlogBySlug($slug) {
+    if (empty($slug)) return false;
     try {
         $pdo = getDB();
         if ($pdo) {
-            $stmt = $pdo->prepare("SELECT * FROM blogs WHERE slug = ? AND status = 'published'");
-            $stmt->execute([$slug]);
+            $stmt = $pdo->prepare("SELECT * FROM blogs WHERE (slug = ? OR id = ?) AND status = 'published'");
+            $stmt->execute([$slug, $slug]);
             $blog = $stmt->fetch();
             if ($blog) return $blog;
         }
@@ -211,7 +212,7 @@ function getBlogBySlug($slug) {
     }
 
     foreach (getDefaultSampleBlogs() as $b) {
-        if ($b['slug'] === $slug) return $b;
+        if ($b['slug'] === $slug || (string)$b['id'] === (string)$slug) return $b;
     }
     return false;
 }

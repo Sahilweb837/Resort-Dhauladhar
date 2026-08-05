@@ -3,8 +3,8 @@ require_once __DIR__ . '/includes/functions.php';
 
 $baseUrl = getBaseUrl();
 
-// Get blog by slug from query param or URI path
-$slug = $_GET['slug'] ?? '';
+// Get blog by slug or ID from query param or URI path
+$slug = $_GET['slug'] ?? $_GET['id'] ?? $_GET['post'] ?? '';
 if (empty($slug)) {
     $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $segments = array_values(array_filter(explode('/', $requestUri)));
