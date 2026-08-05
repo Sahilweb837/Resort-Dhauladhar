@@ -2,7 +2,8 @@
 # Dhauladhar Heights Resort - Apache Config
 # =============================================
 
-# Enable Rewrite Engine
+# Enable Rewrite Engine & Disable MultiViews
+Options -MultiViews -Indexes
 RewriteEngine On
 
 # ---- SEO Clean URL Rewrite Rules ----

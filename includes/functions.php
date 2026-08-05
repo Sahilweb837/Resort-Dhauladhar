@@ -90,6 +90,19 @@ function getDefaultSampleBlogs() {
             'status' => 'published',
             'created_at' => date('Y-m-d H:i:s', strtotime('-2 weeks')),
             'views' => 19
+        ],
+        [
+            'id' => 6,
+            'title' => 'World Environment Day 2026: Dhauladhar Heights Resort Leads a Cleanliness Drive for a Greener Dharamshala',
+            'slug' => 'world-environment-day-2026-dhauladhar-heights-resort-leads-a-cleanliness-drive-for-a-greener-dharamshala',
+            'category' => 'Events',
+            'excerpt' => 'Celebrating World Environment Day 2026 with an inspiring eco-drive across Dharamshala and tea garden trails surrounding Dhauladhar Heights Resort.',
+            'content' => '<p>In celebration of World Environment Day 2026, Hotel Dhauladhar Heights Resort organized a major eco-cleanliness drive and tree plantation campaign across Kangra valley tea gardens and local trail routes in Dharamshala.</p><p>Guests, resort team members, and local volunteers gathered to spread awareness on eco-tourism, plastic waste reduction, and preserving the serene Himalayan ecosystem for future generations.</p>',
+            'featured_image' => 'images/DSC09631-scaled.jpg',
+            'author' => 'Admin',
+            'status' => 'published',
+            'created_at' => date('Y-m-d H:i:s', strtotime('-1 day')),
+            'views' => 84
         ]
     ];
 }
@@ -959,6 +972,14 @@ function seedDefaultBlogs($pdo) {
                 'category' => 'Events',
                 'excerpt' => 'Host high-impact corporate conferences, annual meets, and private celebrations in our versatile event venues with state-of-the-art facilities.',
                 'content' => '<p>Combine business with nature\'s tranquility. Our resort provides spacious conference halls, high-speed connectivity, break-out zones, and curated team-building activities set against the backdrop of Dharamshala\'s mountain wilderness.</p>',
+                'featured_image' => 'images/DSC09631-scaled.jpg'
+            ],
+            [
+                'title' => 'World Environment Day 2026: Dhauladhar Heights Resort Leads a Cleanliness Drive for a Greener Dharamshala',
+                'slug' => 'world-environment-day-2026-dhauladhar-heights-resort-leads-a-cleanliness-drive-for-a-greener-dharamshala',
+                'category' => 'Events',
+                'excerpt' => 'Celebrating World Environment Day 2026 with an inspiring eco-drive across Dharamshala and tea garden trails surrounding Dhauladhar Heights Resort.',
+                'content' => '<p>In celebration of World Environment Day 2026, Hotel Dhauladhar Heights Resort organized a major eco-cleanliness drive and tree plantation campaign across Kangra valley tea gardens and local trail routes in Dharamshala.</p><p>Guests, resort team members, and local volunteers gathered to spread awareness on eco-tourism, plastic waste reduction, and preserving the serene Himalayan ecosystem for future generations.</p>',
                 'featured_image' => 'images/DSC09631-scaled.jpg'
             ]
         ];
