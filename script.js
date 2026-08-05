@@ -34,9 +34,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Header scroll effect
-  window.addEventListener("scroll", () => {
-    header?.classList.toggle("is-scrolled", window.scrollY > 50);
-  });
+  const updateHeaderScroll = () => {
+    if (header) {
+      header.classList.toggle("is-scrolled", window.scrollY > 30);
+    }
+  };
+  window.addEventListener("scroll", updateHeaderScroll);
+  updateHeaderScroll();
 
   //  AUTO CLOSE
   window.addEventListener("resize", () => {

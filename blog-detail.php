@@ -342,6 +342,7 @@ include __DIR__ . '/includes/header.php';
             });
         }
     });
+</script>
 <script src="<?php echo $baseUrl; ?>/script.js"></script>
 </body>
 </html>
