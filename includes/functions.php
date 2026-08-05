@@ -94,16 +94,36 @@ function getDefaultSampleBlogs() {
     ];
 }
 
-function getAllBlogs($limit = null, $offset = 0, $status = null) {
+function getAllBlogs($limit = null, $offset = 0, $status = null, $category = null, $author = null, $search = null) {
     try {
         $pdo = getDB();
         if ($pdo) {
-            $sql = "SELECT * FROM blogs";
+            $sql = "SELECT * FROM blogs WHERE 1=1";
             $params = [];
             
             if ($status) {
-                $sql .= " WHERE status = ?";
+                $sql .= " AND status = ?";
                 $params[] = $status;
+            }
+
+            if ($category) {
+                $sql .= " AND (LOWER(category) = LOWER(?) OR LOWER(REPLACE(category, ' ', '-')) = LOWER(?))";
+                $params[] = $category;
+                $params[] = $category;
+            }
+
+            if ($author) {
+                $sql .= " AND (LOWER(author) = LOWER(?) OR LOWER(REPLACE(author, ' ', '-')) = LOWER(?))";
+                $params[] = $author;
+                $params[] = $author;
+            }
+
+            if ($search) {
+                $sql .= " AND (title LIKE ? OR content LIKE ? OR excerpt LIKE ?)";
+                $searchTerm = '%' . $search . '%';
+                $params[] = $searchTerm;
+                $params[] = $searchTerm;
+                $params[] = $searchTerm;
             }
             
             $sql .= " ORDER BY created_at DESC";
@@ -131,6 +151,27 @@ function getAllBlogs($limit = null, $offset = 0, $status = null) {
             return $b['status'] === $status;
         }));
     }
+    if ($category) {
+        $catClean = strtolower(str_replace(' ', '-', $category));
+        $defaults = array_values(array_filter($defaults, function($b) use ($catClean) {
+            return strtolower(str_replace(' ', '-', $b['category'])) === $catClean;
+        }));
+    }
+    if ($author) {
+        $authClean = strtolower(str_replace(' ', '-', $author));
+        $defaults = array_values(array_filter($defaults, function($b) use ($authClean) {
+            return strtolower(str_replace(' ', '-', $b['author'] ?? 'Admin')) === $authClean;
+        }));
+    }
+    if ($search) {
+        $searchClean = strtolower($search);
+        $defaults = array_values(array_filter($defaults, function($b) use ($searchClean) {
+            return strpos(strtolower($b['title']), $searchClean) !== false ||
+                   strpos(strtolower($b['content']), $searchClean) !== false ||
+                   strpos(strtolower($b['excerpt'] ?? ''), $searchClean) !== false;
+        }));
+    }
+
     if ($limit) {
         return array_slice($defaults, $offset, $limit);
     }
@@ -180,13 +221,16 @@ function createBlog($data) {
         $pdo = getDB();
         if (!$pdo) return false;
         
+        $rawSlug = !empty($data['slug']) ? $data['slug'] : $data['title'];
+        $slug = generateUniqueSlug($rawSlug);
+        
         $sql = "INSERT INTO blogs (title, slug, content, excerpt, featured_image, category, author, meta_description, meta_keywords, status, sections, content_format) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         $stmt = $pdo->prepare($sql);
-        return $stmt->execute([
+        $result = $stmt->execute([
             $data['title'],
-            $data['slug'],
+            $slug,
             $data['content'],
             $data['excerpt'] ?? '',
             $data['featured_image'] ?? '',
@@ -198,6 +242,11 @@ function createBlog($data) {
             $data['sections'] ?? null,
             $data['content_format'] ?? 'html'
         ]);
+
+        if ($result) {
+            generateSitemapXML();
+        }
+        return $result;
     } catch (Throwable $e) {
         return false;
     }
@@ -208,6 +257,9 @@ function updateBlog($id, $data) {
         $pdo = getDB();
         if (!$pdo) return false;
         
+        $rawSlug = !empty($data['slug']) ? $data['slug'] : $data['title'];
+        $slug = generateUniqueSlug($rawSlug, $id);
+        
         $sql = "UPDATE blogs SET 
                 title = ?, slug = ?, content = ?, excerpt = ?, 
                 featured_image = ?, category = ?, author = ?, 
@@ -216,9 +268,9 @@ function updateBlog($id, $data) {
                 WHERE id = ?";
         
         $stmt = $pdo->prepare($sql);
-        return $stmt->execute([
+        $result = $stmt->execute([
             $data['title'],
-            $data['slug'],
+            $slug,
             $data['content'],
             $data['excerpt'] ?? '',
             $data['featured_image'] ?? '',
@@ -231,6 +283,11 @@ function updateBlog($id, $data) {
             $data['content_format'] ?? 'html',
             $id
         ]);
+
+        if ($result) {
+            generateSitemapXML();
+        }
+        return $result;
     } catch (Throwable $e) {
         return false;
     }
@@ -248,24 +305,50 @@ function deleteBlog($id) {
         }
         
         $stmt = $pdo->prepare("DELETE FROM blogs WHERE id = ?");
-        return $stmt->execute([$id]);
+        $result = $stmt->execute([$id]);
+        if ($result) {
+            generateSitemapXML();
+        }
+        return $result;
     } catch (Throwable $e) {
         return false;
     }
 }
 
-function getBlogCount($status = null) {
+function getBlogCount($status = null, $category = null, $author = null, $search = null) {
     try {
         $pdo = getDB();
         if ($pdo) {
+            $sql = "SELECT COUNT(*) FROM blogs WHERE 1=1";
+            $params = [];
+            
             if ($status) {
-                $stmt = $pdo->prepare("SELECT COUNT(*) FROM blogs WHERE status = ?");
-                $stmt->execute([$status]);
-            } else {
-                $stmt = $pdo->prepare("SELECT COUNT(*) FROM blogs");
-                $stmt->execute();
+                $sql .= " AND status = ?";
+                $params[] = $status;
+            }
+
+            if ($category) {
+                $sql .= " AND (LOWER(category) = LOWER(?) OR LOWER(REPLACE(category, ' ', '-')) = LOWER(?))";
+                $params[] = $category;
+                $params[] = $category;
+            }
+
+            if ($author) {
+                $sql .= " AND (LOWER(author) = LOWER(?) OR LOWER(REPLACE(author, ' ', '-')) = LOWER(?))";
+                $params[] = $author;
+                $params[] = $author;
+            }
+
+            if ($search) {
+                $sql .= " AND (title LIKE ? OR content LIKE ? OR excerpt LIKE ?)";
+                $searchTerm = '%' . $search . '%';
+                $params[] = $searchTerm;
+                $params[] = $searchTerm;
+                $params[] = $searchTerm;
             }
             
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
             $count = $stmt->fetchColumn();
             if ($count > 0) return $count;
         }
@@ -273,7 +356,8 @@ function getBlogCount($status = null) {
         // Silent catch
     }
 
-    return count(getDefaultSampleBlogs());
+    $blogs = getAllBlogs(null, 0, $status, $category, $author, $search);
+    return count($blogs);
 }
 
 function getRecentBlogs($limit = 5) {
@@ -318,13 +402,132 @@ function createSlug($string) {
 }
 
 /**
+ * Generate unique slug, preventing duplicates (e.g. post, post-1, post-2)
+ */
+function generateUniqueSlug($text, $excludeId = null) {
+    $baseSlug = createSlug($text);
+    if (empty($baseSlug)) {
+        $baseSlug = 'post-' . time();
+    }
+    
+    $slug = $baseSlug;
+    $counter = 1;
+    
+    try {
+        $pdo = getDB();
+        if ($pdo) {
+            while (true) {
+                if ($excludeId) {
+                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM blogs WHERE slug = ? AND id != ?");
+                    $stmt->execute([$slug, $excludeId]);
+                } else {
+                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM blogs WHERE slug = ?");
+                    $stmt->execute([$slug]);
+                }
+                
+                if ($stmt->fetchColumn() == 0) {
+                    break;
+                }
+                
+                $slug = $baseSlug . '-' . $counter;
+                $counter++;
+            }
+            return $slug;
+        }
+    } catch (Throwable $e) {
+        // Fallback
+    }
+
+    $defaults = getDefaultSampleBlogs();
+    while (true) {
+        $found = false;
+        foreach ($defaults as $b) {
+            if ($b['slug'] === $slug && (!$excludeId || $b['id'] != $excludeId)) {
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) break;
+        $slug = $baseSlug . '-' . $counter;
+        $counter++;
+    }
+
+    return $slug;
+}
+
+/**
+ * Dynamically generate/update sitemap.xml
+ */
+function generateSitemapXML() {
+    try {
+        $siteDomain = 'https://dhauladharheightsresort.com';
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<?xml-stylesheet type="text/css" href="https://www.xml-sitemaps.com/css/sitemap.css"?>' . "\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">' . "\n\n";
+
+        $dateNow = date('c');
+
+        $staticPages = [
+            '/' => ['priority' => '1.0000', 'freq' => 'daily'],
+            '/about.php' => ['priority' => '0.8000', 'freq' => 'daily'],
+            '/rooms' => ['priority' => '0.9000', 'freq' => 'daily'],
+            '/rooms/executive-room' => ['priority' => '0.8500', 'freq' => 'daily'],
+            '/rooms/executive-suite' => ['priority' => '0.8500', 'freq' => 'daily'],
+            '/rooms/presidential-suite' => ['priority' => '0.8500', 'freq' => 'daily'],
+            '/rooms/twin-bed' => ['priority' => '0.8500', 'freq' => 'daily'],
+            '/rooms/deluxe-room' => ['priority' => '0.8500', 'freq' => 'daily'],
+            '/blog' => ['priority' => '0.9000', 'freq' => 'daily'],
+            '/destination-wedding.php' => ['priority' => '0.8000', 'freq' => 'daily'],
+            '/events.html' => ['priority' => '0.8000', 'freq' => 'daily'],
+            '/contact.html' => ['priority' => '0.8000', 'freq' => 'daily'],
+            '/gallery.html' => ['priority' => '0.8000', 'freq' => 'daily'],
+        ];
+
+        foreach ($staticPages as $path => $meta) {
+            $xml .= "  <url>\n";
+            $xml .= "       <loc>" . $siteDomain . $path . "</loc>\n";
+            $xml .= "       <lastmod>" . $dateNow . "</lastmod>\n";
+            $xml .= "       <changefreq>" . $meta['freq'] . "</changefreq>\n";
+            $xml .= "       <priority>" . $meta['priority'] . "</priority>\n";
+            $xml .= "  </url>\n";
+        }
+
+        $publishedBlogs = getAllBlogs(null, 0, 'published');
+        foreach ($publishedBlogs as $b) {
+            $catSlug = !empty($b['category']) ? createSlug($b['category']) : 'general';
+            $blogSlug = !empty($b['slug']) ? $b['slug'] : createSlug($b['title']);
+            $blogPath = '/blog/' . $catSlug . '/' . $blogSlug;
+
+            $lastmod = !empty($b['updated_at']) ? date('c', strtotime($b['updated_at'])) : (!empty($b['created_at']) ? date('c', strtotime($b['created_at'])) : $dateNow);
+
+            $xml .= "  <url>\n";
+            $xml .= "       <loc>" . $siteDomain . $blogPath . "</loc>\n";
+            $xml .= "       <lastmod>" . $lastmod . "</lastmod>\n";
+            $xml .= "       <changefreq>daily</changefreq>\n";
+            $xml .= "       <priority>0.8000</priority>\n";
+            $xml .= "  </url>\n";
+        }
+
+        $xml .= '</urlset>';
+
+        $projectRoot = dirname(__DIR__);
+        $sitemapPath = $projectRoot . '/sitemap.xml';
+        file_put_contents($sitemapPath, $xml);
+        return true;
+    } catch (Throwable $e) {
+        error_log("Failed to generate sitemap XML: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
  * Generate SEO clean URL for a blog post
  * Output: /blog/category-slug/blog-slug or /blog/blog-slug
  */
 function getBlogUrl($blog) {
     $baseUrl = getBaseUrl();
     if (is_array($blog)) {
-        $slug = $blog['slug'] ?? '';
+        $slug = $blog['slug'] ?? createSlug($blog['title'] ?? '');
         $cat = !empty($blog['category']) ? createSlug($blog['category']) : 'general';
         return $baseUrl . '/blog/' . $cat . '/' . $slug;
     }

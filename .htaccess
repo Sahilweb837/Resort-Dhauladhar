@@ -27,6 +27,12 @@ RewriteRule ^blog/?$ blog.php [L,QSA]
 # Clean URL for Blog Category filter: /blog/category/category-slug
 RewriteRule ^blog/category/([a-zA-Z0-9-]+)/?$ blog.php?category=$1 [L,QSA]
 
+# Clean URL for Blog Author filter: /blog/author/author-slug
+RewriteRule ^blog/author/([a-zA-Z0-9-]+)/?$ blog.php?author=$1 [L,QSA]
+
+# Clean URL for Blog Search: /blog/search/keyword
+RewriteRule ^blog/search/([a-zA-Z0-9-]+)/?$ blog.php?search=$1 [L,QSA]
+
 # Clean URL for Blog Details with category & post slug: /blog/category-slug/blog-slug
 RewriteRule ^blog/([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)/?$ blog-detail.php?category=$1&slug=$2 [L,QSA]
 

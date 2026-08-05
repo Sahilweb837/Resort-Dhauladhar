@@ -4,20 +4,45 @@ require_once __DIR__ . '/includes/functions.php';
 // Ensure table columns and default seed exist
 ensureBlogTableColumns();
 
-// Get all published blogs
-$blogs = getAllBlogs(null, 0, 'published');
-$popularBlogs = getPopularBlogs(5);
-$categories = getCategories();
+$categoryFilter = isset($_GET['category']) ? trim($_GET['category']) : null;
+$authorFilter = isset($_GET['author']) ? trim($_GET['author']) : null;
+$searchFilter = isset($_GET['search']) ? trim($_GET['search']) : null;
 
 // Pagination
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $perPage = 6;
 $offset = ($page - 1) * $perPage;
-$blogsPaginated = getAllBlogs($perPage, $offset, 'published');
-$totalBlogs = getBlogCount('published');
+
+$blogsPaginated = getAllBlogs($perPage, $offset, 'published', $categoryFilter, $authorFilter, $searchFilter);
+$totalBlogs = getBlogCount('published', $categoryFilter, $authorFilter, $searchFilter);
 $totalPages = ceil($totalBlogs / $perPage);
 
+$popularBlogs = getPopularBlogs(5);
+$categories = getCategories();
+
 $baseUrl = getBaseUrl();
+
+// Page Title logic
+$heroTitle = 'Our Blog';
+if ($categoryFilter) {
+    $heroTitle = 'Category: ' . htmlspecialchars(ucwords(str_replace('-', ' ', $categoryFilter)));
+} elseif ($authorFilter) {
+    $heroTitle = 'Author: ' . htmlspecialchars(ucwords(str_replace('-', ' ', $authorFilter)));
+} elseif ($searchFilter) {
+    $heroTitle = 'Search: ' . htmlspecialchars($searchFilter);
+}
+
+// Build query parameter string for pagination links
+$queryParams = [];
+if ($categoryFilter) $queryParams['category'] = $categoryFilter;
+if ($authorFilter) $queryParams['author'] = $authorFilter;
+if ($searchFilter) $queryParams['search'] = $searchFilter;
+
+function getPaginationUrl($p, $params) {
+    $baseUrl = getBaseUrl();
+    $params['page'] = $p;
+    return $baseUrl . '/blog?' . http_build_query($params);
+}
 
 // Include header
 include __DIR__ . '/includes/header.php';
@@ -25,10 +50,17 @@ include __DIR__ . '/includes/header.php';
 
 <!-- Hero Section -->
 <div class="common-hero blog">
-    <h1 data-aos="fade-down">Our Blog</h1>
+    <h1 data-aos="fade-down"><?php echo $heroTitle; ?></h1>
     <div class="hero-links" data-aos="fade-up">
         <a href="<?php echo $baseUrl; ?>/">Home</a>
         <a href="<?php echo $baseUrl; ?>/blog">/ Blog</a>
+        <?php if ($categoryFilter): ?>
+            <a href="#">/ Category</a>
+        <?php elseif ($authorFilter): ?>
+            <a href="#">/ Author</a>
+        <?php elseif ($searchFilter): ?>
+            <a href="#">/ Search</a>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -38,8 +70,9 @@ include __DIR__ . '/includes/header.php';
             <?php if (empty($blogsPaginated)): ?>
                 <div class="no-posts" style="text-align: center; padding: 60px; background: white; border-radius: 12px;">
                     <i class="fas fa-blog" style="font-size: 64px; color: #ccc; margin-bottom: 20px;"></i>
-                    <h3>No blog posts yet</h3>
-                    <p>Check back soon for updates!</p>
+                    <h3>No blog posts found</h3>
+                    <p>Check back soon or try another category or search query!</p>
+                    <a href="<?php echo $baseUrl; ?>/blog" style="display: inline-block; margin-top: 15px; padding: 10px 20px; background: #000e3a; color: white; border-radius: 6px; text-decoration: none;">View All Posts</a>
                 </div>
             <?php else: ?>
                 <div class="blog-grid">
@@ -47,6 +80,9 @@ include __DIR__ . '/includes/header.php';
                         <?php 
                         $imageUrl = getBlogImageUrl($blog['featured_image']);
                         $blogUrl = getBlogUrl($blog);
+                        $catName = $blog['category'] ?? 'General';
+                        $catSlug = createSlug($catName);
+                        $catUrl = $baseUrl . '/blog/category/' . $catSlug;
                         ?>
                         <article class="blog-card" data-aos="fade-up">
                             <div class="blog-img">
@@ -59,8 +95,8 @@ include __DIR__ . '/includes/header.php';
                             
                             <div class="blog-content">
                                 <div class="meta">
-                                    <span><?php echo date('F d, Y', strtotime($blog['created_at'])); ?></span>
-                                    <span><?php echo htmlspecialchars($blog['category'] ?? 'General'); ?></span>
+                                    <span><i class="fas fa-calendar"></i> <?php echo date('F d, Y', strtotime($blog['created_at'])); ?></span>
+                                    <span><a href="<?php echo $catUrl; ?>" style="color: inherit; text-decoration: none;"><i class="fas fa-folder"></i> <?php echo htmlspecialchars($catName); ?></a></span>
                                 </div>
                                 
                                 <h4><a href="<?php echo $blogUrl; ?>" style="color: inherit; text-decoration: none;"><?php echo htmlspecialchars($blog['title']); ?></a></h4>
@@ -86,15 +122,15 @@ include __DIR__ . '/includes/header.php';
                 <?php if ($totalPages > 1): ?>
                     <div class="pagination">
                         <?php if ($page > 1): ?>
-                            <a href="<?php echo $baseUrl; ?>/blog?page=<?php echo $page - 1; ?>"><i class="fas fa-chevron-left"></i> Previous</a>
+                            <a href="<?php echo getPaginationUrl($page - 1, $queryParams); ?>"><i class="fas fa-chevron-left"></i> Previous</a>
                         <?php endif; ?>
                         
                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                            <a href="<?php echo $baseUrl; ?>/blog?page=<?php echo $i; ?>" class="<?php echo $i == $page ? 'active' : ''; ?>"><?php echo $i; ?></a>
+                            <a href="<?php echo getPaginationUrl($i, $queryParams); ?>" class="<?php echo $i == $page ? 'active' : ''; ?>"><?php echo $i; ?></a>
                         <?php endfor; ?>
                         
                         <?php if ($page < $totalPages): ?>
-                            <a href="<?php echo $baseUrl; ?>/blog?page=<?php echo $page + 1; ?>">Next <i class="fas fa-chevron-right"></i></a>
+                            <a href="<?php echo getPaginationUrl($page + 1, $queryParams); ?>">Next <i class="fas fa-chevron-right"></i></a>
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
@@ -104,8 +140,27 @@ include __DIR__ . '/includes/header.php';
         <aside class="sidebar">
             <!-- SEARCH -->
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search blog posts...">
-                <i class="fa fa-search"></i>
+                <form action="<?php echo $baseUrl; ?>/blog" method="GET" style="display: flex; width: 100%; align-items: center;">
+                    <input type="text" name="search" id="searchInput" placeholder="Search blog posts..." value="<?php echo htmlspecialchars($searchFilter ?? ''); ?>" style="border: none; outline: none; width: 100%; padding-right: 30px;">
+                    <button type="submit" style="background: none; border: none; cursor: pointer; color: #666;"><i class="fa fa-search"></i></button>
+                </form>
+            </div>
+
+            <!-- BLOG CATEGORIES -->
+            <div class="sidebar-card">
+                <h3>Blog Categories</h3>
+                <ul class="category">
+                    <?php foreach ($categories as $cat): ?>
+                        <?php 
+                        $cName = is_array($cat) ? $cat['name'] : $cat;
+                        $cSlug = createSlug($cName);
+                        $cCount = getBlogCount('published', $cSlug);
+                        ?>
+                        <a href="<?php echo $baseUrl; ?>/blog/category/<?php echo $cSlug; ?>">
+                            <li><?php echo htmlspecialchars($cName); ?> <span><?php echo $cCount; ?></span></li>
+                        </a>
+                    <?php endforeach; ?>
+                </ul>
             </div>
             
             <!-- POPULAR POSTS -->

@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = "Invalid security token.";
     } else {
         $title = trim($_POST['title']);
+        $slugInput = trim($_POST['slug'] ?? '');
         $excerpt = trim($_POST['excerpt'] ?? '');
         $category = trim($_POST['category'] ?? '');
         $author = trim($_POST['author'] ?? ($_SESSION['admin_name'] ?? 'Admin'));
@@ -146,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 
                 $data = [
                     'title' => htmlspecialchars($title, ENT_QUOTES, 'UTF-8'),
-                    'slug' => createSlug($title),
+                    'slug' => !empty($slugInput) ? createSlug($slugInput) : createSlug($title),
                     'content' => '',
                     'excerpt' => htmlspecialchars($excerpt, ENT_QUOTES, 'UTF-8'),
                     'featured_image' => $featured_image,
@@ -333,8 +334,14 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                     
                     <div class="form-group">
                         <label><i class="fas fa-heading"></i> <span class="required">Blog Title</span></label>
-                        <input type="text" name="title" required value="<?php echo htmlspecialchars($_POST['title'] ?? ''); ?>" placeholder="Enter blog title" maxlength="200">
+                        <input type="text" name="title" id="titleInput" required value="<?php echo htmlspecialchars($_POST['title'] ?? ''); ?>" placeholder="Enter blog title" maxlength="200">
                         <div class="char-counter">0/200 characters</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-link"></i> Blog Slug (SEO Clean URL)</label>
+                        <input type="text" name="slug" id="slugInput" value="<?php echo htmlspecialchars($_POST['slug'] ?? ''); ?>" placeholder="auto-generated-from-title" maxlength="200">
+                        <small style="color:var(--text-muted);display:block;margin-top:4px;">Live Clean URL Preview: <span id="slugPreview" style="color:var(--primary-light);font-weight:600;"><?php echo getBaseUrl(); ?>/blog/category/your-slug</span></small>
                     </div>
                     
                     <div class="form-group">
@@ -617,7 +624,49 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                     categoryCustom.style.display = 'none';
                     categoryCustom.value = '';
                 }
+                updateSlugPreview();
             });
+        }
+
+        // Live Auto-Slug Generation & Preview
+        const titleInput = document.getElementById('titleInput');
+        const slugInput = document.getElementById('slugInput');
+        const slugPreview = document.getElementById('slugPreview');
+        const baseUrl = '<?php echo getBaseUrl(); ?>';
+
+        function createCleanSlug(text) {
+            return text.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+
+        function updateSlugPreview() {
+            if (!slugPreview) return;
+            const currentSlug = slugInput && slugInput.value.trim() ? createCleanSlug(slugInput.value) : (titleInput ? createCleanSlug(titleInput.value) : '');
+            let catName = 'general';
+            if (categorySelect && categorySelect.value) {
+                catName = categorySelect.value === 'other' ? (categoryCustom ? categoryCustom.value : 'general') : categorySelect.value;
+            }
+            const catSlug = createCleanSlug(catName) || 'general';
+            slugPreview.textContent = `${baseUrl}/blog/${catSlug}/${currentSlug || 'your-slug'}`;
+        }
+
+        if (titleInput && slugInput) {
+            let isManualSlug = false;
+
+            slugInput.addEventListener('input', function() {
+                isManualSlug = this.value.trim().length > 0;
+                updateSlugPreview();
+            });
+
+            titleInput.addEventListener('input', function() {
+                if (!isManualSlug) {
+                    slugInput.value = createCleanSlug(this.value);
+                }
+                updateSlugPreview();
+            });
+            
+            updateSlugPreview();
         }
         
         // Add initial section

@@ -26,8 +26,8 @@ if (!$blog && !empty($slug)) {
 }
 
 if (!$blog) {
-    header('HTTP/1.0 404 Not Found');
-    echo "<div style='text-align: center; padding: 100px;'><h1>Blog post not found</h1><p>The blog post you're looking for doesn't exist.</p><a href='{$baseUrl}/blog' style='color: #000e3a;'>Back to Blog</a></div>";
+    http_response_code(404);
+    include __DIR__ . '/404.php';
     exit();
 }
 
@@ -43,6 +43,10 @@ if (!empty($blog['sections'])) {
 }
 
 $featuredImageUrl = getBlogImageUrl($blog['featured_image']);
+$blogCanonicalUrl = getBlogUrl($blog);
+$metaDesc = !empty($blog['meta_description']) ? $blog['meta_description'] : (!empty($blog['excerpt']) ? $blog['excerpt'] : substr(strip_tags($blog['content']), 0, 160));
+$metaKeys = !empty($blog['meta_keywords']) ? $blog['meta_keywords'] : 'Dhauladhar Heights Resort, Dharamshala, ' . ($blog['category'] ?? 'Blog');
+
 include __DIR__ . '/includes/header.php';
 
 ?>
@@ -51,7 +55,54 @@ include __DIR__ . '/includes/header.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($blog['title']); ?> - Hotel Dhauladhar Heights</title>
+    <title><?php echo htmlspecialchars($blog['title']); ?> - Hotel Dhauladhar Heights Resort</title>
+    <meta name="description" content="<?php echo htmlspecialchars($metaDesc); ?>">
+    <meta name="keywords" content="<?php echo htmlspecialchars($metaKeys); ?>">
+    <link rel="canonical" href="<?php echo $blogCanonicalUrl; ?>">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="<?php echo $blogCanonicalUrl; ?>">
+    <meta property="og:title" content="<?php echo htmlspecialchars($blog['title']); ?>">
+    <meta property="og:description" content="<?php echo htmlspecialchars($metaDesc); ?>">
+    <meta property="og:image" content="<?php echo $featuredImageUrl; ?>">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="<?php echo $blogCanonicalUrl; ?>">
+    <meta property="twitter:title" content="<?php echo htmlspecialchars($blog['title']); ?>">
+    <meta property="twitter:description" content="<?php echo htmlspecialchars($metaDesc); ?>">
+    <meta property="twitter:image" content="<?php echo $featuredImageUrl; ?>">
+
+    <!-- Schema.org BlogPosting JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "<?php echo $blogCanonicalUrl; ?>"
+      },
+      "headline": <?php echo json_encode($blog['title']); ?>,
+      "description": <?php echo json_encode($metaDesc); ?>,
+      "image": <?php echo json_encode($featuredImageUrl); ?>,
+      "author": {
+        "@type": "Person",
+        "name": <?php echo json_encode($blog['author'] ?? 'Admin'); ?>
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Hotel Dhauladhar Heights Resort",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "<?php echo $baseUrl; ?>/images/logo.png"
+        }
+      },
+      "datePublished": "<?php echo date('c', strtotime($blog['created_at'])); ?>",
+      "dateModified": "<?php echo date('c', strtotime($blog['updated_at'] ?? $blog['created_at'])); ?>"
+    }
+    </script>
+
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>/style.css">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
