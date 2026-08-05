@@ -2,25 +2,31 @@
 // Include database connection FIRST
 require_once __DIR__ . '/db.php';
 
-// Start session if not started with persistent session settings
+// Start session if not started with persistent session settings across all paths
 if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
     @ini_set('session.cookie_lifetime', 2592000); // 30 days
     @ini_set('session.gc_maxlifetime', 2592000); // 30 days
-    if (function_exists('session_set_cookie_params')) {
+    @ini_set('session.cookie_path', '/');
+    if (PHP_VERSION_ID >= 70300) {
         @session_set_cookie_params([
             'lifetime' => 2592000,
             'path' => '/',
             'httponly' => true,
             'samesite' => 'Lax'
         ]);
+    } else {
+        @session_set_cookie_params(2592000, '/', '', false, true);
     }
-    session_start();
+    @session_start();
 }
 
 // ==================== AUTHENTICATION FUNCTIONS ====================
 
 function requireLogin() {
-    if (!isset($_SESSION['admin_id']) && !isset($_SESSION['admin_logged_in'])) {
+    if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+        @session_start();
+    }
+    if (!isLoggedIn()) {
         $basePath = getBaseUrl();
         header('Location: ' . $basePath . '/admin/index.php');
         exit();
@@ -28,7 +34,25 @@ function requireLogin() {
 }
 
 function isLoggedIn() {
-    return isset($_SESSION['admin_id']) || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true);
+    if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+        @session_start();
+    }
+    return !empty($_SESSION['admin_id']) || !empty($_SESSION['admin_logged_in']);
+}
+
+function logout() {
+    if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+        @session_start();
+    }
+    $_SESSION = [];
+    if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+            $params["path"], $params["domain"],
+            $params["secure"], $params["httponly"]
+        );
+    }
+    @session_destroy();
 }
 
 // ==================== BLOG FUNCTIONS ====================
@@ -640,16 +664,13 @@ function getBlogUrl($blog) {
 }
 
 /**
- * Generate SEO clean URL for a room page
- * Output: /rooms/room-slug
+ * Generate URL for a room page using room-details.html
+ * Output: /room-details.html?room=room-slug
  */
 function getRoomUrl($roomSlug, $catSlug = null) {
     $baseUrl = getBaseUrl();
     $roomSlug = ltrim($roomSlug, '/');
-    if ($catSlug) {
-        return $baseUrl . '/rooms/' . createSlug($catSlug) . '/' . $roomSlug;
-    }
-    return $baseUrl . '/rooms/' . $roomSlug;
+    return $baseUrl . '/room-details.html?room=' . urlencode($roomSlug);
 }
 
 function uploadImage($file, $uploadDir = 'uploads/') {

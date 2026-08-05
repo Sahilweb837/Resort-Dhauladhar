@@ -1023,14 +1023,11 @@ document.addEventListener("click", function (e) {
   if (btn && btn.dataset.room) {
     e.preventDefault();
     const roomKey = btn.dataset.room;
-    // Get base path
+    // Get base directory path
     const pathParts = window.location.pathname.split('/');
-    const roomsIdx = pathParts.indexOf('rooms');
-    let basePath = '';
-    if (roomsIdx > 0) {
-      basePath = pathParts.slice(0, roomsIdx).join('/');
-    }
-    window.location.href = `${basePath}/rooms/${roomKey}`;
+    pathParts.pop(); // remove current filename if present
+    const basePath = pathParts.join('/');
+    window.location.href = `${basePath}/room-details.html?room=${encodeURIComponent(roomKey)}`;
   }
 });
 

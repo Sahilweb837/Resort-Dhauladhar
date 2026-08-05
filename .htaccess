@@ -13,14 +13,14 @@ RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
 # Clean URL for Rooms listing: /rooms or /rooms/
-RewriteRule ^rooms/?$ rooms.php [L,QSA]
+RewriteRule ^rooms/?$ rooms.html [L,QSA]
 
 # Clean URL for Room Details with category & room: /rooms/category-slug/room-slug
-RewriteRule ^rooms/([^/]+)/([^/]+)/?$ room-details.php?category=$1&room=$2 [L,QSA]
+RewriteRule ^rooms/([^/]+)/([^/]+)/?$ room-details.html?category=$1&room=$2 [L,QSA]
 
 # Clean URL for Room Details: /rooms/room-slug or /room/room-slug
-RewriteRule ^rooms/([^/]+)/?$ room-details.php?room=$1 [L,QSA]
-RewriteRule ^room/([^/]+)/?$ room-details.php?room=$1 [L,QSA]
+RewriteRule ^rooms/([^/]+)/?$ room-details.html?room=$1 [L,QSA]
+RewriteRule ^room/([^/]+)/?$ room-details.html?room=$1 [L,QSA]
 
 # Clean URL for Blog listing: /blog or /blog/
 RewriteRule ^blog/?$ blog.php [L,QSA]

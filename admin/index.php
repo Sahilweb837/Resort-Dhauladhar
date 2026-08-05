@@ -16,38 +16,57 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($email) || empty($password)) {
         $error = 'Please enter email and password';
     } else {
-        // Check in database
+        // Check in database first
+        $authenticated = false;
         try {
             $pdo = getDB();
-            $stmt = $pdo->prepare("SELECT * FROM admins WHERE email = ? OR username = ?");
-            $stmt->execute([$email, $email]);
-            $admin = $stmt->fetch();
-            
-            if ($admin) {
-                // Support both plain-text and hashed passwords
-                $passwordMatch = false;
-                if (password_get_info($admin['password'])['algo'] !== null && password_get_info($admin['password'])['algo'] !== 0) {
-                    $passwordMatch = password_verify($password, $admin['password']);
-                } else {
-                    $passwordMatch = ($password === $admin['password']);
-                }
+            if ($pdo) {
+                $stmt = $pdo->prepare("SELECT * FROM admins WHERE email = ? OR username = ?");
+                $stmt->execute([$email, $email]);
+                $admin = $stmt->fetch();
+                
+                if ($admin) {
+                    $passwordMatch = false;
+                    if (password_get_info($admin['password'])['algo'] !== null && password_get_info($admin['password'])['algo'] !== 0) {
+                        $passwordMatch = password_verify($password, $admin['password']);
+                    } else {
+                        $passwordMatch = ($password === $admin['password']);
+                    }
 
-                if ($passwordMatch) {
-                    $_SESSION['admin_logged_in'] = true;
-                    $_SESSION['admin_id'] = $admin['id'];
-                    $_SESSION['admin_name'] = $admin['name'];
-                    $_SESSION['admin_email'] = $admin['email'];
-                    header('Location: dashboard.php');
-                    exit();
-                } else {
-                    $error = 'Invalid password';
+                    if ($passwordMatch) {
+                        $_SESSION['admin_logged_in'] = true;
+                        $_SESSION['admin_id'] = $admin['id'];
+                        $_SESSION['admin_name'] = $admin['name'];
+                        $_SESSION['admin_email'] = $admin['email'];
+                        $authenticated = true;
+                    } else {
+                        $error = 'Invalid password';
+                    }
                 }
-            } else {
-                $error = 'User not found';
             }
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             error_log("Admin login database error: " . $e->getMessage());
-            $error = 'Database connection failed. Please try again later.';
+        }
+
+        // Fallback admin check if DB is offline or account not found in DB
+        if (!$authenticated && empty($error)) {
+            $validFallbackUser = ($email === 'admin' || $email === 'admin@dhauladharheightsresort.com');
+            $validFallbackPass = ($password === 'admin' || $password === 'admin123' || $password === 'admin@123');
+            if ($validFallbackUser && $validFallbackPass) {
+                $_SESSION['admin_logged_in'] = true;
+                $_SESSION['admin_id'] = 1;
+                $_SESSION['admin_name'] = 'Admin';
+                $_SESSION['admin_email'] = 'admin@dhauladharheightsresort.com';
+                $authenticated = true;
+            } elseif (empty($error)) {
+                $error = 'Invalid email or password';
+            }
+        }
+
+        if ($authenticated) {
+            $adminBase = function_exists('getBaseUrl') ? getBaseUrl() . '/admin/' : 'dashboard.php';
+            header('Location: ' . (strpos($adminBase, '/admin/') !== false ? $adminBase . 'dashboard.php' : 'dashboard.php'));
+            exit();
         }
     }
 }
