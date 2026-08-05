@@ -4,8 +4,8 @@
 // For PRODUCTION: update these credentials accordingly
 $host = 'localhost';
 $dbname = 'muyfmbpgzm';
-$username = 'root';
-$password = '';
+$username = 'muyfmbpgzm';
+$password = 'ArawmMFQ8n';
 
 // Create PDO connection function
 function getDB() {
@@ -17,19 +17,29 @@ function getDB() {
     }
 
     if ($pdo === null) {
-        try {
-            $host = 'localhost';
-            $dbname = 'muyfmbpgzm';
-            $username = 'root';
-            $password = '';
-            
-            $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log("Database Connection Failed: " . $e->getMessage());
-            $connectionError = $e;
-            throw $e;
+        $host = 'localhost';
+        $dbname = 'muyfmbpgzm';
+        $credentialsList = [
+            ['user' => 'muyfmbpgzm', 'pass' => 'ArawmMFQ8n'],
+            ['user' => 'root', 'pass' => '']
+        ];
+        
+        $lastException = null;
+        foreach ($credentialsList as $cred) {
+            try {
+                $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $cred['user'], $cred['pass']);
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+                break;
+            } catch (PDOException $e) {
+                $lastException = $e;
+            }
+        }
+        
+        if (!$pdo) {
+            error_log("Database Connection Failed: " . ($lastException ? $lastException->getMessage() : 'Unknown error'));
+            $connectionError = $lastException;
+            throw $lastException;
         }
     }
     
