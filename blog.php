@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
 
+// Ensure table columns and default seed exist
+ensureBlogTableColumns();
+
 // Get all published blogs
 $blogs = getAllBlogs(null, 0, 'published');
 $popularBlogs = getPopularBlogs(5);
@@ -24,8 +27,8 @@ include __DIR__ . '/includes/header.php';
 <div class="common-hero blog">
     <h1 data-aos="fade-down">Our Blog</h1>
     <div class="hero-links" data-aos="fade-up">
-        <a href="index.php">Home</a>
-        <a href="blog.php">/ Blog</a>
+        <a href="<?php echo $baseUrl; ?>/">Home</a>
+        <a href="<?php echo $baseUrl; ?>/blog">/ Blog</a>
     </div>
 </div>
 
@@ -43,12 +46,15 @@ include __DIR__ . '/includes/header.php';
                     <?php foreach ($blogsPaginated as $blog): ?>
                         <?php 
                         $imageUrl = getBlogImageUrl($blog['featured_image']);
+                        $blogUrl = getBlogUrl($blog);
                         ?>
                         <article class="blog-card" data-aos="fade-up">
                             <div class="blog-img">
-                                <img src="<?php echo $imageUrl; ?>" 
-                                     alt="<?php echo htmlspecialchars($blog['title']); ?>"
-                                     onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
+                                <a href="<?php echo $blogUrl; ?>">
+                                    <img src="<?php echo $imageUrl; ?>" 
+                                         alt="<?php echo htmlspecialchars($blog['title']); ?>"
+                                         onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
+                                </a>
                             </div>
                             
                             <div class="blog-content">
@@ -57,7 +63,7 @@ include __DIR__ . '/includes/header.php';
                                     <span><?php echo htmlspecialchars($blog['category'] ?? 'General'); ?></span>
                                 </div>
                                 
-                                <h4><?php echo htmlspecialchars($blog['title']); ?></h4>
+                                <h4><a href="<?php echo $blogUrl; ?>" style="color: inherit; text-decoration: none;"><?php echo htmlspecialchars($blog['title']); ?></a></h4>
                                 
                                 <div class="blog-excerpt">
                                     <?php echo htmlspecialchars($blog['excerpt'] ?? substr(strip_tags($blog['content']), 0, 150) . '...'); ?>
@@ -65,9 +71,9 @@ include __DIR__ . '/includes/header.php';
                             </div>
                             
                             <div class="blog-footer">
-                                <a href="blog-detail.php?slug=<?php echo urlencode($blog['slug']); ?>">Read More</a>
+                                <a href="<?php echo $blogUrl; ?>">Read More</a>
                                 <span class="tag">
-                                    <a href="blog-detail.php?slug=<?php echo urlencode($blog['slug']); ?>">
+                                    <a href="<?php echo $blogUrl; ?>">
                                         <i class="fa fa-arrow-right"></i>
                                     </a>
                                 </span>
@@ -80,15 +86,15 @@ include __DIR__ . '/includes/header.php';
                 <?php if ($totalPages > 1): ?>
                     <div class="pagination">
                         <?php if ($page > 1): ?>
-                            <a href="?page=<?php echo $page - 1; ?>"><i class="fas fa-chevron-left"></i> Previous</a>
+                            <a href="<?php echo $baseUrl; ?>/blog?page=<?php echo $page - 1; ?>"><i class="fas fa-chevron-left"></i> Previous</a>
                         <?php endif; ?>
                         
                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                            <a href="?page=<?php echo $i; ?>" class="<?php echo $i == $page ? 'active' : ''; ?>"><?php echo $i; ?></a>
+                            <a href="<?php echo $baseUrl; ?>/blog?page=<?php echo $i; ?>" class="<?php echo $i == $page ? 'active' : ''; ?>"><?php echo $i; ?></a>
                         <?php endfor; ?>
                         
                         <?php if ($page < $totalPages): ?>
-                            <a href="?page=<?php echo $page + 1; ?>">Next <i class="fas fa-chevron-right"></i></a>
+                            <a href="<?php echo $baseUrl; ?>/blog?page=<?php echo $page + 1; ?>">Next <i class="fas fa-chevron-right"></i></a>
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
@@ -109,8 +115,9 @@ include __DIR__ . '/includes/header.php';
                     <?php foreach ($popularBlogs as $popular): ?>
                         <?php 
                         $popularImageUrl = getBlogImageUrl($popular['featured_image']);
+                        $popularUrl = getBlogUrl($popular);
                         ?>
-                        <div class="post">
+                        <a href="<?php echo $popularUrl; ?>" class="post" style="text-decoration: none; display: flex; gap: 15px;">
                             <img src="<?php echo $popularImageUrl; ?>" 
                                  alt="<?php echo htmlspecialchars($popular['title']); ?>"
                                  onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
@@ -118,47 +125,34 @@ include __DIR__ . '/includes/header.php';
                                 <p><?php echo htmlspecialchars($popular['title']); ?></p>
                                 <span><?php echo date('M d, Y', strtotime($popular['created_at'])); ?></span>
                             </div>
-                        </div>
+                        </a>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <p>No popular posts yet.</p>
                 <?php endif; ?>
             </div>
             
-            <!-- BLOG CATEGORIES -->
-            <!-- <div class="sidebar-card">
-                <h3>Categories</h3>
-                <ul class="category">
-                    <?php foreach ($categories as $cat): ?>
-                        <li>
-                            <?php echo htmlspecialchars($cat['name']); ?>
-                            <span>(<?php echo rand(5, 20); ?>)</span>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            </div> -->
-            
-            <!-- ROOM CATEGORIES - Static as requested -->
+            <!-- ROOM CATEGORIES - SEO Clean URLs -->
             <div class="sidebar-card">
                     <h3>Rooms Category</h3>
                     <ul class="category">
-                        <a href="room-details.html?room=executive-room">
+                        <a href="<?php echo getRoomUrl('executive-room'); ?>">
                             <li>Executive Room<span>24</span></li>
                         </a>
-                        <a href="room-details.html?room=executive-suite">
+                        <a href="<?php echo getRoomUrl('executive-suite'); ?>">
                             <li>Executive Suite<span>40</span></li>
                         </a>
-                        <a href="room-details.html?room=presidential-suite">
+                        <a href="<?php echo getRoomUrl('presidential-suite'); ?>">
                             <li>Presidential Suite<span>02</span></li>
                         </a>
-                        <a href="room-details.html?room=twin-bed">
+                        <a href="<?php echo getRoomUrl('twin-bed'); ?>">
                             <li>Twin Bed<span>04</span></li>
                         </a>
-                        <a href="room-details.html?room=deluxe-room">
+                        <a href="<?php echo getRoomUrl('deluxe-room'); ?>">
                             <li>Deluxe Room<span>03</span></li>
                         </a>
                     </ul>
-                </div>	
+            </div>	
         </aside>
     </div>
 </section>

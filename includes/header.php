@@ -21,6 +21,9 @@ if (session_status() === PHP_SESSION_NONE) {
 </head>
 <body>
 
+<?php
+$baseUrl = getBaseUrl();
+?>
 <header class="site-header">
     <!-- TOP INFO -->
     <div class="top-info">
@@ -35,15 +38,15 @@ if (session_status() === PHP_SESSION_NONE) {
     <nav class="navbar">
         <!-- LEFT LINKS (3) -->
         <ul class="nav-left">
-            <li><a href="index.php">THE RESORT</a></li>
-            <li><a href="about.php">ABOUT</a></li>
-            <li><a href="rooms.html">ROOMS</a></li>
+            <li><a href="<?php echo $baseUrl; ?>/">THE RESORT</a></li>
+            <li><a href="<?php echo $baseUrl; ?>/about.php">ABOUT</a></li>
+            <li><a href="<?php echo $baseUrl; ?>/rooms">ROOMS</a></li>
         </ul>
 
         <!-- CENTER LOGO -->
    <div class="nav-logo">
-        <a href="index.php">
-          <img src="./images/dhr_logo_full_white_720.png" alt="Logo">
+        <a href="<?php echo $baseUrl; ?>/">
+          <img src="<?php echo $baseUrl; ?>/images/dhr_logo_full_white_720.png" alt="Logo">
         </a>
       </div>
 
@@ -53,19 +56,19 @@ if (session_status() === PHP_SESSION_NONE) {
                 <a href="#">EVENTS <i class="fa-solid fa-chevron-down"></i></a>
                 <ul class="nav-dropdown-menu">
                     <li>
-                        <a href="destination-wedding.php">
+                        <a href="<?php echo $baseUrl; ?>/destination-wedding.php">
                             <i class="fa-solid fa-heart"></i> Destination Wedding
                         </a>
                     </li>
                     <li>
-                        <a href="events.html">
+                        <a href="<?php echo $baseUrl; ?>/events.html">
                             <i class="fa-solid fa-champagne-glasses"></i> Event Venues
                         </a>
                     </li>
                 </ul>
             </li>
-            <li><a href="blog.php">BLOG</a></li>
-            <li><a href="contact.html">CONTACT</a></li>
+            <li><a href="<?php echo $baseUrl; ?>/blog">BLOG</a></li>
+            <li><a href="<?php echo $baseUrl; ?>/contact.html">CONTACT</a></li>
         </ul>
 
         <!-- MOBILE MENU -->
@@ -79,13 +82,13 @@ if (session_status() === PHP_SESSION_NONE) {
     <div class="overlay-right">
         <span class="close-btn" id="menuClose"><i class="fa-solid fa-xmark"></i></span>
         <ul class="overlay-links">
-            <li><a href="index.php">THE RESORT</a></li>
-            <li><a href="about.php">ABOUT</a></li>
-            <li><a href="rooms.html">ROOMS</a></li>
-            <li><a href="destination-wedding.php">DESTINATION WEDDING</a></li>
-            <li><a href="events.html">EVENT VENUES</a></li>
-            <li><a href="blog.php">BLOG</a></li>
-            <li><a href="contact.html">CONTACT</a></li>
+            <li><a href="<?php echo $baseUrl; ?>/">THE RESORT</a></li>
+            <li><a href="<?php echo $baseUrl; ?>/about.php">ABOUT</a></li>
+            <li><a href="<?php echo $baseUrl; ?>/rooms">ROOMS</a></li>
+            <li><a href="<?php echo $baseUrl; ?>/destination-wedding.php">DESTINATION WEDDING</a></li>
+            <li><a href="<?php echo $baseUrl; ?>/events.html">EVENT VENUES</a></li>
+            <li><a href="<?php echo $baseUrl; ?>/blog">BLOG</a></li>
+            <li><a href="<?php echo $baseUrl; ?>/contact.html">CONTACT</a></li>
         </ul>
     </div>
 </div>

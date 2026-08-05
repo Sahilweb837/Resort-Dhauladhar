@@ -10,40 +10,63 @@ $password = 'ArawmMFQ8n';
 // Create PDO connection function
 function getDB() {
     static $pdo = null;
-    static $connectionError = null;
-    
-    if ($connectionError !== null) {
-        throw $connectionError;
+    static $connectionAttempted = false;
+
+    if ($pdo !== null) {
+        return $pdo;
     }
 
-    if ($pdo === null) {
-        $host = 'localhost';
-        $dbname = 'muyfmbpgzm';
-        $credentialsList = [
-            ['user' => 'muyfmbpgzm', 'pass' => 'ArawmMFQ8n'],
-            ['user' => 'root', 'pass' => '']
-        ];
-        
-        $lastException = null;
+    if ($connectionAttempted && $pdo === null) {
+        return null;
+    }
+
+    $connectionAttempted = true;
+    global $host, $dbname, $username, $password;
+
+    $hosts = ['localhost', '127.0.0.1'];
+    $targetDb = !empty($dbname) ? $dbname : 'muyfmbpgzm';
+    
+    $credentialsList = [];
+    if (!empty($username)) {
+        $credentialsList[] = ['user' => $username, 'pass' => $password ?? ''];
+    }
+    $credentialsList[] = ['user' => 'muyfmbpgzm', 'pass' => 'ArawmMFQ8n'];
+    $credentialsList[] = ['user' => 'root', 'pass' => ''];
+
+    $lastException = null;
+
+    foreach ($hosts as $h) {
         foreach ($credentialsList as $cred) {
             try {
-                $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $cred['user'], $cred['pass']);
-                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-                break;
+                // Try connecting directly to target database
+                $pdo = new PDO("mysql:host=$h;dbname=$targetDb;charset=utf8mb4", $cred['user'], $cred['pass'], [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_TIMEOUT => 2
+                ]);
+                return $pdo;
             } catch (PDOException $e) {
                 $lastException = $e;
+                // If database doesn't exist (Error code 1049), auto-create it!
+                if ($e->getCode() == 1049 || strpos($e->getMessage(), 'Unknown database') !== false) {
+                    try {
+                        $tmpPdo = new PDO("mysql:host=$h;charset=utf8mb4", $cred['user'], $cred['pass']);
+                        $tmpPdo->exec("CREATE DATABASE IF NOT EXISTS `$targetDb` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                        
+                        $pdo = new PDO("mysql:host=$h;dbname=$targetDb;charset=utf8mb4", $cred['user'], $cred['pass'], [
+                            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+                        ]);
+                        return $pdo;
+                    } catch (PDOException $e2) {
+                        $lastException = $e2;
+                    }
+                }
             }
         }
-        
-        if (!$pdo) {
-            error_log("Database Connection Failed: " . ($lastException ? $lastException->getMessage() : 'Unknown error'));
-            $connectionError = $lastException;
-            throw $lastException;
-        }
     }
-    
-    return $pdo;
+
+    return null;
 }
 
 // Keep a global variable name for older files

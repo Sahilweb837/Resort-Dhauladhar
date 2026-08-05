@@ -1,13 +1,33 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
 
-// Get blog by slug
+$baseUrl = getBaseUrl();
+
+// Get blog by slug from query param or URI path
 $slug = $_GET['slug'] ?? '';
+if (empty($slug)) {
+    $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $segments = array_values(array_filter(explode('/', $requestUri)));
+    $blogIndex = array_search('blog', $segments);
+    if ($blogIndex !== false && isset($segments[$blogIndex + 1])) {
+        // If URI is /blog/category/slug or /blog/slug
+        $slug = end($segments);
+    }
+}
+
 $blog = getBlogBySlug($slug);
+
+// Fallback search if exact slug not matched
+if (!$blog && !empty($slug)) {
+    $pdo = getDB();
+    $stmt = $pdo->prepare("SELECT * FROM blogs WHERE (slug = ? OR id = ?) AND status = 'published'");
+    $stmt->execute([$slug, $slug]);
+    $blog = $stmt->fetch();
+}
 
 if (!$blog) {
     header('HTTP/1.0 404 Not Found');
-    echo "<div style='text-align: center; padding: 100px;'><h1>Blog post not found</h1><p>The blog post you're looking for doesn't exist.</p><a href='blog.php' style='color: #000e3a;'>Back to Blog</a></div>";
+    echo "<div style='text-align: center; padding: 100px;'><h1>Blog post not found</h1><p>The blog post you're looking for doesn't exist.</p><a href='{$baseUrl}/blog' style='color: #000e3a;'>Back to Blog</a></div>";
     exit();
 }
 
@@ -31,21 +51,20 @@ include __DIR__ . '/includes/header.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($blog['title']); ?> - Hotel Dhauladhar</title>
-    <link rel="stylesheet" href="style.css">
+    <title><?php echo htmlspecialchars($blog['title']); ?> - Hotel Dhauladhar Heights</title>
+    <link rel="stylesheet" href="<?php echo $baseUrl; ?>/style.css">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
 </head>
 <body>
 
-<!-- Include your header -->
-  <!----------------------- hero section ---------------------->
+<!----------------------- hero section ---------------------->
 <div class="common-hero blog" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('<?php echo $featuredImageUrl; ?>'); background-size: cover; background-position: center;">
-    <h1 data-aos="fade-down" data-aos-duration="1200">Blog Details</h1>
+    <h1 data-aos="fade-down" data-aos-duration="1200"><?php echo htmlspecialchars($blog['title']); ?></h1>
     <div class="hero-links" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="300">
-      <a href="index.php">THE RESORT</a>
-      <a href="blog.php">/Blog</a>
+      <a href="<?php echo $baseUrl; ?>/">THE RESORT</a>
+      <a href="<?php echo $baseUrl; ?>/blog">/ Blog</a>
+      <a href="#">/ <?php echo htmlspecialchars($blog['category'] ?? 'General'); ?></a>
     </div>
   </div>
 
@@ -66,7 +85,7 @@ include __DIR__ . '/includes/header.php';
                     <img src="<?php echo $featuredImageUrl; ?>" 
                          alt="<?php echo htmlspecialchars($blog['title']); ?>" 
                          class="blog-featured-image"
-                         onerror="this.onerror=null; this.src='./images/default-blog.jpg';">
+                         onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
                 </div>
             <?php endif; ?>
             
@@ -90,7 +109,7 @@ include __DIR__ . '/includes/header.php';
                                             <div class="gallery-item" onclick="openLightbox('<?php echo $imageUrl; ?>')">
                                                 <img src="<?php echo $imageUrl; ?>" 
                                                      alt="<?php echo htmlspecialchars($section['title'] ?? 'Image'); ?>"
-                                                     onerror="this.onerror=null; this.src='./images/default-blog.jpg';">
+                                                     onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
                                                 <div class="gallery-overlay">
                                                     <i class="fas fa-search-plus"></i>
                                                 </div>
@@ -107,7 +126,7 @@ include __DIR__ . '/includes/header.php';
                 <?php else: ?>
                     <div class="blog-section">
                         <div class="section-content">
-                            <?php echo nl2br(htmlspecialchars($blog['content'])); ?>
+                            <?php echo nl2br($blog['content']); ?>
                         </div>
                     </div>
                 <?php endif; ?>
@@ -144,11 +163,14 @@ include __DIR__ . '/includes/header.php';
                 <?php if (!empty($popularBlogs)): ?>
                     <?php foreach ($popularBlogs as $popular): ?>
                         <?php if ($popular['id'] != $blog['id']): ?>
-                            <?php $popularImageUrl = getBlogImageUrl($popular['featured_image']); ?>
-                            <a href="blog-detail.php?slug=<?php echo $popular['slug']; ?>" class="post" style="text-decoration: none; display: flex; gap: 15px;">
+                            <?php 
+                            $popularImageUrl = getBlogImageUrl($popular['featured_image']); 
+                            $popularUrl = getBlogUrl($popular);
+                            ?>
+                            <a href="<?php echo $popularUrl; ?>" class="post" style="text-decoration: none; display: flex; gap: 15px;">
                                 <img src="<?php echo $popularImageUrl; ?>" 
                                      alt="<?php echo htmlspecialchars($popular['title']); ?>"
-                                     onerror="this.onerror=null; this.src='./images/default-blog.jpg';">
+                                     onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
                                 <div>
                                     <p><?php echo htmlspecialchars($popular['title']); ?></p>
                                     <span><?php echo date('M d, Y', strtotime($popular['created_at'])); ?></span>
@@ -159,6 +181,27 @@ include __DIR__ . '/includes/header.php';
                 <?php else: ?>
                     <p>No popular posts yet.</p>
                 <?php endif; ?>
+            </div>
+            
+            <div class="sidebar-card">
+                    <h3>Rooms Category</h3>
+                    <ul class="category">
+                        <a href="<?php echo getRoomUrl('executive-room'); ?>">
+                            <li>Executive Room<span>24</span></li>
+                        </a>
+                        <a href="<?php echo getRoomUrl('executive-suite'); ?>">
+                            <li>Executive Suite<span>40</span></li>
+                        </a>
+                        <a href="<?php echo getRoomUrl('presidential-suite'); ?>">
+                            <li>Presidential Suite<span>02</span></li>
+                        </a>
+                        <a href="<?php echo getRoomUrl('twin-bed'); ?>">
+                            <li>Twin Bed<span>04</span></li>
+                        </a>
+                        <a href="<?php echo getRoomUrl('deluxe-room'); ?>">
+                            <li>Deluxe Room<span>03</span></li>
+                        </a>
+                    </ul>
             </div>
         </aside>
     </div>

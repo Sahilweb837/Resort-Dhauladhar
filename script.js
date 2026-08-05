@@ -926,44 +926,80 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
-  const params = new URLSearchParams(window.location.search);
-  const roomKey = params.get("room");
-  const room = roomData[roomKey];
+  function getRoomKeyFromPathOrQuery() {
+    const params = new URLSearchParams(window.location.search);
+    let roomKey = params.get("room");
+    if (!roomKey) {
+      const pathParts = window.location.pathname.split('/').filter(Boolean);
+      const roomsIdx = pathParts.indexOf('rooms');
+      if (roomsIdx !== -1 && pathParts[roomsIdx + 1]) {
+        roomKey = pathParts[pathParts.length - 1];
+      } else {
+        const roomIdx = pathParts.indexOf('room');
+        if (roomIdx !== -1 && pathParts[roomIdx + 1]) {
+          roomKey = pathParts[pathParts.length - 1];
+        }
+      }
+    }
+    return roomKey || "executive-room";
+  }
+
+  const roomKey = getRoomKeyFromPathOrQuery();
+  const room = roomData[roomKey] || roomData["executive-room"];
 
   if (!room) return;
 
   const roomDetails = document.getElementById("roomDetails");
-const roomHero = document.getElementById("roomHero");
-if (!roomDetails || !roomHero) return;
-roomHero.style.backgroundImage = `url(${room.image})`;
-  roomDetails.innerHTML = `
-    <div class="room-content" data-aos="fade-up">
-      <h2 class="room-heading">${room.title}</h2>
+  const roomHero = document.getElementById("roomHero");
+  if (roomHero && room.image) {
+    roomHero.style.backgroundImage = `url(${room.image})`;
+  }
+  if (roomDetails) {
+    roomDetails.innerHTML = `
+      <div class="room-content" data-aos="fade-up">
+        <h2 class="room-heading">${room.title}</h2>
 
-      <ul class="room-features">
-        <li>${room.features}</li>
-      </ul>
+        <ul class="room-features">
+          <li>${room.features}</li>
+        </ul>
 
-      <p class="room-description">${room.desc}</p>
+        <p class="room-description">${room.desc}</p>
 
-      <a href="https://asiatech.in/booking_engine/index3?token=NTc3MQ==" class="discover-button rect-btn">
-        BOOK now
-      </a>
-    </div>
-
-    <div class="room-image">
-      <div class="image-overlay-text">
-        <img src="${room.image}" alt="${room.title}">
+        <a href="https://asiatech.in/booking_engine/index3?token=NTc3MQ==" target="_blank" class="discover-button rect-btn">
+          BOOK now
+        </a>
       </div>
-    </div>
-  `;
+
+      <div class="room-image">
+        <div class="image-overlay-text">
+          <img src="${room.image}" alt="${room.title}">
+        </div>
+      </div>
+    `;
+  }
+
+  // Highlight active room button
+  document.querySelectorAll(".room-button").forEach(btn => {
+    if (btn.dataset.room === roomKey) {
+      btn.classList.add("active");
+    }
+  });
 });
+
 // if user select btns for rooms
 document.addEventListener("click", function (e) {
   const btn = e.target.closest(".room-button");
-  if (btn) {
+  if (btn && btn.dataset.room) {
+    e.preventDefault();
     const roomKey = btn.dataset.room;
-    window.location.href = `room-details.html?room=${roomKey}`;
+    // Get base path
+    const pathParts = window.location.pathname.split('/');
+    const roomsIdx = pathParts.indexOf('rooms');
+    let basePath = '';
+    if (roomsIdx > 0) {
+      basePath = pathParts.slice(0, roomsIdx).join('/');
+    }
+    window.location.href = `${basePath}/rooms/${roomKey}`;
   }
 });
 
@@ -1070,8 +1106,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* ================= LOAD BASED ON URL ================= */
 
-  const params = new URLSearchParams(window.location.search);
-  const roomKeyFromURL = params.get("room") || "executive-room";
+  let roomKeyFromURL = new URLSearchParams(window.location.search).get("room");
+  if (!roomKeyFromURL) {
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    if (parts.length) {
+      roomKeyFromURL = parts[parts.length - 1];
+    }
+  }
+  if (!roomImages[roomKeyFromURL]) {
+    roomKeyFromURL = "executive-room";
+  }
 
   loadSelectedRoomSlider(roomKeyFromURL);
 
@@ -1190,5 +1234,5 @@ $('.mobile-next').on('click', function(){
         document.getElementById('bookBtn')?.addEventListener('click', function() {
             const checkIn = document.getElementById('checkIn').value;
             const checkOut = document.getElementById('checkOut').value;
-            window.location.href = `rooms.html?checkin=${checkIn}&checkout=${checkOut}`;
+            window.location.href = `rooms?checkin=${checkIn}&checkout=${checkOut}`;
         });

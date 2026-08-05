@@ -24,164 +24,288 @@ function isLoggedIn() {
 
 // ==================== BLOG FUNCTIONS ====================
 
+function getDefaultSampleBlogs() {
+    return [
+        [
+            'id' => 1,
+            'title' => 'Dream Destination Weddings in Dharamshala at Dhauladhar Heights',
+            'slug' => 'destination-wedding-in-dharamshala',
+            'category' => 'Wedding',
+            'excerpt' => 'Exchange your vows surrounded by the majestic Dhauladhar mountains. Discover how our luxury resort makes your dream hill-station wedding unforgettable.',
+            'content' => '<p>Planning a destination wedding in the serene hills of Himachal Pradesh? Hotel Dhauladhar Heights Resort offers breathtaking mountain vistas, exquisite banquet halls, open lawn venues, and five-star hospitality for your special day.</p><p>From royal outdoor mandaps overlooking tea gardens to customized catering and lavish guest suites, we turn every wedding celebration into a lifelong memory.</p>',
+            'featured_image' => 'images/sangeet1.jpg',
+            'author' => 'Admin',
+            'status' => 'published',
+            'created_at' => date('Y-m-d H:i:s'),
+            'views' => 45
+        ],
+        [
+            'id' => 2,
+            'title' => 'Exploring Dharamshala: Top Attractions and Hill Station Experiences',
+            'slug' => 'exploring-dharamshala-attractions',
+            'category' => 'Travel',
+            'excerpt' => 'From Kangra valley tea gardens to McLeod Ganj monasteries, discover the top places to visit during your stay at Dhauladhar Heights Resort.',
+            'content' => '<p>Dharamshala is a sanctuary of peace, natural beauty, and vibrant culture. Located at the foothills of the Dhauladhar ranges, it offers everything from tranquil forest walks to historic temples and Tibetan heritage.</p><p>Key highlights include McLeod Ganj, Bhagsu Waterfall, Kunal Pathri Temple, and panoramic tea garden trails right outside our resort doors.</p>',
+            'featured_image' => 'images/aboutbanner - Copy.jpg',
+            'author' => 'Admin',
+            'status' => 'published',
+            'created_at' => date('Y-m-d H:i:s', strtotime('-2 days')),
+            'views' => 38
+        ],
+        [
+            'id' => 3,
+            'title' => 'Luxury Accommodation Guide: Executive Suites & Presidential Living',
+            'slug' => 'luxury-accommodation-guide-dharamshala',
+            'category' => 'Lifestyle',
+            'excerpt' => 'Experience ultimate luxury, mountain views, and modern comforts in our signature suites and executive rooms at Dhauladhar Heights.',
+            'content' => '<p>Whether traveling for business or leisure, choosing the right room enhances your mountain getaway. Our resort features Executive Rooms, Executive Suites with separate living spaces, and exclusive Presidential Suites equipped with top-tier amenities, smart TVs, high-speed Wi-Fi, and private balconies facing the snow-capped peaks.</p>',
+            'featured_image' => 'images/presidentialmain.jpg',
+            'author' => 'Admin',
+            'status' => 'published',
+            'created_at' => date('Y-m-d H:i:s', strtotime('-5 days')),
+            'views' => 62
+        ],
+        [
+            'id' => 4,
+            'title' => 'Culinary Journey: Authentic Himachali & International Flavors',
+            'slug' => 'authentic-himachali-food-guide',
+            'category' => 'Food',
+            'excerpt' => 'Indulge in delicious multi-cuisine dining, traditional Himachali specialties, and soothing teas served at our hill-view restaurant.',
+            'content' => '<p>At Dhauladhar Heights Resort, dining is an extraordinary experience. Enjoy freshly prepared North Indian, Continental, and local Himachali delicacies crafted by our executive chefs using organic regional ingredients.</p>',
+            'featured_image' => 'images/DSC09149-scaled.jpg',
+            'author' => 'Admin',
+            'status' => 'published',
+            'created_at' => date('Y-m-d H:i:s', strtotime('-1 week')),
+            'views' => 29
+        ],
+        [
+            'id' => 5,
+            'title' => 'Corporate Retreats & Event Venues in the Himalayas',
+            'slug' => 'corporate-retreats-event-venues-dharamshala',
+            'category' => 'Events',
+            'excerpt' => 'Host high-impact corporate conferences, annual meets, and private celebrations in our versatile event venues with state-of-the-art facilities.',
+            'content' => '<p>Combine business with nature\'s tranquility. Our resort provides spacious conference halls, high-speed connectivity, break-out zones, and curated team-building activities set against the backdrop of Dharamshala\'s mountain wilderness.</p>',
+            'featured_image' => 'images/DSC09631-scaled.jpg',
+            'author' => 'Admin',
+            'status' => 'published',
+            'created_at' => date('Y-m-d H:i:s', strtotime('-2 weeks')),
+            'views' => 19
+        ]
+    ];
+}
+
 function getAllBlogs($limit = null, $offset = 0, $status = null) {
     try {
         $pdo = getDB();
-        $sql = "SELECT * FROM blogs";
-        $params = [];
-        
-        if ($status) {
-            $sql .= " WHERE status = ?";
-            $params[] = $status;
+        if ($pdo) {
+            $sql = "SELECT * FROM blogs";
+            $params = [];
+            
+            if ($status) {
+                $sql .= " WHERE status = ?";
+                $params[] = $status;
+            }
+            
+            $sql .= " ORDER BY created_at DESC";
+            
+            if ($limit) {
+                $limit = intval($limit);
+                $offset = intval($offset);
+                $sql .= " LIMIT $limit OFFSET $offset";
+            }
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            $results = $stmt->fetchAll();
+            if (!empty($results)) {
+                return $results;
+            }
         }
-        
-        $sql .= " ORDER BY created_at DESC";
-        
-        if ($limit) {
-            $limit = intval($limit);
-            $offset = intval($offset);
-            $sql .= " LIMIT $limit OFFSET $offset";
-        }
-        
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
-    } catch (PDOException $e) {
-        error_log("Error in getAllBlogs: " . $e->getMessage());
-        return [];
+    } catch (Throwable $e) {
+        // Silent catch
     }
+
+    $defaults = getDefaultSampleBlogs();
+    if ($status) {
+        $defaults = array_values(array_filter($defaults, function($b) use ($status) {
+            return $b['status'] === $status;
+        }));
+    }
+    if ($limit) {
+        return array_slice($defaults, $offset, $limit);
+    }
+    return $defaults;
 }
 
 function getBlogById($id) {
     try {
         $pdo = getDB();
-        $stmt = $pdo->prepare("SELECT * FROM blogs WHERE id = ?");
-        $stmt->execute([$id]);
-        return $stmt->fetch();
-    } catch (PDOException $e) {
-        error_log("Error in getBlogById: " . $e->getMessage());
-        return false;
+        if ($pdo) {
+            $stmt = $pdo->prepare("SELECT * FROM blogs WHERE id = ?");
+            $stmt->execute([$id]);
+            $blog = $stmt->fetch();
+            if ($blog) return $blog;
+        }
+    } catch (Throwable $e) {
+        // Silent catch
     }
+
+    foreach (getDefaultSampleBlogs() as $b) {
+        if ($b['id'] == $id) return $b;
+    }
+    return false;
 }
 
 function getBlogBySlug($slug) {
     try {
         $pdo = getDB();
-        $stmt = $pdo->prepare("SELECT * FROM blogs WHERE slug = ? AND status = 'published'");
-        $stmt->execute([$slug]);
-        return $stmt->fetch();
-    } catch (PDOException $e) {
-        error_log("Error in getBlogBySlug: " . $e->getMessage());
+        if ($pdo) {
+            $stmt = $pdo->prepare("SELECT * FROM blogs WHERE slug = ? AND status = 'published'");
+            $stmt->execute([$slug]);
+            $blog = $stmt->fetch();
+            if ($blog) return $blog;
+        }
+    } catch (Throwable $e) {
+        // Silent catch
+    }
+
+    foreach (getDefaultSampleBlogs() as $b) {
+        if ($b['slug'] === $slug) return $b;
+    }
+    return false;
+}
+
+function createBlog($data) {
+    try {
+        $pdo = getDB();
+        if (!$pdo) return false;
+        
+        $sql = "INSERT INTO blogs (title, slug, content, excerpt, featured_image, category, author, meta_description, meta_keywords, status, sections, content_format) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        $stmt = $pdo->prepare($sql);
+        return $stmt->execute([
+            $data['title'],
+            $data['slug'],
+            $data['content'],
+            $data['excerpt'] ?? '',
+            $data['featured_image'] ?? '',
+            $data['category'] ?? '',
+            $data['author'] ?? 'Admin',
+            $data['meta_description'] ?? '',
+            $data['meta_keywords'] ?? '',
+            $data['status'] ?? 'published',
+            $data['sections'] ?? null,
+            $data['content_format'] ?? 'html'
+        ]);
+    } catch (Throwable $e) {
         return false;
     }
 }
 
-function createBlog($data) {
-    $pdo = getDB();
-    
-    $sql = "INSERT INTO blogs (title, slug, content, excerpt, featured_image, category, author, meta_description, meta_keywords, status, sections, content_format) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    
-    $stmt = $pdo->prepare($sql);
-    return $stmt->execute([
-        $data['title'],
-        $data['slug'],
-        $data['content'],
-        $data['excerpt'] ?? '',
-        $data['featured_image'] ?? '',
-        $data['category'] ?? '',
-        $data['author'] ?? 'Admin',
-        $data['meta_description'] ?? '',
-        $data['meta_keywords'] ?? '',
-        $data['status'] ?? 'published',
-        $data['sections'] ?? null,
-        $data['content_format'] ?? 'html'
-    ]);
-}
-
 function updateBlog($id, $data) {
-    $pdo = getDB();
-    
-    $sql = "UPDATE blogs SET 
-            title = ?, slug = ?, content = ?, excerpt = ?, 
-            featured_image = ?, category = ?, author = ?, 
-            meta_description = ?, meta_keywords = ?, status = ?,
-            sections = ?, content_format = ?
-            WHERE id = ?";
-    
-    $stmt = $pdo->prepare($sql);
-    return $stmt->execute([
-        $data['title'],
-        $data['slug'],
-        $data['content'],
-        $data['excerpt'] ?? '',
-        $data['featured_image'] ?? '',
-        $data['category'] ?? '',
-        $data['author'] ?? 'Admin',
-        $data['meta_description'] ?? '',
-        $data['meta_keywords'] ?? '',
-        $data['status'] ?? 'published',
-        $data['sections'] ?? null,
-        $data['content_format'] ?? 'html',
-        $id
-    ]);
+    try {
+        $pdo = getDB();
+        if (!$pdo) return false;
+        
+        $sql = "UPDATE blogs SET 
+                title = ?, slug = ?, content = ?, excerpt = ?, 
+                featured_image = ?, category = ?, author = ?, 
+                meta_description = ?, meta_keywords = ?, status = ?,
+                sections = ?, content_format = ?
+                WHERE id = ?";
+        
+        $stmt = $pdo->prepare($sql);
+        return $stmt->execute([
+            $data['title'],
+            $data['slug'],
+            $data['content'],
+            $data['excerpt'] ?? '',
+            $data['featured_image'] ?? '',
+            $data['category'] ?? '',
+            $data['author'] ?? 'Admin',
+            $data['meta_description'] ?? '',
+            $data['meta_keywords'] ?? '',
+            $data['status'] ?? 'published',
+            $data['sections'] ?? null,
+            $data['content_format'] ?? 'html',
+            $id
+        ]);
+    } catch (Throwable $e) {
+        return false;
+    }
 }
 
 function deleteBlog($id) {
-    $pdo = getDB();
-    
-    // Get blog to delete image
-    $blog = getBlogById($id);
-    if ($blog && !empty($blog['featured_image'])) {
-        deleteImage($blog['featured_image']);
+    try {
+        $pdo = getDB();
+        if (!$pdo) return false;
+        
+        // Get blog to delete image
+        $blog = getBlogById($id);
+        if ($blog && !empty($blog['featured_image'])) {
+            deleteImage($blog['featured_image']);
+        }
+        
+        $stmt = $pdo->prepare("DELETE FROM blogs WHERE id = ?");
+        return $stmt->execute([$id]);
+    } catch (Throwable $e) {
+        return false;
     }
-    
-    $stmt = $pdo->prepare("DELETE FROM blogs WHERE id = ?");
-    return $stmt->execute([$id]);
 }
 
 function getBlogCount($status = null) {
     try {
         $pdo = getDB();
-        
-        if ($status) {
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM blogs WHERE status = ?");
-            $stmt->execute([$status]);
-        } else {
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM blogs");
-            $stmt->execute();
+        if ($pdo) {
+            if ($status) {
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM blogs WHERE status = ?");
+                $stmt->execute([$status]);
+            } else {
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM blogs");
+                $stmt->execute();
+            }
+            
+            $count = $stmt->fetchColumn();
+            if ($count > 0) return $count;
         }
-        
-        return $stmt->fetchColumn();
-    } catch (PDOException $e) {
-        error_log("Error in getBlogCount: " . $e->getMessage());
-        return 0;
+    } catch (Throwable $e) {
+        // Silent catch
     }
+
+    return count(getDefaultSampleBlogs());
 }
 
-// FIXED: getRecentBlogs function - no parameter binding for LIMIT
 function getRecentBlogs($limit = 5) {
     try {
         $pdo = getDB();
-        $limit = intval($limit);
-        $stmt = $pdo->query("SELECT * FROM blogs WHERE status = 'published' ORDER BY created_at DESC LIMIT $limit");
-        return $stmt->fetchAll();
-    } catch (PDOException $e) {
-        error_log("Error in getRecentBlogs: " . $e->getMessage());
-        return [];
+        if ($pdo) {
+            $limit = intval($limit);
+            $stmt = $pdo->query("SELECT * FROM blogs WHERE status = 'published' ORDER BY created_at DESC LIMIT $limit");
+            $results = $stmt->fetchAll();
+            if (!empty($results)) return $results;
+        }
+    } catch (Throwable $e) {
+        // Silent catch
     }
+
+    return array_slice(getDefaultSampleBlogs(), 0, $limit);
 }
 
 function getPopularBlogs($limit = 5) {
     try {
         $pdo = getDB();
-        $limit = intval($limit);
-        $stmt = $pdo->query("SELECT * FROM blogs WHERE status = 'published' ORDER BY views DESC LIMIT $limit");
-        return $stmt->fetchAll();
-    } catch (PDOException $e) {
-        error_log("Error in getPopularBlogs: " . $e->getMessage());
-        return [];
+        if ($pdo) {
+            $limit = intval($limit);
+            $stmt = $pdo->query("SELECT * FROM blogs WHERE status = 'published' ORDER BY views DESC LIMIT $limit");
+            $results = $stmt->fetchAll();
+            if (!empty($results)) return $results;
+        }
+    } catch (Throwable $e) {
+        // Silent catch
     }
+
+    return array_slice(getDefaultSampleBlogs(), 0, $limit);
 }
 
 // ==================== HELPER FUNCTIONS ====================
@@ -191,6 +315,33 @@ function createSlug($string) {
     $string = preg_replace('/[^a-z0-9-]/', '-', $string);
     $string = preg_replace('/-+/', '-', $string);
     return trim($string, '-');
+}
+
+/**
+ * Generate SEO clean URL for a blog post
+ * Output: /blog/category-slug/blog-slug or /blog/blog-slug
+ */
+function getBlogUrl($blog) {
+    $baseUrl = getBaseUrl();
+    if (is_array($blog)) {
+        $slug = $blog['slug'] ?? '';
+        $cat = !empty($blog['category']) ? createSlug($blog['category']) : 'general';
+        return $baseUrl . '/blog/' . $cat . '/' . $slug;
+    }
+    return $baseUrl . '/blog/' . $blog;
+}
+
+/**
+ * Generate SEO clean URL for a room page
+ * Output: /rooms/room-slug
+ */
+function getRoomUrl($roomSlug, $catSlug = null) {
+    $baseUrl = getBaseUrl();
+    $roomSlug = ltrim($roomSlug, '/');
+    if ($catSlug) {
+        return $baseUrl . '/rooms/' . createSlug($catSlug) . '/' . $roomSlug;
+    }
+    return $baseUrl . '/rooms/' . $roomSlug;
 }
 
 function uploadImage($file, $uploadDir = 'uploads/') {
@@ -408,57 +559,65 @@ function sanitize($input) {
 function getCategories() {
     try {
         $pdo = getDB();
-        // Check if categories table exists
-        $stmt = $pdo->query("SHOW TABLES LIKE 'categories'");
-        if ($stmt->rowCount() == 0) {
-            // Create categories table
-            $pdo->exec("CREATE TABLE IF NOT EXISTS categories (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(100) NOT NULL UNIQUE,
-                slug VARCHAR(100) NOT NULL UNIQUE,
-                description TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-            
-            // Insert default categories
-            $default_categories = ['Wedding', 'Travel', 'Food', 'Events', 'Lifestyle'];
-            $insertStmt = $pdo->prepare("INSERT IGNORE INTO categories (name, slug) VALUES (?, ?)");
-            foreach ($default_categories as $cat) {
-                $slug = createSlug($cat);
-                $insertStmt->execute([$cat, $slug]);
+        if ($pdo) {
+            // Check if categories table exists
+            $stmt = $pdo->query("SHOW TABLES LIKE 'categories'");
+            if ($stmt->rowCount() == 0) {
+                // Create categories table
+                $pdo->exec("CREATE TABLE IF NOT EXISTS categories (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(100) NOT NULL UNIQUE,
+                    slug VARCHAR(100) NOT NULL UNIQUE,
+                    description TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+                
+                // Insert default categories
+                $default_categories = ['Wedding', 'Travel', 'Food', 'Events', 'Lifestyle'];
+                $insertStmt = $pdo->prepare("INSERT IGNORE INTO categories (name, slug) VALUES (?, ?)");
+                foreach ($default_categories as $cat) {
+                    $slug = createSlug($cat);
+                    $insertStmt->execute([$cat, $slug]);
+                }
             }
+            
+            $stmt = $pdo->query("SELECT * FROM categories ORDER BY name");
+            $results = $stmt->fetchAll();
+            if (!empty($results)) return $results;
         }
-        
-        $stmt = $pdo->query("SELECT * FROM categories ORDER BY name");
-        return $stmt->fetchAll();
-    } catch (PDOException $e) {
+    } catch (Throwable $e) {
         error_log("Error getting categories: " . $e->getMessage());
-        return [];
     }
+
+    return [
+        ['id' => 1, 'name' => 'Events', 'slug' => 'events'],
+        ['id' => 2, 'name' => 'Food', 'slug' => 'food'],
+        ['id' => 3, 'name' => 'Lifestyle', 'slug' => 'lifestyle'],
+        ['id' => 4, 'name' => 'Travel', 'slug' => 'travel'],
+        ['id' => 5, 'name' => 'Wedding', 'slug' => 'wedding']
+    ];
 }
 
 function getDashboardStats() {
-    $stats = [];
+    $stats = ['total_blogs' => 0, 'published_blogs' => 0, 'draft_blogs' => 0];
     
     try {
         $pdo = getDB();
-        // Total blogs
-        $stmt = $pdo->query("SELECT COUNT(*) FROM blogs");
-        $stats['total_blogs'] = $stmt->fetchColumn() ?: 0;
-        
-        // Published blogs
-        $stmt = $pdo->query("SELECT COUNT(*) FROM blogs WHERE status = 'published'");
-        $stats['published_blogs'] = $stmt->fetchColumn() ?: 0;
-        
-        // Draft blogs
-        $stmt = $pdo->query("SELECT COUNT(*) FROM blogs WHERE status = 'draft'");
-        $stats['draft_blogs'] = $stmt->fetchColumn() ?: 0;
-        
-        return $stats;
-    } catch (PDOException $e) {
-        $stats['total_blogs'] = 0;
-        $stats['published_blogs'] = 0;
-        $stats['draft_blogs'] = 0;
+        if ($pdo) {
+            // Total blogs
+            $stmt = $pdo->query("SELECT COUNT(*) FROM blogs");
+            $stats['total_blogs'] = $stmt->fetchColumn() ?: 0;
+            
+            // Published blogs
+            $stmt = $pdo->query("SELECT COUNT(*) FROM blogs WHERE status = 'published'");
+            $stats['published_blogs'] = $stmt->fetchColumn() ?: 0;
+            
+            // Draft blogs
+            $stmt = $pdo->query("SELECT COUNT(*) FROM blogs WHERE status = 'draft'");
+            $stats['draft_blogs'] = $stmt->fetchColumn() ?: 0;
+        }
+    } catch (Throwable $e) {
+        // Fallback
     }
     
     return $stats;
@@ -467,8 +626,9 @@ function getDashboardStats() {
 // ==================== ADMIN AUTH FUNCTIONS ====================
 
 function authenticateAdmin($username, $password) {
-    $pdo = getDB();
     try {
+        $pdo = getDB();
+        if (!$pdo) return false;
         $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ? OR email = ?");
         $stmt->execute([$username, $username]);
         $user = $stmt->fetch();
@@ -482,7 +642,7 @@ function authenticateAdmin($username, $password) {
             return true;
         }
         return false;
-    } catch (PDOException $e) {
+    } catch (Throwable $e) {
         error_log("Authentication error: " . $e->getMessage());
         return false;
     }
@@ -502,10 +662,15 @@ function logout() {
 }
 
 function getAdminById($id) {
-    $pdo = getDB();
-    $stmt = $pdo->prepare("SELECT id, username, email, name FROM admins WHERE id = ?");
-    $stmt->execute([$id]);
-    return $stmt->fetch();
+    try {
+        $pdo = getDB();
+        if (!$pdo) return false;
+        $stmt = $pdo->prepare("SELECT id, username, email, name FROM admins WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    } catch (Throwable $e) {
+        return false;
+    }
 }
 
 // ==================== ENSURE UPLOAD DIRECTORY EXISTS ====================
@@ -549,31 +714,116 @@ function ensureUploadDirectory() {
 ensureUploadDirectory();
 
 // ==================== DATABASE UPDATE FUNCTIONS ====================
+function seedDefaultBlogs($pdo) {
+    try {
+        $defaultPosts = [
+            [
+                'title' => 'Dream Destination Weddings in Dharamshala at Dhauladhar Heights',
+                'slug' => 'destination-wedding-in-dharamshala',
+                'category' => 'Wedding',
+                'excerpt' => 'Exchange your vows surrounded by the majestic Dhauladhar mountains. Discover how our luxury resort makes your dream hill-station wedding unforgettable.',
+                'content' => '<p>Planning a destination wedding in the serene hills of Himachal Pradesh? Hotel Dhauladhar Heights Resort offers breathtaking mountain vistas, exquisite banquet halls, open lawn venues, and five-star hospitality for your special day.</p><p>From royal outdoor mandaps overlooking tea gardens to customized catering and lavish guest suites, we turn every wedding celebration into a lifelong memory.</p>',
+                'featured_image' => 'images/sangeet1.jpg'
+            ],
+            [
+                'title' => 'Exploring Dharamshala: Top Attractions and Hill Station Experiences',
+                'slug' => 'exploring-dharamshala-attractions',
+                'category' => 'Travel',
+                'excerpt' => 'From Kangra valley tea gardens to McLeod Ganj monasteries, discover the top places to visit during your stay at Dhauladhar Heights Resort.',
+                'content' => '<p>Dharamshala is a sanctuary of peace, natural beauty, and vibrant culture. Located at the foothills of the Dhauladhar ranges, it offers everything from tranquil forest walks to historic temples and Tibetan heritage.</p><p>Key highlights include McLeod Ganj, Bhagsu Waterfall, Kunal Pathri Temple, and panoramic tea garden trails right outside our resort doors.</p>',
+                'featured_image' => 'images/aboutbanner - Copy.jpg'
+            ],
+            [
+                'title' => 'Luxury Accommodation Guide: Executive Suites & Presidential Living',
+                'slug' => 'luxury-accommodation-guide-dharamshala',
+                'category' => 'Lifestyle',
+                'excerpt' => 'Experience ultimate luxury, mountain views, and modern comforts in our signature suites and executive rooms at Dhauladhar Heights.',
+                'content' => '<p>Whether traveling for business or leisure, choosing the right room enhances your mountain getaway. Our resort features Executive Rooms, Executive Suites with separate living spaces, and exclusive Presidential Suites equipped with top-tier amenities, smart TVs, high-speed Wi-Fi, and private balconies facing the snow-capped peaks.</p>',
+                'featured_image' => 'images/presidentialmain.jpg'
+            ],
+            [
+                'title' => 'Culinary Journey: Authentic Himachali & International Flavors',
+                'slug' => 'authentic-himachali-food-guide',
+                'category' => 'Food',
+                'excerpt' => 'Indulge in delicious multi-cuisine dining, traditional Himachali specialties, and soothing teas served at our hill-view restaurant.',
+                'content' => '<p>At Dhauladhar Heights Resort, dining is an extraordinary experience. Enjoy freshly prepared North Indian, Continental, and local Himachali delicacies crafted by our executive chefs using organic regional ingredients.</p>',
+                'featured_image' => 'images/DSC09149-scaled.jpg'
+            ],
+            [
+                'title' => 'Corporate Retreats & Event Venues in the Himalayas',
+                'slug' => 'corporate-retreats-event-venues-dharamshala',
+                'category' => 'Events',
+                'excerpt' => 'Host high-impact corporate conferences, annual meets, and private celebrations in our versatile event venues with state-of-the-art facilities.',
+                'content' => '<p>Combine business with nature\'s tranquility. Our resort provides spacious conference halls, high-speed connectivity, break-out zones, and curated team-building activities set against the backdrop of Dharamshala\'s mountain wilderness.</p>',
+                'featured_image' => 'images/DSC09631-scaled.jpg'
+            ]
+        ];
+
+        $stmt = $pdo->prepare("INSERT IGNORE INTO blogs (title, slug, content, excerpt, featured_image, category, author, status, views) VALUES (?, ?, ?, ?, ?, ?, 'Admin', 'published', 15)");
+        foreach ($defaultPosts as $post) {
+            $stmt->execute([
+                $post['title'],
+                $post['slug'],
+                $post['content'],
+                $post['excerpt'],
+                $post['featured_image'],
+                $post['category']
+            ]);
+        }
+    } catch (PDOException $e) {
+        error_log("Error seeding blogs: " . $e->getMessage());
+    }
+}
+
 function ensureBlogTableColumns() {
     try {
         $pdo = getDB();
-        // Check if blogs table exists first
+        if (!$pdo) return;
         $stmt = $pdo->query("SHOW TABLES LIKE 'blogs'");
-        if ($stmt->rowCount() > 0) {
-            // Check if views column exists
-            $stmt = $pdo->query("SHOW COLUMNS FROM blogs LIKE 'views'");
-            if ($stmt->rowCount() == 0) {
+        if ($stmt->rowCount() == 0) {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS blogs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                slug VARCHAR(255) NOT NULL UNIQUE,
+                content LONGTEXT NOT NULL,
+                excerpt TEXT,
+                featured_image VARCHAR(255) DEFAULT '',
+                category VARCHAR(100) DEFAULT 'General',
+                author VARCHAR(100) DEFAULT 'Admin',
+                meta_description TEXT,
+                meta_keywords TEXT,
+                status VARCHAR(20) DEFAULT 'published',
+                views INT DEFAULT 0,
+                sections JSON DEFAULT NULL,
+                content_format VARCHAR(20) DEFAULT 'html',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+            
+            seedDefaultBlogs($pdo);
+        } else {
+            // Check if table has columns
+            $stmtCol = $pdo->query("SHOW COLUMNS FROM blogs LIKE 'views'");
+            if ($stmtCol->rowCount() == 0) {
                 $pdo->exec("ALTER TABLE blogs ADD COLUMN views INT DEFAULT 0 AFTER status");
             }
-            // Check if sections column exists
-            $stmt = $pdo->query("SHOW COLUMNS FROM blogs LIKE 'sections'");
-            if ($stmt->rowCount() == 0) {
+            $stmtCol = $pdo->query("SHOW COLUMNS FROM blogs LIKE 'sections'");
+            if ($stmtCol->rowCount() == 0) {
                 $pdo->exec("ALTER TABLE blogs ADD COLUMN sections JSON DEFAULT NULL AFTER views");
             }
-            // Check if content_format column exists
-            $stmt = $pdo->query("SHOW COLUMNS FROM blogs LIKE 'content_format'");
-            if ($stmt->rowCount() == 0) {
+            $stmtCol = $pdo->query("SHOW COLUMNS FROM blogs LIKE 'content_format'");
+            if ($stmtCol->rowCount() == 0) {
                 $pdo->exec("ALTER TABLE blogs ADD COLUMN content_format VARCHAR(20) DEFAULT 'html' AFTER sections");
             }
+            
+            // Check if 0 rows in blogs table
+            $countStmt = $pdo->query("SELECT COUNT(*) FROM blogs");
+            if ($countStmt->fetchColumn() == 0) {
+                seedDefaultBlogs($pdo);
+            }
         }
-    } catch (PDOException $e) {
-        // Table might not exist yet - that's OK
-        error_log("Blog table not found, skipping column updates: " . $e->getMessage());
+    } catch (Throwable $e) {
+        // Silent catch for DB connection error
     }
 }
 
@@ -587,6 +837,7 @@ function ensureBlogTableColumns() {
 function ensureReviewsTable() {
     try {
         $pdo = getDB();
+        if (!$pdo) return;
         $stmt = $pdo->query("SHOW TABLES LIKE 'google_reviews'");
         if ($stmt->rowCount() == 0) {
             $pdo->exec("CREATE TABLE google_reviews (
@@ -634,8 +885,8 @@ function ensureReviewsTable() {
                 'Google', date('Y-m-d', strtotime('-4 months')), 'Holiday | Family', 5
             ]);
         }
-    } catch (PDOException $e) {
-        error_log("Reviews table error: " . $e->getMessage());
+    } catch (Throwable $e) {
+        // Silent catch
     }
 }
 
@@ -652,25 +903,29 @@ function getTopReviews($limit = 2) {
     try {
         ensureReviewsTable();
         $pdo = getDB();
-        $limit = intval($limit);
-        $stmt = $pdo->query("SELECT * FROM google_reviews WHERE status = 1 ORDER BY display_order ASC, review_date DESC LIMIT $limit");
-        return $stmt->fetchAll();
-    } catch (PDOException $e) {
-        error_log("Error fetching reviews: " . $e->getMessage());
-        return [];
+        if ($pdo) {
+            $limit = intval($limit);
+            $stmt = $pdo->query("SELECT * FROM google_reviews WHERE status = 1 ORDER BY display_order ASC, review_date DESC LIMIT $limit");
+            return $stmt->fetchAll();
+        }
+    } catch (Throwable $e) {
+        // Fallback
     }
+    return [];
 }
 
 function getAllReviews() {
     try {
         ensureReviewsTable();
         $pdo = getDB();
-        $stmt = $pdo->query("SELECT * FROM google_reviews WHERE status = 1 ORDER BY display_order ASC, review_date DESC");
-        return $stmt->fetchAll();
-    } catch (PDOException $e) {
-        error_log("Error fetching all reviews: " . $e->getMessage());
-        return [];
+        if ($pdo) {
+            $stmt = $pdo->query("SELECT * FROM google_reviews WHERE status = 1 ORDER BY display_order ASC, review_date DESC");
+            return $stmt->fetchAll();
+        }
+    } catch (Throwable $e) {
+        // Fallback
     }
+    return [];
 }
 
 function getReviewStats() {
@@ -684,82 +939,103 @@ function getReviewStats() {
     try {
         ensureReviewsTable();
         $pdo = getDB();
-        $stmt = $pdo->query("SELECT COUNT(*) as total, AVG(rating) as avg_rating FROM google_reviews WHERE status = 1");
-        return $stmt->fetch();
-    } catch (PDOException $e) {
-        return ['total' => 0, 'avg_rating' => 0];
+        if ($pdo) {
+            $stmt = $pdo->query("SELECT COUNT(*) as total, AVG(rating) as avg_rating FROM google_reviews WHERE status = 1");
+            return $stmt->fetch();
+        }
+    } catch (Throwable $e) {
+        // Fallback
     }
+    return ['total' => 0, 'avg_rating' => 0];
 }
 
 function getAllAdminReviews() {
     try {
         ensureReviewsTable();
         $pdo = getDB();
-        $stmt = $pdo->query("SELECT * FROM google_reviews ORDER BY created_at DESC");
-        return $stmt->fetchAll();
-    } catch (PDOException $e) {
-        error_log("Error fetching all admin reviews: " . $e->getMessage());
-        return [];
+        if ($pdo) {
+            $stmt = $pdo->query("SELECT * FROM google_reviews ORDER BY created_at DESC");
+            return $stmt->fetchAll();
+        }
+    } catch (Throwable $e) {
+        // Fallback
     }
+    return [];
 }
 
 function getReviewById($id) {
     try {
         $pdo = getDB();
-        $stmt = $pdo->prepare("SELECT * FROM google_reviews WHERE id = ?");
-        $stmt->execute([$id]);
-        return $stmt->fetch();
-    } catch (PDOException $e) {
-        error_log("Error in getReviewById: " . $e->getMessage());
+        if ($pdo) {
+            $stmt = $pdo->prepare("SELECT * FROM google_reviews WHERE id = ?");
+            $stmt->execute([$id]);
+            return $stmt->fetch();
+        }
+    } catch (Throwable $e) {
+        // Fallback
+    }
+    return false;
+}
+
+function createReview($data) {
+    try {
+        $pdo = getDB();
+        if (!$pdo) return false;
+        $sql = "INSERT INTO google_reviews (reviewer_name, reviewer_image, rating, review_text, guest_type, status, review_date) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $pdo->prepare($sql);
+        return $stmt->execute([
+            $data['reviewer_name'],
+            $data['reviewer_image'] ?? '',
+            $data['rating'] ?? 5,
+            $data['review_text'],
+            $data['guest_type'] ?? '',
+            $data['status'] ?? 1,
+            $data['review_date'] ?? date('Y-m-d')
+        ]);
+    } catch (Throwable $e) {
         return false;
     }
 }
 
-function createReview($data) {
-    $pdo = getDB();
-    $sql = "INSERT INTO google_reviews (reviewer_name, reviewer_image, rating, review_text, guest_type, status, review_date) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $pdo->prepare($sql);
-    return $stmt->execute([
-        $data['reviewer_name'],
-        $data['reviewer_image'] ?? '',
-        $data['rating'] ?? 5,
-        $data['review_text'],
-        $data['guest_type'] ?? '',
-        $data['status'] ?? 1,
-        $data['review_date'] ?? date('Y-m-d')
-    ]);
-}
-
 function updateReview($id, $data) {
-    $pdo = getDB();
-    $sql = "UPDATE google_reviews SET 
-            reviewer_name = ?, reviewer_image = ?, rating = ?, 
-            review_text = ?, guest_type = ?, status = ?, review_date = ?
-            WHERE id = ?";
-    $stmt = $pdo->prepare($sql);
-    return $stmt->execute([
-        $data['reviewer_name'],
-        $data['reviewer_image'] ?? '',
-        $data['rating'] ?? 5,
-        $data['review_text'],
-        $data['guest_type'] ?? '',
-        $data['status'] ?? 1,
-        $data['review_date'] ?? date('Y-m-d'),
-        $id
-    ]);
+    try {
+        $pdo = getDB();
+        if (!$pdo) return false;
+        $sql = "UPDATE google_reviews SET 
+                reviewer_name = ?, reviewer_image = ?, rating = ?, 
+                review_text = ?, guest_type = ?, status = ?, review_date = ?
+                WHERE id = ?";
+        $stmt = $pdo->prepare($sql);
+        return $stmt->execute([
+            $data['reviewer_name'],
+            $data['reviewer_image'] ?? '',
+            $data['rating'] ?? 5,
+            $data['review_text'],
+            $data['guest_type'] ?? '',
+            $data['status'] ?? 1,
+            $data['review_date'] ?? date('Y-m-d'),
+            $id
+        ]);
+    } catch (Throwable $e) {
+        return false;
+    }
 }
 
 function deleteReview($id) {
-    $pdo = getDB();
-    
-    // Get review to delete image
-    $review = getReviewById($id);
-    if ($review && !empty($review['reviewer_image'])) {
-        deleteImage($review['reviewer_image']);
+    try {
+        $pdo = getDB();
+        if (!$pdo) return false;
+        
+        $review = getReviewById($id);
+        if ($review && !empty($review['reviewer_image'])) {
+            deleteImage($review['reviewer_image']);
+        }
+        
+        $stmt = $pdo->prepare("DELETE FROM google_reviews WHERE id = ?");
+        return $stmt->execute([$id]);
+    } catch (Throwable $e) {
+        return false;
     }
-    
-    $stmt = $pdo->prepare("DELETE FROM google_reviews WHERE id = ?");
-    return $stmt->execute([$id]);
 }
 ?>

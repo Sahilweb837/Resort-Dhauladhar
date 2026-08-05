@@ -53,13 +53,12 @@
             <div class="hf-col hf-links" data-aos="fade-up" data-aos-delay="100">
                 <h3>USEFUL LINKS</h3>
                 <ul>
-                    <li><a class="is-active" href="./about.php">About </a></li>
-                    <li><a href="./rooms.html">Rooms & Suites</a></li>
-                    <li><a href="./contact.html">Reservations</a></li>
-                    <li><a href="./blog.php">News & Blogs</a></li>
-                    <li><a href="./contact.html">Contact Us</a></li>
-                    <li><a href="./privacypolicy.html">Privacy Policy</a></li>
-
+                    <li><a class="is-active" href="<?php echo getBaseUrl(); ?>/about.php">About </a></li>
+                    <li><a href="<?php echo getBaseUrl(); ?>/rooms">Rooms & Suites</a></li>
+                    <li><a href="<?php echo getBaseUrl(); ?>/contact.html">Reservations</a></li>
+                    <li><a href="<?php echo getBaseUrl(); ?>/blog">News & Blogs</a></li>
+                    <li><a href="<?php echo getBaseUrl(); ?>/contact.html">Contact Us</a></li>
+                    <li><a href="<?php echo getBaseUrl(); ?>/privacypolicy.html">Privacy Policy</a></li>
                 </ul>
             </div>
 

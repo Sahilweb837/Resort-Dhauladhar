@@ -5,26 +5,33 @@
 # Enable Rewrite Engine
 RewriteEngine On
 
-# Force HTTPS (uncomment on production)
-# RewriteCond %{HTTPS} off
-# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
-# Remove trailing slash (except for directories)
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)/$ /$1 [L,R=301]
-
-# Force trailing slash for directories (prevents insecure HTTP redirects by mod_dir behind proxies)
+# ---- SEO Clean URL Rewrite Rules ----
+# Skip rewriting for physical files and directories
+RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
-RewriteCond %{REQUEST_URI} !(.*)/$
-RewriteCond %{HTTP:X-Forwarded-Proto} https [OR]
-RewriteCond %{HTTPS} on
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI}/ [L,R=301]
+RewriteRule ^ - [L]
 
-RewriteCond %{REQUEST_FILENAME} -d
-RewriteCond %{REQUEST_URI} !(.*)/$
-RewriteCond %{HTTP:X-Forwarded-Proto} !https
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ http://%{HTTP_HOST}%{REQUEST_URI}/ [L,R=301]
+# Clean URL for Rooms listing: /rooms or /rooms/
+RewriteRule ^rooms/?$ rooms.php [L,QSA]
+
+# Clean URL for Room Details with category & room: /rooms/category-slug/room-slug
+RewriteRule ^rooms/([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)/?$ room-details.php?category=$1&room=$2 [L,QSA]
+
+# Clean URL for Room Details: /rooms/room-slug or /room/room-slug
+RewriteRule ^rooms/([a-zA-Z0-9-]+)/?$ room-details.php?room=$1 [L,QSA]
+RewriteRule ^room/([a-zA-Z0-9-]+)/?$ room-details.php?room=$1 [L,QSA]
+
+# Clean URL for Blog listing: /blog or /blog/
+RewriteRule ^blog/?$ blog.php [L,QSA]
+
+# Clean URL for Blog Category filter: /blog/category/category-slug
+RewriteRule ^blog/category/([a-zA-Z0-9-]+)/?$ blog.php?category=$1 [L,QSA]
+
+# Clean URL for Blog Details with category & post slug: /blog/category-slug/blog-slug
+RewriteRule ^blog/([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)/?$ blog-detail.php?category=$1&slug=$2 [L,QSA]
+
+# Clean URL for Blog Details with post slug: /blog/blog-slug
+RewriteRule ^blog/([a-zA-Z0-9-]+)/?$ blog-detail.php?slug=$1 [L,QSA]
 
 # Set default index
 DirectoryIndex index.php index.html

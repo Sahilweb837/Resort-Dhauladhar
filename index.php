@@ -210,7 +210,7 @@ $baseUrl = getBaseUrl();
                     <div class="roomCardImage">
                         <img src="./images/presidentialmain.jpg" alt="Presidential Suite">
 
-                        <a href="room-details.html?room=presidential-suite" class="roomViewBtn">
+                        <a href="<?php echo getRoomUrl('presidential-suite'); ?>" class="roomViewBtn">
                             View Details <i class="fa fa-arrow-right" aria-hidden="true"></i>
                         </a>
 
@@ -226,7 +226,7 @@ $baseUrl = getBaseUrl();
                 <div class="roomCard" data-aos="zoom-in" data-aos-delay="100">
                     <div class="roomCardImage">
                         <img src="./images/executivesuite.jpg">
-                        <a href="room-details.html?room=executive-suite" class="roomViewBtn">
+                        <a href="<?php echo getRoomUrl('executive-suite'); ?>" class="roomViewBtn">
                             View Details <i class="fa fa-arrow-right" aria-hidden="true"></i>
                         </a>
 
@@ -242,7 +242,7 @@ $baseUrl = getBaseUrl();
                 <div class="roomCard" data-aos="fade-right" data-aos-delay="100">
                     <div class="roomCardImage">
                         <img src="./images/DSC00963.jpg" alt="Executive Room">
-                        <a href="room-details.html?room=executive-room" class="roomViewBtn">
+                        <a href="<?php echo getRoomUrl('executive-room'); ?>" class="roomViewBtn">
                             View Details <i class="fa fa-arrow-right" aria-hidden="true"></i>
                         </a>
                     </div>
@@ -486,27 +486,32 @@ $baseUrl = getBaseUrl();
         <div class="blog-grid-3">
             <?php if (!empty($latestBlogs)): ?>
                 <?php foreach ($latestBlogs as $blog): ?>
-                    <?php $imageUrl = getBlogImageUrl($blog['featured_image']); ?>
+                    <?php 
+                    $imageUrl = getBlogImageUrl($blog['featured_image']);
+                    $blogUrl = getBlogUrl($blog);
+                    ?>
                     <article class="blog-card" data-aos="fade-up" data-aos-duration="1000">
                         <div class="blog-img">
-                            <img src="<?php echo $imageUrl; ?>" 
-                                 alt="<?php echo htmlspecialchars($blog['title']); ?>"
-                                 onerror="this.onerror=null; this.src='./images/default-blog.jpg';">
+                            <a href="<?php echo $blogUrl; ?>">
+                                <img src="<?php echo $imageUrl; ?>" 
+                                     alt="<?php echo htmlspecialchars($blog['title']); ?>"
+                                     onerror="this.onerror=null; this.src='./images/default-blog.jpg';">
+                            </a>
                         </div>
                         <div class="blog-content">
                             <div class="meta">
                                 <span><?php echo date('F d, Y', strtotime($blog['created_at'])); ?></span>
                                 <span><?php echo htmlspecialchars($blog['category'] ?? 'General'); ?></span>
                             </div>
-                            <h4><?php echo htmlspecialchars($blog['title']); ?></h4>
+                            <h4><a href="<?php echo $blogUrl; ?>" style="color: inherit; text-decoration: none;"><?php echo htmlspecialchars($blog['title']); ?></a></h4>
                             <div class="blog-excerpt">
                                 <?php echo htmlspecialchars($blog['excerpt'] ?? substr(strip_tags($blog['content']), 0, 100) . '...'); ?>
                             </div>
                         </div>
                         <div class="blog-footer">
-                            <a href="blog-detail.php?slug=<?php echo urlencode($blog['slug']); ?>">Read More</a>
+                            <a href="<?php echo $blogUrl; ?>">Read More</a>
                             <span class="tag">
-                                <a href="blog-detail.php?slug=<?php echo urlencode($blog['slug']); ?>">
+                                <a href="<?php echo $blogUrl; ?>">
                                     <i class="fa fa-arrow-right" aria-hidden="true"></i>
                                 </a>
                             </span>
