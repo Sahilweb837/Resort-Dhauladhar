@@ -46,7 +46,7 @@ $baseUrl = getBaseUrl();
         <ul class="nav-left">
             <li><a href="<?php echo $baseUrl; ?>/">THE RESORT</a></li>
             <li><a href="<?php echo $baseUrl; ?>/about.php">ABOUT</a></li>
-            <li><a href="<?php echo $baseUrl; ?>/rooms">ROOMS</a></li>
+            <li><a href="<?php echo $baseUrl; ?>/rooms.html">ROOMS</a></li>
         </ul>
 
         <!-- CENTER LOGO -->
@@ -73,7 +73,7 @@ $baseUrl = getBaseUrl();
                     </li>
                 </ul>
             </li>
-            <li><a href="<?php echo $baseUrl; ?>/blog">BLOG</a></li>
+            <li><a href="<?php echo $baseUrl; ?>/blog.php">BLOG</a></li>
             <li><a href="<?php echo $baseUrl; ?>/contact.html">CONTACT</a></li>
         </ul>
 
