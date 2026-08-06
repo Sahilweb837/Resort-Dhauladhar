@@ -7,7 +7,9 @@ $success = '';
 
 // Generate CSRF token
 if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
 }
 
 // Get categories
@@ -173,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
