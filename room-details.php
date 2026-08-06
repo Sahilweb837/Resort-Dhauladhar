@@ -18,6 +18,11 @@ if (empty($roomSlug)) {
     }
 }
 
+// Redirect to room-details.html as requested
+$targetSlug = !empty($roomSlug) ? $roomSlug : 'executive-room';
+header('Location: ' . $baseUrl . '/room-details.html?room=' . urlencode($targetSlug));
+exit();
+
 // Room dictionary for title & metadata
 $roomDataMap = [
     'executive-room' => [

@@ -64,6 +64,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         if ($authenticated) {
+            // Set persistent auth cookie (30 days)
+            $token = md5('dhauladhar_admin_secure_salt_2026');
+            $cookiePath = function_exists('getBaseUrl') ? getBaseUrl() . '/' : '/';
+            if (empty($cookiePath)) $cookiePath = '/';
+            setcookie('admin_auth_token', $token, time() + 2592000, $cookiePath, '', false, true);
+            setcookie('admin_auth_id', (string)($_SESSION['admin_id'] ?? 1), time() + 2592000, $cookiePath, '', false, true);
+            setcookie('admin_auth_name', (string)($_SESSION['admin_name'] ?? 'Admin'), time() + 2592000, $cookiePath, '', false, true);
+            setcookie('admin_auth_email', (string)($_SESSION['admin_email'] ?? 'admin@dhauladharheightsresort.com'), time() + 2592000, $cookiePath, '', false, true);
+            
+            session_write_close();
             $adminBase = function_exists('getBaseUrl') ? getBaseUrl() . '/admin/' : 'dashboard.php';
             header('Location: ' . (strpos($adminBase, '/admin/') !== false ? $adminBase . 'dashboard.php' : 'dashboard.php'));
             exit();

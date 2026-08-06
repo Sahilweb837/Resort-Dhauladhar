@@ -10,11 +10,15 @@ $blog = null;
 if (isset($_GET['id'])) {
     $blog = getBlogById($_GET['id']);
     if (!$blog) {
-        header('Location: index.php?msg=error');
+        $adminBase = function_exists('getBaseUrl') ? getBaseUrl() . '/admin/' : '../';
+        session_write_close();
+        header('Location: ' . $adminBase . 'blogs/index.php?msg=error');
         exit();
     }
 } else {
-    header('Location: index.php');
+    $adminBase = function_exists('getBaseUrl') ? getBaseUrl() . '/admin/' : '../';
+    session_write_close();
+    header('Location: ' . $adminBase . 'blogs/index.php');
     exit();
 }
 
@@ -205,7 +209,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 ];
                 
                 if (updateBlog($blog['id'], $data)) {
-                    header('Location: index.php?msg=updated');
+                    $adminBase = function_exists('getBaseUrl') ? getBaseUrl() . '/admin/' : '../';
+                    session_write_close();
+                    header('Location: ' . $adminBase . 'blogs/index.php?msg=updated');
                     exit();
                 } else {
                     $error = "Failed to update blog. Please try again.";

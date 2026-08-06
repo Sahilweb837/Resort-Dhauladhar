@@ -28,6 +28,7 @@ function requireLogin() {
     }
     if (!isLoggedIn()) {
         $basePath = getBaseUrl();
+        session_write_close();
         header('Location: ' . $basePath . '/admin/index.php');
         exit();
     }
@@ -37,7 +38,24 @@ function isLoggedIn() {
     if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
         @session_start();
     }
-    return !empty($_SESSION['admin_id']) || !empty($_SESSION['admin_logged_in']);
+    
+    if (!empty($_SESSION['admin_id']) || !empty($_SESSION['admin_logged_in'])) {
+        return true;
+    }
+    
+    // Fallback: Check persistent auth cookie if session was cleared or lost
+    if (!empty($_COOKIE['admin_auth_token'])) {
+        $expectedToken = md5('dhauladhar_admin_secure_salt_2026');
+        if ($_COOKIE['admin_auth_token'] === $expectedToken) {
+            $_SESSION['admin_logged_in'] = true;
+            $_SESSION['admin_id'] = !empty($_COOKIE['admin_auth_id']) ? intval($_COOKIE['admin_auth_id']) : 1;
+            $_SESSION['admin_name'] = !empty($_COOKIE['admin_auth_name']) ? $_COOKIE['admin_auth_name'] : 'Admin';
+            $_SESSION['admin_email'] = !empty($_COOKIE['admin_auth_email']) ? $_COOKIE['admin_auth_email'] : 'admin@dhauladharheightsresort.com';
+            return true;
+        }
+    }
+    
+    return false;
 }
 
 function logout() {
@@ -45,6 +63,15 @@ function logout() {
         @session_start();
     }
     $_SESSION = [];
+    
+    $cookiePath = function_exists('getBaseUrl') ? getBaseUrl() . '/' : '/';
+    if (empty($cookiePath)) $cookiePath = '/';
+    
+    setcookie('admin_auth_token', '', time() - 3600, $cookiePath, '', false, true);
+    setcookie('admin_auth_id', '', time() - 3600, $cookiePath, '', false, true);
+    setcookie('admin_auth_name', '', time() - 3600, $cookiePath, '', false, true);
+    setcookie('admin_auth_email', '', time() - 3600, $cookiePath, '', false, true);
+    
     if (ini_get("session.use_cookies")) {
         $params = session_get_cookie_params();
         setcookie(session_name(), '', time() - 42000,

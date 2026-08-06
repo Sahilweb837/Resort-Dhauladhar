@@ -31,7 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $error = "Review text is required.";
         } else {
             if (createReview($data)) {
-                header('Location: index.php?msg=created');
+                $adminBase = function_exists('getBaseUrl') ? getBaseUrl() . '/admin/' : '../';
+                session_write_close();
+                header('Location: ' . $adminBase . 'reviews/index.php?msg=created');
                 exit();
             } else {
                 $error = "Failed to add review.";

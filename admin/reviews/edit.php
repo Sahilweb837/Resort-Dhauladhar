@@ -2,15 +2,19 @@
 require_once __DIR__ . '/../../includes/functions.php';
 requireLogin();
 
+$adminBase = function_exists('getBaseUrl') ? getBaseUrl() . '/admin/' : '../';
+
 $id = $_GET['id'] ?? null;
 if (!$id) {
-    header('Location: index.php');
+    session_write_close();
+    header('Location: ' . $adminBase . 'reviews/index.php');
     exit();
 }
 
 $review = getReviewById($id);
 if (!$review) {
-    header('Location: index.php');
+    session_write_close();
+    header('Location: ' . $adminBase . 'reviews/index.php');
     exit();
 }
 
@@ -56,7 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $error = "Review text is required.";
         } else {
             if (updateReview($id, $data)) {
-                header('Location: index.php?msg=updated');
+                session_write_close();
+                header('Location: ' . $adminBase . 'reviews/index.php?msg=updated');
                 exit();
             } else {
                 $error = "Failed to update review.";
