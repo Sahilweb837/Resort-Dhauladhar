@@ -7,9 +7,7 @@ $success = '';
 
 // Generate CSRF token
 if (empty($_SESSION['csrf_token'])) {
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // Get categories
@@ -358,7 +356,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <div class="form-row">
                         <div class="form-group">
                             <label><i class="fas fa-tag"></i> Category</label>
-                            <select name="category" id="categorySelect">
+                            <select name="category" id="categorySelect" style="background-color:#f0f0f0;">
                                 <option value="">Select Category</option>
                                 <?php foreach ($categories as $cat): ?>
                                     <option value="<?php echo htmlspecialchars($cat['name']); ?>" <?php echo (($_POST['category'] ?? '') == $cat['name']) ? 'selected' : ''; ?>>
