@@ -53,7 +53,7 @@ include __DIR__ . '/includes/header.php';
     <h1 data-aos="fade-down"><?php echo $heroTitle; ?></h1>
     <div class="hero-links" data-aos="fade-up">
         <a href="<?php echo $baseUrl; ?>/">Home</a>
-        <a href="<?php echo $baseUrl; ?>/blog">/ Blog</a>
+        <a href="<?php echo $baseUrl; ?>/blog.php">/ Blog</a>
         <?php if ($categoryFilter): ?>
             <a href="#">/ Category</a>
         <?php elseif ($authorFilter): ?>

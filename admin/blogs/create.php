@@ -8,8 +8,11 @@ error_reporting(E_ALL);
 $error = '';
 $success = '';
 
-// Generate CSRF token
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+}
 
 // Get categories
 $categories = getCategories();
