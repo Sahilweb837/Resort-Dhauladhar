@@ -8,17 +8,18 @@ error_reporting(E_ALL);
 $error = '';
 $success = '';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
+// Ensure session csrf_token is set
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // Get categories
 $categories = getCategories();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+    $sessionToken = $_SESSION['csrf_token'] ?? '';
+    $postToken = $_POST['csrf_token'] ?? '';
+    if (empty($postToken) || !hash_equals($sessionToken, $postToken)) {
         $error = "Invalid security token.";
     } else {
         $title = trim($_POST['title']);
