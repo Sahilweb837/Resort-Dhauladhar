@@ -74,7 +74,7 @@ $baseUrl = getBaseUrl();
                     </li>
                 </ul>
             </li>
-            <!-- <li><a href="<?php echo $baseUrl; ?>/blog.php">BLOG</a></li> -->
+            <li><a href="<?php echo $baseUrl; ?>/blog.php">BLOG</a></li>
             <li><a href="<?php echo $baseUrl; ?>/contact.html">CONTACT</a></li>
         </ul>
 
@@ -94,7 +94,7 @@ $baseUrl = getBaseUrl();
             <li><a href="<?php echo $baseUrl; ?>/rooms">ROOMS</a></li>
             <li><a href="<?php echo $baseUrl; ?>/destination-wedding.php">DESTINATION WEDDING</a></li>
             <li><a href="<?php echo $baseUrl; ?>/events.html">EVENT VENUES</a></li>
-            <!-- <li><a href="<?php echo $baseUrl; ?>/blog">BLOG</a></li> -->
+            <li><a href="<?php echo $baseUrl; ?>/blog.php">BLOG</a></li>
             <li><a href="<?php echo $baseUrl; ?>/contact.html">CONTACT</a></li>
         </ul>
     </div>

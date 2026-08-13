@@ -86,7 +86,7 @@ $baseUrl = getBaseUrl();
                     </ul>
                 </li>
 
-                <!-- <li><a href="blog.php">BLOG</a></li> -->
+                <li><a href="blog.php">BLOG</a></li>
                 <li><a href="contact.html">CONTACT</a></li>
             </ul>
 
@@ -108,7 +108,7 @@ $baseUrl = getBaseUrl();
                 <li><a href="rooms.html"> ROOMS</a></li>
                 <li><a href="destination-wedding.php">DESTINATION WEDDING</a></li>
                 <li><a href="events.html"> EVENT VENUES</a></li>
-                <!-- <li><a href="blog.php"> BLOG</a></li> -->
+                <li><a href="blog.php"> BLOG</a></li>
                 <li><a href="contact.html"> CONTACT</a></li>
             </ul>
 
@@ -467,8 +467,7 @@ $baseUrl = getBaseUrl();
         </p>
     </div>
 </div>
-    <!-- DYNAMIC BLOG SECTION (HIDDEN) -->
-    <!--
+    <!-- DYNAMIC BLOG SECTION -->
     <section class="blog-section">
         <section class="title-section">
             <div class="title-wrapper">
@@ -576,10 +575,9 @@ $baseUrl = getBaseUrl();
         </div>
         
         <div class="view-all-btn">
-            <!-- <a href="blog.php" class="hero-btn">View All Blogs <i class="fas fa-arrow-right"></i></a> -->
+            <a href="blog.php" class="hero-btn">View All Blogs <i class="fas fa-arrow-right"></i></a>
         </div>
     </section>
-    -->
 
     <!-- FAQ Section -->
     <section class="faq-section">
@@ -662,7 +660,7 @@ $baseUrl = getBaseUrl();
                     <li><a class="is-active" href="./about.php">About </a></li>
                     <li><a href="./rooms.html">Rooms & Suites</a></li>
                     <li><a href="./contact.html">Reservations</a></li>
-                    <!-- <li><a href="./blog.php">News & Blogs</a></li> -->
+                    <li><a href="./blog.php">News & Blogs</a></li>
                     <li><a href="./contact.html">Contact Us</a></li>
                     <li><a href="./privacypolicy.html">Privacy Policy</a></li>
 

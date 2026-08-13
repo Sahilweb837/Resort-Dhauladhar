@@ -87,7 +87,7 @@ $googleReviewsUrl = 'https://www.google.com/travel/hotels/entity/CgsI7_2S5eW34JL
                     </ul>
                 </li>
 
-                <!-- <li><a href="blog.php">BLOG</a></li> -->
+                <li><a href="blog.php">BLOG</a></li>
                 <li><a href="contact.html">CONTACT</a></li>
             </ul>
 
@@ -110,7 +110,7 @@ $googleReviewsUrl = 'https://www.google.com/travel/hotels/entity/CgsI7_2S5eW34JL
         <li><a href="rooms.html"> ROOMS</a></li>
         <li><a href="destination-wedding.php">DESTINATION WEDDING</a></li>
         <li><a href="events.html"> EVENT VENUES</a></li>
-        <!-- <li><a href="blog.php"> BLOG</a></li> -->
+        <li><a href="blog.php"> BLOG</a></li>
         <li><a href="contact.html"> CONTACT</a></li>
       </ul>
 
@@ -550,7 +550,7 @@ $googleReviewsUrl = 'https://www.google.com/travel/hotels/entity/CgsI7_2S5eW34JL
                  <li><a class="is-active" href="./about.php">About </a></li>
                     <li><a href="./rooms.html">Rooms & Suites</a></li>
                     <li><a href="./contact.html">Reservations</a></li>
-                    <!-- <li><a href="./blog.php">News & Blogs</a></li> -->
+                    <li><a href="./blog.php">News & Blogs</a></li>
                     <li><a href="./contact.html">Contact Us</a></li>
                     <li><a href="./privacypolicy.html">Privacy Policy</a></li>
                 </ul>

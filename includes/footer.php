@@ -56,7 +56,7 @@
                     <li><a class="is-active" href="<?php echo getBaseUrl(); ?>/about.php">About </a></li>
                     <li><a href="<?php echo getBaseUrl(); ?>/rooms">Rooms & Suites</a></li>
                     <li><a href="<?php echo getBaseUrl(); ?>/contact.html">Reservations</a></li>
-                    <!-- <li><a href="<?php echo getBaseUrl(); ?>/blog">News & Blogs</a></li> -->
+                    <li><a href="<?php echo getBaseUrl(); ?>/blog.php">News & Blogs</a></li>
                     <li><a href="<?php echo getBaseUrl(); ?>/contact.html">Contact Us</a></li>
                     <li><a href="<?php echo getBaseUrl(); ?>/privacypolicy.html">Privacy Policy</a></li>
                 </ul>
