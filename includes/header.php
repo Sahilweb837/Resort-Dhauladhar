@@ -13,6 +13,7 @@ $baseUrl = getBaseUrl();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($pageTitle ?? 'Hotel Dhauladhar Heights Resort'); ?></title>
+    <link rel="icon" type="image/png" href="<?php echo $baseUrl; ?>/images/dhr_logo_icon.png">
     <?php if (!empty($pageMetaDescription)): ?>
         <meta name="description" content="<?php echo htmlspecialchars($pageMetaDescription); ?>">
     <?php endif; ?>
@@ -73,7 +74,7 @@ $baseUrl = getBaseUrl();
                     </li>
                 </ul>
             </li>
-            <li><a href="<?php echo $baseUrl; ?>/blog.php">BLOG</a></li>
+            <!-- <li><a href="<?php echo $baseUrl; ?>/blog.php">BLOG</a></li> -->
             <li><a href="<?php echo $baseUrl; ?>/contact.html">CONTACT</a></li>
         </ul>
 
@@ -93,7 +94,7 @@ $baseUrl = getBaseUrl();
             <li><a href="<?php echo $baseUrl; ?>/rooms">ROOMS</a></li>
             <li><a href="<?php echo $baseUrl; ?>/destination-wedding.php">DESTINATION WEDDING</a></li>
             <li><a href="<?php echo $baseUrl; ?>/events.html">EVENT VENUES</a></li>
-            <li><a href="<?php echo $baseUrl; ?>/blog">BLOG</a></li>
+            <!-- <li><a href="<?php echo $baseUrl; ?>/blog">BLOG</a></li> -->
             <li><a href="<?php echo $baseUrl; ?>/contact.html">CONTACT</a></li>
         </ul>
     </div>
