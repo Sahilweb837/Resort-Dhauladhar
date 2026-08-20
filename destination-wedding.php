@@ -283,7 +283,7 @@ $baseUrl = getBaseUrl();
         </div>
 
         <div class="item"
-          style="background:linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('./images/mehndinewimg\ \(1\).jpg'); background-size: cover; background-position: center;">
+          style="background:linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('./images/mehndinewimg (1).jpg'); background-size: cover; background-position: center;">
           <div class="content">
             <div class="name">Pre Wedding Gathering</div>
             <div class="description">Enjoy joyful celebrations with your loved ones through laughter, beautiful décor, and cherished moments before the wedding.</div>
@@ -299,7 +299,7 @@ $baseUrl = getBaseUrl();
         </div>
 
         <div class="item"
-          style="background:linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('./images/sangeetnew\ \(1\).jpg'); background-size: cover; background-position: center;">
+          style="background:linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('./images/sangeetnew (1).jpg'); background-size: cover; background-position: center;">
           <div class="content">
             <div class="name">Musical Evenings</div>
             <div class="description">Dance beneath sparkling lights and celebrate togetherness with enchanting performances, rhythmic beats, and unforgettable festive energy.</div>
@@ -308,7 +308,7 @@ $baseUrl = getBaseUrl();
       
 
         <div class="item"
-          style="background:linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('./images/DSC00899.JPG'); background-size: cover; background-position:center;">
+          style="background:linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('./images/DSC00899.jpg'); background-size: cover; background-position:center;">
           <div class="content">
             <div class="name">Forever Begins Here</div>
             <div class="description">Create a magical start to your journey together with a romantic and unforgettable celebration of love.</div>
@@ -317,7 +317,7 @@ $baseUrl = getBaseUrl();
       </div>
 
       <div class="button">
-        <button class="prev" id-><i class="fa-solid fa-arrow-left"></i></button>
+        <button class="prev"><i class="fa-solid fa-arrow-left"></i></button>
         <button class="next"><i class="fa-solid fa-arrow-right"></i></button>
       </div>
     </div>

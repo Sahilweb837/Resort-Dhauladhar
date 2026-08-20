@@ -1048,7 +1048,7 @@ document.addEventListener("DOMContentLoaded", function () {
     "executive-suite": [
       "./images/executivesuite2.jpg",
       "./images/executivesuite1.jpg",
-      "/images/DSC00496-HDR-Enhanced-NR-Edit-1-scaled.jpg"
+      "./images/DSC00496-HDR-Enhanced-NR-Edit-1-scaled.jpg"
     ],
     "presidential-suite": [
       "./images/Presidential Suite Living room.jpg.jpg",
@@ -1057,7 +1057,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ],
     "twin-bed": [
       "./images/DSC00511-HDR-2-scaled.jpg",
-      "./images/Executive Twin Bedroom.jpg",
+      "./images/Executice-Twin-Bedroom.jpg",
       "./images/twinbebbed.jpg"
     ],
     "deluxe-room": [
