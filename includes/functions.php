@@ -1526,76 +1526,99 @@ function autoFormatBlogContent($content) {
         return $text;
     }
     
-    // Split text into chunks separated by 2 or more newlines (paragraphs)
-    $blocks = preg_split('/\n{2,}/', $text);
+    // Split into lines to parse paragraphs, headings, blockquotes, and lists
+    $rawLines = preg_split('/\r\n|\r|\n/', $text);
     $htmlParts = [];
-    
-    foreach ($blocks as $block) {
-        $block = trim($block);
-        if ($block === '') continue;
-        
-        // Check for Headings: ## Heading 2 or ### Heading 3
-        if (preg_match('/^(#{2,3})\s+(.+)$/m', $block, $matches)) {
-            $level = strlen($matches[1]) === 3 ? 'h3' : 'h2';
-            $headingClass = $level === 'h3' ? 'blog-subheading' : 'blog-section-heading';
-            $titleText = htmlspecialchars(trim($matches[2]));
-            $htmlParts[] = "<{$level} class=\"{$headingClass}\">{$titleText}</{$level}>";
-            continue;
+    $currentType = null; // 'p', 'ul', 'quote'
+    $currentBuffer = [];
+
+    $flush = function() use (&$currentType, &$currentBuffer, &$htmlParts) {
+        if ($currentType === null || empty($currentBuffer)) {
+            $currentType = null;
+            $currentBuffer = [];
+            return;
         }
-        
-        // Check for Blockquote: > Quote text
-        if (preg_match('/^>\s*(.+)$/s', $block, $matches)) {
-            $quoteText = htmlspecialchars(trim($matches[1]));
-            $htmlParts[] = '<div class="blog-section-quote">
-                <div class="quote-icon"><i class="fa-solid fa-quote-left"></i></div>
-                <blockquote>' . $quoteText . '</blockquote>
-            </div>';
-            continue;
-        }
-        
-        // Check for Bullet Lists: lines starting with *, -, or •
-        $lines = explode("\n", $block);
-        $isList = true;
-        $listItems = [];
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if ($line === '') continue;
-            if (preg_match('/^[\*\-•]\s+(.+)$/u', $line, $listMatch)) {
-                $listItems[] = $listMatch[1];
-            } else {
-                $isList = false;
-                break;
-            }
-        }
-        
-        if ($isList && !empty($listItems)) {
+
+        if ($currentType === 'p') {
+            $pText = implode("\n", $currentBuffer);
+            $escaped = htmlspecialchars($pText);
+            $escaped = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $escaped);
+            $escaped = preg_replace('/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/s', '<em>$1</em>', $escaped);
+            $escaped = preg_replace('/\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/', '<a href="$2" target="_blank" rel="noopener" class="blog-inline-link">$1</a>', $escaped);
+            $escaped = nl2br($escaped);
+            $htmlParts[] = '<p class="blog-paragraph">' . $escaped . '</p>';
+        } elseif ($currentType === 'ul') {
             $listHtml = '<ul class="blog-styled-list">';
-            foreach ($listItems as $item) {
-                // Parse bold / italic inside list items
+            foreach ($currentBuffer as $item) {
                 $formattedItem = htmlspecialchars(trim($item));
                 $formattedItem = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $formattedItem);
                 $formattedItem = preg_replace('/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/s', '<em>$1</em>', $formattedItem);
+                $formattedItem = preg_replace('/\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/', '<a href="$2" target="_blank" rel="noopener" class="blog-inline-link">$1</a>', $formattedItem);
                 $listHtml .= '<li><i class="fa-solid fa-circle-check"></i> <span>' . $formattedItem . '</span></li>';
             }
             $listHtml .= '</ul>';
             $htmlParts[] = $listHtml;
+        } elseif ($currentType === 'quote') {
+            $quoteText = htmlspecialchars(implode(' ', $currentBuffer));
+            $quoteText = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $quoteText);
+            $quoteText = preg_replace('/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/s', '<em>$1</em>', $quoteText);
+            $htmlParts[] = '<div class="blog-section-quote">
+                <div class="quote-icon"><i class="fa-solid fa-quote-left"></i></div>
+                <blockquote>' . $quoteText . '</blockquote>
+            </div>';
+        }
+
+        $currentType = null;
+        $currentBuffer = [];
+    };
+
+    foreach ($rawLines as $line) {
+        $trimmed = trim($line);
+        if ($trimmed === '') {
+            $flush();
             continue;
         }
-        
-        // Standard Paragraph with inline markdown support
-        $escaped = htmlspecialchars($block);
-        // Bold: **text**
-        $escaped = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $escaped);
-        // Italic: *text*
-        $escaped = preg_replace('/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/s', '<em>$1</em>', $escaped);
-        // Links: [Text](url)
-        $escaped = preg_replace('/\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/', '<a href="$2" target="_blank" rel="noopener" class="blog-inline-link">$1</a>', $escaped);
-        // Single line breaks inside paragraph
-        $escaped = nl2br($escaped);
-        
-        $htmlParts[] = '<p class="blog-paragraph">' . $escaped . '</p>';
+
+        // Heading: ## Heading 2 or ### Heading 3
+        if (preg_match('/^(#{2,3})\s+(.+)$/', $trimmed, $hMatch)) {
+            $flush();
+            $level = strlen($hMatch[1]) === 3 ? 'h3' : 'h2';
+            $headingClass = $level === 'h3' ? 'blog-subheading' : 'blog-section-heading';
+            $titleText = htmlspecialchars(trim($hMatch[2]));
+            $htmlParts[] = "<{$level} class=\"{$headingClass}\">{$titleText}</{$level}>";
+            continue;
+        }
+
+        // Blockquote: > Quote text
+        if (preg_match('/^>\s*(.+)$/', $trimmed, $qMatch)) {
+            if ($currentType !== 'quote') {
+                $flush();
+                $currentType = 'quote';
+            }
+            $currentBuffer[] = trim($qMatch[1]);
+            continue;
+        }
+
+        // Bullet list item: *, -, or •
+        if (preg_match('/^[\*\-•]\s+(.+)$/u', $trimmed, $lMatch)) {
+            if ($currentType !== 'ul') {
+                $flush();
+                $currentType = 'ul';
+            }
+            $currentBuffer[] = trim($lMatch[1]);
+            continue;
+        }
+
+        // Regular paragraph text
+        if ($currentType !== 'p') {
+            $flush();
+            $currentType = 'p';
+        }
+        $currentBuffer[] = $trimmed;
     }
-    
+
+    $flush();
+
     return implode("\n\n", $htmlParts);
 }
 
