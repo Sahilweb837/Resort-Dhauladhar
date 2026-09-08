@@ -1492,4 +1492,508 @@ function deleteReview($id) {
         return false;
     }
 }
+
+/**
+ * =========================================================================
+ * ADVANCED BLOG FORMATTING & SECTION RENDERING ENGINE
+ * =========================================================================
+ */
+
+/**
+ * Automatically format blog text with generous spacing, styled paragraphs,
+ * headings, bullet lists, bold/italic, and quotes.
+ */
+function autoFormatBlogContent($content) {
+    if (empty($content)) return '';
+    
+    // If content already has complex block-level HTML tags, return cleanly after sanitizing
+    $hasBlockTags = preg_match('/<(?:p|div|section|article|table|ul|ol|h[1-6]|blockquote)\b/i', $content);
+    
+    // Normalize line endings
+    $text = str_replace(["\r\n", "\r"], "\n", trim($content));
+    
+    // If it already has HTML block tags, just ensure paragraphs and images have proper spacing classes
+    if ($hasBlockTags) {
+        // Add .blog-paragraph class to <p> tags if missing
+        $text = preg_replace_callback('/<p(?:\s+class="([^"]*)")?([^>]*)>/i', function($m) {
+            $class = isset($m[1]) ? trim($m[1]) : '';
+            $rest = isset($m[2]) ? $m[2] : '';
+            if (strpos($class, 'blog-paragraph') === false) {
+                $class = trim($class . ' blog-paragraph');
+            }
+            return '<p class="' . htmlspecialchars($class) . '"' . $rest . '>';
+        }, $text);
+        return $text;
+    }
+    
+    // Split text into chunks separated by 2 or more newlines (paragraphs)
+    $blocks = preg_split('/\n{2,}/', $text);
+    $htmlParts = [];
+    
+    foreach ($blocks as $block) {
+        $block = trim($block);
+        if ($block === '') continue;
+        
+        // Check for Headings: ## Heading 2 or ### Heading 3
+        if (preg_match('/^(#{2,3})\s+(.+)$/m', $block, $matches)) {
+            $level = strlen($matches[1]) === 3 ? 'h3' : 'h2';
+            $headingClass = $level === 'h3' ? 'blog-subheading' : 'blog-section-heading';
+            $titleText = htmlspecialchars(trim($matches[2]));
+            $htmlParts[] = "<{$level} class=\"{$headingClass}\">{$titleText}</{$level}>";
+            continue;
+        }
+        
+        // Check for Blockquote: > Quote text
+        if (preg_match('/^>\s*(.+)$/s', $block, $matches)) {
+            $quoteText = htmlspecialchars(trim($matches[1]));
+            $htmlParts[] = '<div class="blog-section-quote">
+                <div class="quote-icon"><i class="fa-solid fa-quote-left"></i></div>
+                <blockquote>' . $quoteText . '</blockquote>
+            </div>';
+            continue;
+        }
+        
+        // Check for Bullet Lists: lines starting with *, -, or •
+        $lines = explode("\n", $block);
+        $isList = true;
+        $listItems = [];
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '') continue;
+            if (preg_match('/^[\*\-•]\s+(.+)$/u', $line, $listMatch)) {
+                $listItems[] = $listMatch[1];
+            } else {
+                $isList = false;
+                break;
+            }
+        }
+        
+        if ($isList && !empty($listItems)) {
+            $listHtml = '<ul class="blog-styled-list">';
+            foreach ($listItems as $item) {
+                // Parse bold / italic inside list items
+                $formattedItem = htmlspecialchars(trim($item));
+                $formattedItem = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $formattedItem);
+                $formattedItem = preg_replace('/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/s', '<em>$1</em>', $formattedItem);
+                $listHtml .= '<li><i class="fa-solid fa-circle-check"></i> <span>' . $formattedItem . '</span></li>';
+            }
+            $listHtml .= '</ul>';
+            $htmlParts[] = $listHtml;
+            continue;
+        }
+        
+        // Standard Paragraph with inline markdown support
+        $escaped = htmlspecialchars($block);
+        // Bold: **text**
+        $escaped = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $escaped);
+        // Italic: *text*
+        $escaped = preg_replace('/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/s', '<em>$1</em>', $escaped);
+        // Links: [Text](url)
+        $escaped = preg_replace('/\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/', '<a href="$2" target="_blank" rel="noopener" class="blog-inline-link">$1</a>', $escaped);
+        // Single line breaks inside paragraph
+        $escaped = nl2br($escaped);
+        
+        $htmlParts[] = '<p class="blog-paragraph">' . $escaped . '</p>';
+    }
+    
+    return implode("\n\n", $htmlParts);
+}
+
+/**
+ * Render multi-type advanced blog sections into semantic HTML.
+ * Handles text, image, gallery_2col, gallery_grid, quote, features, callout, faq, video, cta.
+ */
+function renderAdvancedBlogSections($sections, $fallbackContent = '') {
+    $baseUrl = getBaseUrl();
+    
+    // Normalize sections if string
+    if (is_string($sections) && !empty($sections)) {
+        $decoded = json_decode($sections, true);
+        if (is_array($decoded)) {
+            $sections = $decoded;
+        }
+    }
+    
+    // Fallback if no structured sections
+    if (empty($sections) || !is_array($sections)) {
+        return '<div class="blog-section blog-section-text">' . autoFormatBlogContent($fallbackContent) . '</div>';
+    }
+    
+    $output = '';
+    $sectionCount = count($sections);
+    
+    foreach ($sections as $index => $sec) {
+        if (!is_array($sec)) continue;
+        
+        $type = $sec['type'] ?? 'text';
+        $output .= '<div class="blog-section blog-section-' . htmlspecialchars($type) . '">';
+        
+        switch ($type) {
+            case 'text':
+                $heading = trim($sec['heading'] ?? ($sec['title'] ?? ''));
+                $level = (!empty($sec['level']) && in_array($sec['level'], ['h2', 'h3'])) ? $sec['level'] : 'h2';
+                $body = $sec['content'] ?? ($sec['body'] ?? '');
+                
+                if (!empty($heading)) {
+                    $headingClass = $level === 'h3' ? 'blog-subheading' : 'section-title';
+                    $output .= "<{$level} class=\"{$headingClass}\">" . htmlspecialchars($heading) . "</{$level}>";
+                }
+                
+                $output .= '<div class="section-content-inner">' . autoFormatBlogContent($body) . '</div>';
+                
+                // If section has attached legacy images
+                if (!empty($sec['images']) && is_array($sec['images'])) {
+                    $output .= '<div class="section-gallery">';
+                    foreach ($sec['images'] as $img) {
+                        if (empty($img)) continue;
+                        $imgUrl = getBlogImageUrl($img);
+                        $output .= '<div class="gallery-item" onclick="openLightbox(\'' . htmlspecialchars($imgUrl) . '\')">';
+                        $output .= '<img src="' . htmlspecialchars($imgUrl) . '" alt="' . htmlspecialchars($heading ?: 'Resort View') . '" loading="lazy" onerror="this.onerror=null; this.src=\'' . $baseUrl . '/images/default-blog.jpg\';">';
+                        $output .= '<div class="gallery-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>';
+                        $output .= '</div>';
+                    }
+                    $output .= '</div>';
+                }
+                break;
+                
+            case 'image':
+                $img = $sec['image_url'] ?? ($sec['image'] ?? '');
+                $caption = trim($sec['caption'] ?? '');
+                $layout = in_array($sec['layout'] ?? '', ['full', 'contained', 'centered']) ? $sec['layout'] : 'full';
+                
+                if (!empty($img)) {
+                    $imgUrl = getBlogImageUrl($img);
+                    $output .= '<div class="blog-section-image-card layout-' . htmlspecialchars($layout) . '">';
+                    $output .= '<div class="img-zoom-wrap" onclick="openLightbox(\'' . htmlspecialchars($imgUrl) . '\')">';
+                    $output .= '<img src="' . htmlspecialchars($imgUrl) . '" alt="' . htmlspecialchars($caption ?: 'Resort Dhauladhar') . '" loading="lazy" onerror="this.onerror=null; this.src=\'' . $baseUrl . '/images/default-blog.jpg\';">';
+                    $output .= '<div class="gallery-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>';
+                    $output .= '</div>';
+                    if (!empty($caption)) {
+                        $output .= '<div class="blog-img-caption"><i class="fa-solid fa-camera"></i> ' . htmlspecialchars($caption) . '</div>';
+                    }
+                    $output .= '</div>';
+                }
+                break;
+                
+            case 'gallery_2col':
+                $img1 = $sec['image_url'] ?? ($sec['image_1'] ?? '');
+                $cap1 = trim($sec['caption'] ?? ($sec['caption_1'] ?? ''));
+                $img2 = $sec['image_url_2'] ?? ($sec['image_2'] ?? '');
+                $cap2 = trim($sec['caption_2'] ?? '');
+                
+                $output .= '<div class="blog-section-gallery-2col">';
+                if (!empty($img1)) {
+                    $imgUrl1 = getBlogImageUrl($img1);
+                    $output .= '<div class="gallery-col-item">';
+                    $output .= '<div class="img-zoom-wrap" onclick="openLightbox(\'' . htmlspecialchars($imgUrl1) . '\')">';
+                    $output .= '<img src="' . htmlspecialchars($imgUrl1) . '" alt="' . htmlspecialchars($cap1 ?: 'Resort View') . '" loading="lazy" onerror="this.onerror=null; this.src=\'' . $baseUrl . '/images/default-blog.jpg\';">';
+                    $output .= '<div class="gallery-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>';
+                    $output .= '</div>';
+                    if (!empty($cap1)) {
+                        $output .= '<div class="blog-img-caption">' . htmlspecialchars($cap1) . '</div>';
+                    }
+                    $output .= '</div>';
+                }
+                if (!empty($img2)) {
+                    $imgUrl2 = getBlogImageUrl($img2);
+                    $output .= '<div class="gallery-col-item">';
+                    $output .= '<div class="img-zoom-wrap" onclick="openLightbox(\'' . htmlspecialchars($imgUrl2) . '\')">';
+                    $output .= '<img src="' . htmlspecialchars($imgUrl2) . '" alt="' . htmlspecialchars($cap2 ?: 'Resort View') . '" loading="lazy" onerror="this.onerror=null; this.src=\'' . $baseUrl . '/images/default-blog.jpg\';">';
+                    $output .= '<div class="gallery-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>';
+                    $output .= '</div>';
+                    if (!empty($cap2)) {
+                        $output .= '<div class="blog-img-caption">' . htmlspecialchars($cap2) . '</div>';
+                    }
+                    $output .= '</div>';
+                }
+                $output .= '</div>';
+                break;
+                
+            case 'quote':
+                $quote = trim($sec['quote'] ?? ($sec['content'] ?? ''));
+                $author = trim($sec['author'] ?? 'Hotel Dhauladhar Heights Team');
+                
+                $output .= '<div class="blog-section-quote">';
+                $output .= '<div class="quote-icon"><i class="fa-solid fa-quote-left"></i></div>';
+                $output .= '<blockquote>' . htmlspecialchars($quote) . '</blockquote>';
+                if (!empty($author)) {
+                    $output .= '<div class="quote-author">— ' . htmlspecialchars($author) . '</div>';
+                }
+                $output .= '</div>';
+                break;
+                
+            case 'features':
+                $heading = trim($sec['heading'] ?? ($sec['title'] ?? 'Key Highlights & Amenities'));
+                $items = $sec['items'] ?? [];
+                if (is_string($items)) {
+                    $items = array_filter(array_map('trim', explode("\n", $items)));
+                }
+                
+                $output .= '<div class="blog-section-features">';
+                if (!empty($heading)) {
+                    $output .= '<h3><i class="fa-solid fa-star"></i> ' . htmlspecialchars($heading) . '</h3>';
+                }
+                if (!empty($items)) {
+                    $output .= '<ul class="feature-checklist">';
+                    foreach ($items as $item) {
+                        if (trim($item) === '') continue;
+                        $output .= '<li><i class="fa-solid fa-circle-check"></i> <span>' . htmlspecialchars(trim($item)) . '</span></li>';
+                    }
+                    $output .= '</ul>';
+                }
+                $output .= '</div>';
+                break;
+                
+            case 'callout':
+                $title = trim($sec['title'] ?? ($sec['heading'] ?? 'Pro Tip / Note'));
+                $body = trim($sec['body'] ?? ($sec['content'] ?? ''));
+                
+                $output .= '<div class="blog-section-callout">';
+                $output .= '<div class="callout-icon"><i class="fa-solid fa-lightbulb"></i></div>';
+                $output .= '<div class="callout-content">';
+                if (!empty($title)) {
+                    $output .= '<h4 class="callout-title">' . htmlspecialchars($title) . '</h4>';
+                }
+                $output .= '<div class="callout-body">' . autoFormatBlogContent($body) . '</div>';
+                $output .= '</div>';
+                $output .= '</div>';
+                break;
+                
+            case 'faq':
+                $items = $sec['items'] ?? [];
+                // Support single item or multiple
+                if (empty($items) && !empty($sec['question'])) {
+                    $items = [['question' => $sec['question'], 'answer' => $sec['answer'] ?? '']];
+                }
+                
+                $faqHeading = trim($sec['heading'] ?? 'Frequently Asked Questions');
+                $output .= '<div class="blog-section-faq">';
+                if (!empty($faqHeading)) {
+                    $output .= '<h3><i class="fa-solid fa-circle-question"></i> ' . htmlspecialchars($faqHeading) . '</h3>';
+                }
+                if (!empty($items) && is_array($items)) {
+                    $output .= '<div class="faq-accordion-list">';
+                    foreach ($items as $fIndex => $faq) {
+                        $q = trim($faq['question'] ?? '');
+                        $a = trim($faq['answer'] ?? '');
+                        if (empty($q)) continue;
+                        $output .= '<div class="faq-accordion-item' . ($fIndex === 0 ? ' active' : '') . '">';
+                        $output .= '<button type="button" class="faq-accordion-header" onclick="toggleFaqAccordion(this)">';
+                        $output .= '<span>' . htmlspecialchars($q) . '</span>';
+                        $output .= '<i class="fa-solid fa-chevron-down"></i>';
+                        $output .= '</button>';
+                        $output .= '<div class="faq-accordion-body"' . ($fIndex === 0 ? ' style="display:block;"' : ' style="display:none;"') . '>';
+                        $output .= '<div class="faq-inner">' . autoFormatBlogContent($a) . '</div>';
+                        $output .= '</div>';
+                        $output .= '</div>';
+                    }
+                    $output .= '</div>';
+                }
+                $output .= '</div>';
+                break;
+                
+            case 'video':
+                $vUrl = trim($sec['video_url'] ?? ($sec['url'] ?? ''));
+                $vTitle = trim($sec['heading'] ?? ($sec['title'] ?? 'Resort Video Tour'));
+                
+                $output .= '<div class="blog-section-video">';
+                if (!empty($vTitle)) {
+                    $output .= '<h3><i class="fa-solid fa-video"></i> ' . htmlspecialchars($vTitle) . '</h3>';
+                }
+                if (preg_match('/(?:v=|\/embed\/|\/shorts\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/i', $vUrl, $m)) {
+                    $ytId = $m[1];
+                    $output .= '<div class="video-embed-wrap"><iframe src="https://www.youtube.com/embed/' . htmlspecialchars($ytId) . '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>';
+                } elseif (preg_match('/\.(mp4|webm)/i', $vUrl)) {
+                    $output .= '<div class="video-embed-wrap"><video src="' . htmlspecialchars($vUrl) . '" controls playsinline preload="metadata"></video></div>';
+                } elseif (!empty($vUrl)) {
+                    $output .= '<div class="video-link-wrap"><a href="' . htmlspecialchars($vUrl) . '" target="_blank" rel="noopener" class="cta-btn-primary"><i class="fa-solid fa-play"></i> Watch Video / Reel</a></div>';
+                }
+                $output .= '</div>';
+                break;
+                
+            case 'cta':
+                $ctaTitle = trim($sec['heading'] ?? ($sec['title'] ?? 'Plan Your Event or Mountain Stay'));
+                $ctaDesc = trim($sec['body'] ?? ($sec['content'] ?? 'Experience panoramic Himalayan luxury, grand banquet halls, and 5-star hospitality in Dharamshala.'));
+                $ctaPhone = trim($sec['phone'] ?? '+917018841900');
+                $ctaWhatsapp = trim($sec['whatsapp'] ?? '917018841900');
+                
+                $output .= '<div class="blog-section-cta">';
+                $output .= '<div class="cta-content">';
+                $output .= '<h3>' . htmlspecialchars($ctaTitle) . '</h3>';
+                $output .= '<p>' . htmlspecialchars($ctaDesc) . '</p>';
+                $output .= '</div>';
+                $output .= '<div class="cta-btns">';
+                $output .= '<a href="tel:' . htmlspecialchars($ctaPhone) . '" class="cta-btn-primary"><i class="fa-solid fa-phone"></i> Call Direct</a>';
+                $output .= '<a href="https://wa.me/' . htmlspecialchars($ctaWhatsapp) . '?text=' . urlencode('Hello Dhauladhar Heights Resort, I would like to book a stay/event.') . '" target="_blank" class="cta-btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>';
+                $output .= '</div>';
+                $output .= '</div>';
+                break;
+                
+            default:
+                // Generic fallback for custom types
+                $body = $sec['content'] ?? ($sec['body'] ?? '');
+                $output .= autoFormatBlogContent($body);
+                break;
+        }
+        
+        $output .= '</div>';
+        
+        // Subtle divider between sections
+        if ($index < $sectionCount - 1) {
+            $output .= '<div class="section-divider"></div>';
+        }
+    }
+    
+    return $output;
+}
+
+/**
+ * Compile structured sections array into clean, standalone semantic HTML.
+ * Used when saving/updating blog posts so the 'content' column is never empty.
+ */
+function compileBlogSectionsToHtml($sections, $fallbackContent = '') {
+    return renderAdvancedBlogSections($sections, $fallbackContent);
+}
+
+/**
+ * Process raw POST submitted blog sections into sanitized structured array
+ * Handles multi-type sections and image uploads
+ */
+function processSubmittedBlogSections($rawSections, $filesArray = null) {
+    $processed = [];
+    if (!is_array($rawSections)) return $processed;
+    
+    foreach ($rawSections as $index => $sec) {
+        if (!is_array($sec)) continue;
+        $type = $sec['type'] ?? 'text';
+        $item = ['type' => $type, 'order' => $index];
+        
+        switch ($type) {
+            case 'text':
+                $item['heading'] = trim($sec['heading'] ?? ($sec['title'] ?? ''));
+                $item['level'] = (!empty($sec['level']) && in_array($sec['level'], ['h2', 'h3'])) ? $sec['level'] : 'h2';
+                $item['content'] = trim($sec['content'] ?? ($sec['body'] ?? ''));
+                
+                // Existing section images
+                $secImages = [];
+                if (!empty($sec['existing_images'])) {
+                    $secImages = json_decode($sec['existing_images'], true) ?: [];
+                }
+                // Handle new uploaded images for this section
+                if (isset($filesArray['name'][$index]['images']) && is_array($filesArray['name'][$index]['images'])) {
+                    foreach ($filesArray['name'][$index]['images'] as $fIdx => $fName) {
+                        if (!empty($fName) && isset($filesArray['error'][$index]['images'][$fIdx]) && $filesArray['error'][$index]['images'][$fIdx] === 0) {
+                            $file = [
+                                'name' => $filesArray['name'][$index]['images'][$fIdx],
+                                'type' => $filesArray['type'][$index]['images'][$fIdx],
+                                'tmp_name' => $filesArray['tmp_name'][$index]['images'][$fIdx],
+                                'error' => $filesArray['error'][$index]['images'][$fIdx],
+                                'size' => $filesArray['size'][$index]['images'][$fIdx]
+                            ];
+                            $up = uploadImage($file);
+                            if ($up) $secImages[] = $up;
+                        }
+                    }
+                }
+                // Remove images if requested
+                if (isset($_POST['remove_images_' . $index]) && is_array($_POST['remove_images_' . $index])) {
+                    foreach ($_POST['remove_images_' . $index] as $rem) {
+                        $k = array_search($rem, $secImages);
+                        if ($k !== false) {
+                            deleteImage($rem);
+                            unset($secImages[$k]);
+                        }
+                    }
+                    $secImages = array_values($secImages);
+                }
+                $item['images'] = $secImages;
+                break;
+                
+            case 'image':
+                $imgUrl = trim($sec['image_url'] ?? '');
+                if (isset($_FILES['section_image_' . $index]) && $_FILES['section_image_' . $index]['error'] === 0) {
+                    $up = uploadImage($_FILES['section_image_' . $index]);
+                    if ($up) $imgUrl = $up;
+                }
+                $item['image_url'] = $imgUrl;
+                $item['caption'] = trim($sec['caption'] ?? '');
+                $item['layout'] = in_array($sec['layout'] ?? '', ['full', 'contained', 'centered']) ? $sec['layout'] : 'full';
+                break;
+                
+            case 'gallery_2col':
+                $img1 = trim($sec['image_url'] ?? '');
+                if (isset($_FILES['section_file1_' . $index]) && $_FILES['section_file1_' . $index]['error'] === 0) {
+                    $up = uploadImage($_FILES['section_file1_' . $index]);
+                    if ($up) $img1 = $up;
+                }
+                $img2 = trim($sec['image_url_2'] ?? '');
+                if (isset($_FILES['section_file2_' . $index]) && $_FILES['section_file2_' . $index]['error'] === 0) {
+                    $up = uploadImage($_FILES['section_file2_' . $index]);
+                    if ($up) $img2 = $up;
+                }
+                $item['image_url'] = $img1;
+                $item['caption'] = trim($sec['caption'] ?? '');
+                $item['image_url_2'] = $img2;
+                $item['caption_2'] = trim($sec['caption_2'] ?? '');
+                break;
+                
+            case 'quote':
+                $item['quote'] = trim($sec['quote'] ?? '');
+                $item['author'] = trim($sec['author'] ?? 'Hotel Dhauladhar Heights Team');
+                break;
+                
+            case 'features':
+                $item['heading'] = trim($sec['heading'] ?? 'Key Highlights & Amenities');
+                $items = $sec['items'] ?? [];
+                if (is_string($items)) {
+                    $items = array_filter(array_map('trim', explode("\n", $items)));
+                } elseif (is_array($items)) {
+                    $items = array_values(array_filter(array_map('trim', $items)));
+                }
+                $item['items'] = $items;
+                break;
+                
+            case 'callout':
+                $item['title'] = trim($sec['title'] ?? 'Pro Tip / Note');
+                $item['body'] = trim($sec['body'] ?? '');
+                $item['style'] = trim($sec['style'] ?? 'tip');
+                break;
+                
+            case 'faq':
+                $item['heading'] = trim($sec['heading'] ?? 'Frequently Asked Questions');
+                $faqList = [];
+                if (isset($sec['items']) && is_array($sec['items'])) {
+                    foreach ($sec['items'] as $fq) {
+                        if (!empty($fq['question'])) {
+                            $faqList[] = ['question' => trim($fq['question']), 'answer' => trim($fq['answer'] ?? '')];
+                        }
+                    }
+                } elseif (!empty($sec['question'])) {
+                    $faqList[] = ['question' => trim($sec['question']), 'answer' => trim($sec['answer'] ?? '')];
+                }
+                $item['items'] = $faqList;
+                break;
+                
+            case 'video':
+                $item['heading'] = trim($sec['heading'] ?? 'Resort Video Tour');
+                $item['video_url'] = trim($sec['video_url'] ?? '');
+                break;
+                
+            case 'cta':
+                $item['heading'] = trim($sec['heading'] ?? 'Plan Your Event or Mountain Stay');
+                $item['body'] = trim($sec['body'] ?? '');
+                $item['phone'] = trim($sec['phone'] ?? '+917018841900');
+                $item['whatsapp'] = trim($sec['whatsapp'] ?? '917018841900');
+                break;
+                
+            default:
+                $item['content'] = trim($sec['content'] ?? '');
+                break;
+        }
+        
+        $processed[] = $item;
+    }
+    return $processed;
+}
+
 ?>

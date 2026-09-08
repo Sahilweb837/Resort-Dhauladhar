@@ -148,46 +148,7 @@ include __DIR__ . '/includes/header.php';
         </div>
         
         <div class="blog-detail-content">
-            <?php if (!empty($sections) && is_array($sections)): ?>
-                <?php foreach ($sections as $index => $section): ?>
-                    <div class="blog-section">
-                        <?php if (!empty($section['title'])): ?>
-                            <h2 class="section-title"><?php echo htmlspecialchars($section['title']); ?></h2>
-                        <?php endif; ?>
-                        
-                        <div class="section-content">
-                            <?php echo $section['content']; ?>
-                        </div>
-                        
-                        <?php if (!empty($section['images']) && is_array($section['images'])): ?>
-                            <div class="section-gallery">
-                                <?php foreach ($section['images'] as $image): ?>
-                                    <?php if (!empty($image)): ?>
-                                        <?php $imageUrl = getBlogImageUrl($image); ?>
-                                        <div class="gallery-item" onclick="openLightbox('<?php echo $imageUrl; ?>')">
-                                            <img src="<?php echo $imageUrl; ?>" 
-                                                 alt="<?php echo htmlspecialchars($section['title'] ?? 'Image'); ?>"
-                                                 onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
-                                            <div class="gallery-overlay">
-                                                <i class="fas fa-search-plus"></i>
-                                            </div>
-                                        </div>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    <?php if ($index < count($sections) - 1): ?>
-                        <div class="section-divider"></div>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <div class="blog-section">
-                    <div class="section-content">
-                        <?php echo nl2br($blog['content'] ?? ''); ?>
-                    </div>
-                </div>
-            <?php endif; ?>
+            <?php echo renderAdvancedBlogSections($sections, $blog['content'] ?? ''); ?>
 
             <?php if (!empty($blog['meta_keywords'])): ?>
                 <div class="blog-tags" style="margin-top:30px;">
@@ -353,6 +314,31 @@ include __DIR__ . '/includes/header.php';
         }
     }
     
+    function toggleFaqAccordion(btn) {
+        const item = btn.closest('.faq-accordion-item');
+        if (!item) return;
+        const body = item.querySelector('.faq-accordion-body');
+        const isActive = item.classList.contains('active');
+        
+        // Toggle current item
+        if (isActive) {
+            item.classList.remove('active');
+            if (body) body.style.display = 'none';
+        } else {
+            // Close other sibling items in same list
+            const parentList = item.closest('.faq-accordion-list');
+            if (parentList) {
+                parentList.querySelectorAll('.faq-accordion-item.active').forEach(openItem => {
+                    openItem.classList.remove('active');
+                    const ob = openItem.querySelector('.faq-accordion-body');
+                    if (ob) ob.style.display = 'none';
+                });
+            }
+            item.classList.add('active');
+            if (body) body.style.display = 'block';
+        }
+    }
+
     function openLightbox(imgSrc) {
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');

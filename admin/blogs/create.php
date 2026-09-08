@@ -19,161 +19,96 @@ $categories = getCategories();
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $sessionToken = $_SESSION['csrf_token'] ?? '';
     $postToken = $_POST['csrf_token'] ?? '';
-    // Bypass CSRF check if session is unstable on production hosting
-    if (false && (empty($postToken) || !hash_equals($sessionToken, $postToken))) {
-        $error = "Invalid security token.";
-    } else {
-        $title = trim($_POST['title']);
-        $slugInput = trim($_POST['slug'] ?? '');
-        $excerpt = trim($_POST['excerpt'] ?? '');
-        $category = trim($_POST['category'] ?? '');
-        $author = trim($_POST['author'] ?? ($_SESSION['admin_name'] ?? 'Admin'));
-        $meta_description = trim($_POST['meta_description'] ?? '');
-        $meta_keywords = trim($_POST['meta_keywords'] ?? '');
-        $status = $_POST['status'] ?? 'published';
+    
+    $title = trim($_POST['title'] ?? '');
+    $slugInput = trim($_POST['slug'] ?? '');
+    $excerpt = trim($_POST['excerpt'] ?? '');
+    $category = trim($_POST['category'] ?? '');
+    $author = trim($_POST['author'] ?? ($_SESSION['admin_name'] ?? 'Admin'));
+    $meta_description = trim($_POST['meta_description'] ?? '');
+    $meta_keywords = trim($_POST['meta_keywords'] ?? '');
+    $status = $_POST['status'] ?? 'published';
+    
+    // Handle custom category
+    if ($category === 'other' && !empty($_POST['category_custom'])) {
+        $category = trim($_POST['category_custom']);
+    }
+    
+    // Process all dynamic multi-type sections
+    $rawSections = $_POST['sections'] ?? [];
+    $sections = processSubmittedBlogSections($rawSections, $_FILES['sections'] ?? null);
+    
+    // Validate
+    if (empty($title)) {
+        $error = "Title is required.";
+    } elseif (strlen($title) < 3) {
+        $error = "Title must be at least 3 characters.";
+    } elseif (empty($sections)) {
+        $error = "Please add at least one section.";
+    }
+    
+    if (empty($error)) {
+        $featured_image = '';
         
-        // Handle custom category
-        if ($category === 'other' && !empty($_POST['category_custom'])) {
-            $category = trim($_POST['category_custom']);
-        }
-        
-        // Handle sections with multiple images
-        $sections = [];
-        if (isset($_POST['sections']) && is_array($_POST['sections'])) {
-            foreach ($_POST['sections'] as $index => $section) {
-                $section_title = trim($section['title'] ?? '');
-                $section_content = trim($section['content'] ?? '');
-                $section_images = [];
+        // Handle featured image upload
+        if (isset($_FILES['featured_image']) && $_FILES['featured_image']['error'] == 0) {
+            if ($_FILES['featured_image']['size'] > 5 * 1024 * 1024) {
+                $error = "Featured image size must be less than 5MB.";
+            } else {
+                $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                $file_type = mime_content_type($_FILES['featured_image']['tmp_name']);
                 
-                // Get existing images
-                if (!empty($section['existing_images'])) {
-                    $section_images = json_decode($section['existing_images'], true) ?: [];
-                }
-                
-                // Handle new image uploads for this section
-                if (isset($_FILES['sections']['name'][$index]['images']) && is_array($_FILES['sections']['name'][$index]['images'])) {
-                    $fileCount = count($_FILES['sections']['name'][$index]['images']);
-                    
-                    for ($i = 0; $i < $fileCount; $i++) {
-                        if (isset($_FILES['sections']['error'][$index]['images'][$i]) && 
-                            $_FILES['sections']['error'][$index]['images'][$i] == 0 && 
-                            !empty($_FILES['sections']['tmp_name'][$index]['images'][$i])) {
-                            
-                            $file = [
-                                'name' => $_FILES['sections']['name'][$index]['images'][$i],
-                                'type' => $_FILES['sections']['type'][$index]['images'][$i],
-                                'tmp_name' => $_FILES['sections']['tmp_name'][$index]['images'][$i],
-                                'error' => $_FILES['sections']['error'][$index]['images'][$i],
-                                'size' => $_FILES['sections']['size'][$index]['images'][$i]
-                            ];
-                            
-                            if ($file['size'] > 5 * 1024 * 1024) {
-                                $error = "Image size must be less than 5MB.";
-                                break 2;
-                            }
-                            
-                            $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                            $file_type = mime_content_type($file['tmp_name']);
-                            
-                            if (!in_array($file_type, $allowed_types)) {
-                                $error = "Only JPG, PNG, GIF, and WEBP images are allowed.";
-                                break 2;
-                            }
-                            
-                            $upload_result = uploadImage($file);
-                            if ($upload_result) {
-                                $section_images[] = $upload_result;
-                            }
-                        }
+                if (!in_array($file_type, $allowed_types)) {
+                    $error = "Only JPG, PNG, GIF, and WEBP images are allowed.";
+                } else {
+                    $upload_result = uploadImage($_FILES['featured_image']);
+                    if ($upload_result) {
+                        $featured_image = $upload_result;
+                    } else {
+                        $error = "Failed to upload featured image.";
                     }
-                }
-                
-                // Remove images if requested
-                if (isset($_POST['remove_images_' . $index]) && is_array($_POST['remove_images_' . $index])) {
-                    foreach ($_POST['remove_images_' . $index] as $removeImg) {
-                        $key = array_search($removeImg, $section_images);
-                        if ($key !== false) {
-                            deleteImage($removeImg);
-                            unset($section_images[$key]);
-                        }
-                    }
-                    $section_images = array_values($section_images);
-                }
-                
-                if (!empty($section_title) || !empty($section_content) || !empty($section_images)) {
-                    $sections[] = [
-                        'title' => htmlspecialchars($section_title, ENT_QUOTES, 'UTF-8'),
-                        'content' => $section_content,
-                        'images' => $section_images,
-                        'order' => $index
-                    ];
                 }
             }
-        }
-        
-        // Validate
-        if (empty($title)) {
-            $error = "Title is required.";
-        } elseif (strlen($title) < 3) {
-            $error = "Title must be at least 3 characters.";
-        } elseif (empty($sections)) {
-            $error = "Please add at least one section.";
         }
         
         if (empty($error)) {
-            $featured_image = '';
-            
-            // Handle featured image upload
-            if (isset($_FILES['featured_image']) && $_FILES['featured_image']['error'] == 0) {
-                if ($_FILES['featured_image']['size'] > 5 * 1024 * 1024) {
-                    $error = "Featured image size must be less than 5MB.";
-                } else {
-                    $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                    $file_type = mime_content_type($_FILES['featured_image']['tmp_name']);
-                    
-                    if (!in_array($file_type, $allowed_types)) {
-                        $error = "Only JPG, PNG, GIF, and WEBP images are allowed.";
-                    } else {
-                        $upload_result = uploadImage($_FILES['featured_image']);
-                        if ($upload_result) {
-                            $featured_image = $upload_result;
-                        } else {
-                            $error = "Failed to upload featured image.";
-                        }
-                    }
+            // Auto-generate excerpt if empty
+            if (empty($excerpt)) {
+                $textParts = [];
+                foreach ($sections as $s) {
+                    if (!empty($s['content'])) $textParts[] = strip_tags($s['content']);
+                    if (!empty($s['body'])) $textParts[] = strip_tags($s['body']);
+                    if (!empty($s['quote'])) $textParts[] = strip_tags($s['quote']);
                 }
+                $combined = implode(' ', $textParts);
+                $excerpt = substr($combined, 0, 200) . (strlen($combined) > 200 ? '...' : '');
             }
             
-            if (empty($error)) {
-                if (empty($excerpt)) {
-                    // Create excerpt from first section content
-                    $first_section = $sections[0] ?? [];
-                    $excerpt = substr(strip_tags($first_section['content'] ?? ''), 0, 200) . '...';
-                }
-                
-                $data = [
-                    'title' => htmlspecialchars($title, ENT_QUOTES, 'UTF-8'),
-                    'slug' => !empty($slugInput) ? createSlug($slugInput) : createSlug($title),
-                    'content' => '',
-                    'excerpt' => htmlspecialchars($excerpt, ENT_QUOTES, 'UTF-8'),
-                    'featured_image' => $featured_image,
-                    'category' => htmlspecialchars($category, ENT_QUOTES, 'UTF-8'),
-                    'author' => htmlspecialchars($author, ENT_QUOTES, 'UTF-8'),
-                    'meta_description' => htmlspecialchars($meta_description, ENT_QUOTES, 'UTF-8'),
-                    'meta_keywords' => htmlspecialchars($meta_keywords, ENT_QUOTES, 'UTF-8'),
-                    'status' => $status,
-                    'sections' => json_encode($sections, JSON_UNESCAPED_UNICODE),
-                    'content_format' => 'html'
-                ];
-                
-                if (createBlog($data)) {
-                    $adminBase = function_exists('getBaseUrl') ? getBaseUrl() . '/admin/' : '../';
-                    session_write_close();
-                    header('Location: ' . $adminBase . 'blogs/index.php?msg=created');
-                    exit();
-                } else {
-                    $error = "Failed to create blog. Please try again.";
-                }
+            // Compile sections to standalone semantic HTML for content column
+            $compiledHtml = compileBlogSectionsToHtml($sections);
+            
+            $data = [
+                'title' => htmlspecialchars($title, ENT_QUOTES, 'UTF-8'),
+                'slug' => !empty($slugInput) ? createSlug($slugInput) : createSlug($title),
+                'content' => $compiledHtml,
+                'excerpt' => htmlspecialchars($excerpt, ENT_QUOTES, 'UTF-8'),
+                'featured_image' => $featured_image,
+                'category' => htmlspecialchars($category, ENT_QUOTES, 'UTF-8'),
+                'author' => htmlspecialchars($author, ENT_QUOTES, 'UTF-8'),
+                'meta_description' => htmlspecialchars($meta_description, ENT_QUOTES, 'UTF-8'),
+                'meta_keywords' => htmlspecialchars($meta_keywords, ENT_QUOTES, 'UTF-8'),
+                'status' => $status,
+                'sections' => json_encode($sections, JSON_UNESCAPED_UNICODE),
+                'content_format' => 'html'
+            ];
+            
+            if (createBlog($data)) {
+                $adminBase = function_exists('getBaseUrl') ? getBaseUrl() . '/admin/' : '../';
+                session_write_close();
+                header('Location: ' . $adminBase . 'blogs/index.php?msg=created');
+                exit();
+            } else {
+                $error = "Failed to create blog. Please try again.";
             }
         }
     }
@@ -193,128 +128,270 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <?php include_once __DIR__ . '/../includes/admin_styles.php'; ?>
     <style>
-        .sections-container { margin-top: 15px; }
-        .section-item {
-            background: rgba(255, 255, 255, 0.02);
+        .sections-container {
+            background: rgba(10, 19, 34, 0.6);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 24px;
+            margin-top: 10px;
+        }
+
+        .add-section-toolbar {
+            background: rgba(22, 35, 64, 0.7);
+            border: 1px solid rgba(93, 197, 227, 0.25);
+            border-radius: 10px;
+            padding: 16px 20px;
             margin-bottom: 24px;
         }
-        .section-header {
+
+        .add-section-toolbar .add-label {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--primary-light);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 18px;
-            flex-wrap: wrap;
-            gap: 12px;
+            gap: 8px;
+            margin-bottom: 12px;
         }
-        .section-title-input {
-            font-size: 16px;
-            font-weight: 600;
-            flex: 1;
-            min-width: 200px;
-        }
-        .section-images-area {
-            margin-top: 18px;
-            padding: 18px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 8px;
-            border: 1px dashed var(--border);
-        }
-        .images-preview {
+
+        .add-btn-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 12px;
+            gap: 10px;
         }
-        .image-preview-item {
-            position: relative;
-            display: inline-block;
-        }
-        .image-preview-item img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 2px solid var(--border);
-        }
-        .remove-image {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 22px;
-            height: 22px;
+
+        .btn-add-sec {
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 9px 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.22s ease;
+        }
+
+        .btn-add-sec i {
+            color: var(--primary-light);
+        }
+
+        .btn-add-sec:hover {
+            background: rgba(93, 197, 227, 0.15);
+            border-color: var(--primary-light);
+            color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        /* Section Item Card */
+        .section-item {
+            background: rgba(15, 26, 46, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-item.collapsed .section-body {
+            display: none;
+        }
+
+        .section-item-header {
+            background: rgba(22, 35, 64, 0.9);
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            user-select: none;
+        }
+
+        .sec-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sec-drag-icon {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .sec-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
             font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(93, 197, 227, 0.15);
+            color: var(--primary-light);
+            border: 1px solid rgba(93, 197, 227, 0.3);
+            white-space: nowrap;
+        }
+
+        .sec-title-preview {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sec-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-sec-ctrl {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-sec-ctrl:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+
+        .btn-sec-ctrl.btn-danger:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: #fff;
+        }
+
+        .section-body {
+            padding: 22px;
+        }
+
+        /* Formatting Toolbar */
+        .fmt-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 8px;
+            padding: 6px 10px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        .fmt-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .fmt-btn:hover {
+            background: var(--primary-light);
+            color: var(--darker);
+        }
+
+        /* Dynamic Features Checklist */
+        .checklist-builder {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checklist-item-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checklist-item-row input {
+            flex: 1;
+        }
+
+        .btn-remove-item {
+            background: rgba(225, 112, 85, 0.15);
+            color: #ff7675;
+            border: 1px solid rgba(225, 112, 85, 0.3);
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            flex-shrink: 0;
         }
+
+        .btn-remove-item:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .btn-add-item {
+            background: rgba(93, 197, 227, 0.1);
+            color: var(--primary-light);
+            border: 1px dashed var(--primary-light);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            align-self: flex-start;
+            margin-top: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-add-item:hover {
+            background: var(--primary-light);
+            color: var(--darker);
+            border-style: solid;
+        }
+
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
+
         .char-counter {
             font-size: 12px;
             color: var(--text-muted);
             text-align: right;
             margin-top: 5px;
         }
-        .add-section-btn {
-            width: 100%;
-            background: rgba(93, 197, 227, 0.15);
-            color: var(--primary-light);
-            border: 1px dashed var(--primary-light);
-            padding: 14px;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            margin-top: 10px;
-            transition: all 0.25s ease;
-        }
-        .add-section-btn:hover {
-            background: var(--primary-light);
-            color: var(--darker);
-            border-style: solid;
-        }
-        .add-image-btn {
-            background: rgba(255,255,255,0.05);
-            color: #fff;
-            border: 1px solid var(--border);
-            padding: 8px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            margin-bottom: 10px;
-            transition: all 0.2s;
-        }
-        .add-image-btn:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        .remove-section {
-            background: rgba(225, 112, 85, 0.15);
-            color: #ff7675;
-            border: 1px solid rgba(225, 112, 85, 0.3);
-            padding: 8px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.2s;
-        }
-        .remove-section:hover {
-            background: #e17055;
-            color: #fff;
-        }
+
         @media (max-width: 768px) {
             .form-row { grid-template-columns: 1fr; }
+            .add-btn-group { flex-direction: column; }
         }
     </style>
 </head>
@@ -396,31 +473,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </select>
                     </div>
                     
-                    <!-- Blog Sections -->
+                    <!-- Advanced Blog Sections Builder -->
                     <div class="form-group">
-                        <label><i class="fas fa-layer-group"></i> <span class="required">Blog Sections</span></label>
+                        <label><i class="fas fa-layer-group"></i> <span class="required">Blog Sections (Advanced Multi-Type Builder)</span></label>
+                        
                         <div class="sections-container">
+                            <!-- Add Section Toolbar -->
+                            <div class="add-section-toolbar">
+                                <div class="add-label"><i class="fas fa-plus-circle"></i> Add New Section to Blog:</div>
+                                <div class="add-btn-group">
+                                    <button type="button" class="btn-add-sec" onclick="addSection('text')"><i class="fas fa-paragraph"></i> 📝 Text & Story</button>
+                                    <button type="button" class="btn-add-sec" onclick="addSection('image')"><i class="fas fa-image"></i> 🖼️ Single Image</button>
+                                    <button type="button" class="btn-add-sec" onclick="addSection('gallery_2col')"><i class="fas fa-images"></i> 📸 2-Col Gallery</button>
+                                    <button type="button" class="btn-add-sec" onclick="addSection('quote')"><i class="fas fa-quote-left"></i> 💬 Pull Quote</button>
+                                    <button type="button" class="btn-add-sec" onclick="addSection('features')"><i class="fas fa-list-check"></i> ⭐ Key Highlights</button>
+                                    <button type="button" class="btn-add-sec" onclick="addSection('callout')"><i class="fas fa-lightbulb"></i> 💡 Pro Tip / Callout</button>
+                                    <button type="button" class="btn-add-sec" onclick="addSection('faq')"><i class="fas fa-circle-question"></i> ❓ FAQ Item</button>
+                                    <button type="button" class="btn-add-sec" onclick="addSection('video')"><i class="fas fa-video"></i> 🎥 Video Tour</button>
+                                    <button type="button" class="btn-add-sec" onclick="addSection('cta')"><i class="fas fa-bullhorn"></i> 📞 Booking CTA</button>
+                                </div>
+                            </div>
+                            
                             <div id="sections-list"></div>
-                            <button type="button" class="add-section-btn" onclick="addSection()">
-                                <i class="fas fa-plus"></i> Add New Section
-                            </button>
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label><i class="fas fa-search"></i> Meta Description (SEO)</label>
-                        <textarea name="meta_description" placeholder="SEO description" maxlength="160" rows="2"><?php echo htmlspecialchars($_POST['meta_description'] ?? ''); ?></textarea>
+                        <textarea name="meta_description" placeholder="SEO description for Google search results..." maxlength="160" rows="2"><?php echo htmlspecialchars($_POST['meta_description'] ?? ''); ?></textarea>
                         <div class="char-counter">0/160 characters</div>
                     </div>
                     
                     <div class="form-group">
                         <label><i class="fas fa-key"></i> Meta Keywords (SEO)</label>
-                        <input type="text" name="meta_keywords" value="<?php echo htmlspecialchars($_POST['meta_keywords'] ?? ''); ?>" placeholder="tag1, tag2, tag3" maxlength="200">
+                        <input type="text" name="meta_keywords" value="<?php echo htmlspecialchars($_POST['meta_keywords'] ?? ''); ?>" placeholder="resort in dharamshala, destination wedding, himalayan stay" maxlength="200">
                         <small style="color:var(--text-muted);display:block;margin-top:4px;">Separate keywords with commas</small>
                     </div>
                     
                     <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 30px;">
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Create Blog</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Publish Blog Post</button>
                         <a href="index.php" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
                     </div>
                 </form>
@@ -429,218 +520,335 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
     
     <script>
-        let sectionCount = 0;
-        let tempImageUrls = {};
-        
-        function addSection(title = '', content = '', images = []) {
-            const sectionsList = document.getElementById('sections-list');
-            const sectionId = 'section_' + Date.now() + '_' + sectionCount;
-            
-            let imagesHtml = '';
-            if (images.length > 0) {
-                images.forEach((img, idx) => {
-                    imagesHtml += `
-                        <div class="image-preview-item" data-image="${escapeHtml(img)}">
-                            <img src="/${escapeHtml(img)}" onerror="this.src='./images/default-blog.jpg'">
-                            <button type="button" class="remove-image" onclick="removeExistingImage(this, ${sectionCount}, '${escapeHtml(img)}')">×</button>
-                        </div>
-                    `;
-                });
-            }
-            
-            const sectionHtml = `
-                <div class="section-item" id="${sectionId}" data-section-index="${sectionCount}">
-                    <div class="section-header">
-                        <input type="text" class="section-title-input" name="sections[${sectionCount}][title]" 
-                               placeholder="Section Title" value="${escapeHtml(title)}">
-                        <button type="button" class="remove-section" onclick="removeSection('${sectionId}', ${sectionCount})">
-                            <i class="fas fa-trash"></i> Remove Section
-                        </button>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Section Content</label>
-                        <textarea name="sections[${sectionCount}][content]" class="section-content" rows="6" style="width:100%;">${escapeHtml(content)}</textarea>
-                    </div>
-                    
-                    <div class="section-images-area">
-                        <label><i class="fas fa-images"></i> Section Images</label>
-                        <button type="button" class="add-image-btn" onclick="addImageToSection(${sectionCount})">
-                            <i class="fas fa-plus"></i> Add Images (Multiple)
-                        </button>
-                        <input type="file" class="image-input-${sectionCount}" style="display: none;" multiple accept="image/*" 
-                               onchange="previewImages(this, ${sectionCount})">
-                        <div class="images-preview" id="images_preview_${sectionCount}">
-                            ${imagesHtml}
-                        <input type="hidden" name="sections[${sectionCount}][existing_images]" value='${JSON.stringify(images)}' id="existing_images_${sectionCount}">
-                        <div class="file-inputs-container" id="file_inputs_${sectionCount}">
-                            <input type="file" name="sections[${sectionCount}][images][]" class="image-input-${sectionCount}" style="display: none;" multiple accept="image/*" onchange="previewImages(this, ${sectionCount})">
-                        </div>
-                        <small style="color:var(--text-muted);display:block;margin-top:4px;">Max size: 5MB per image. Allowed: JPG, PNG, GIF, WEBP. You can select multiple images at once.</small>
-                    </div>
-                </div>
-            `;
-            
-            sectionsList.insertAdjacentHTML('beforeend', sectionHtml);
-            sectionCount++;
-        }
-        
-        function addImageToSection(sectionIndex) {
-            // Find the last file input that is empty, or create a new one
-            const container = document.getElementById(`file_inputs_${sectionIndex}`);
-            const inputs = container.querySelectorAll('input[type="file"]');
-            let lastInput = inputs[inputs.length - 1];
-            
-            if (lastInput && lastInput.files.length > 0) {
-                // Last input has files, create a new one
-                lastInput = document.createElement('input');
-                lastInput.type = 'file';
-                lastInput.name = `sections[${sectionIndex}][images][]`;
-                lastInput.className = `image-input-${sectionIndex}`;
-                lastInput.style.display = 'none';
-                lastInput.multiple = true;
-                lastInput.accept = 'image/*';
-                lastInput.onchange = function() { previewImages(this, sectionIndex); };
-                container.appendChild(lastInput);
-            }
-            
-            lastInput.click();
-        }
-        
-        function previewImages(input, sectionIndex) {
-            const previewDiv = document.getElementById(`images_preview_${sectionIndex}`);
-            const existingImagesInput = document.getElementById(`existing_images_${sectionIndex}`);
-            let existingImages = [];
-            
-            if (existingImagesInput.value) {
-                existingImages = JSON.parse(existingImagesInput.value);
-            }
-            
-            if (input.files) {
-                for (let i = 0; i < input.files.length; i++) {
-                    const file = input.files[i];
-                    
-                    if (file.size > 5 * 1024 * 1024) {
-                        alert(`Image ${file.name} is too large. Max 5MB.`);
-                        continue;
-                    }
-                    
-                    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                    if (!allowedTypes.includes(file.type)) {
-                        alert(`Only JPG, PNG, GIF, and WEBP images are allowed.`);
-                        continue;
-                    }
-                    
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const imgDiv = document.createElement('div');
-                        imgDiv.className = 'image-preview-item';
-                        imgDiv.setAttribute('data-temp', 'true');
-                        imgDiv.innerHTML = `
-                            <img src="${e.target.result}">
-                            <button type="button" class="remove-image" onclick="this.parentElement.remove(); alert('To remove new images fully, please refresh and re-select.')">×</button>
-                        `;
-                        previewDiv.appendChild(imgDiv);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            }
-        }
-        
-        function removeExistingImage(btn, sectionIndex, imagePath) {
-            if (confirm('Remove this image?')) {
-                const imageDiv = btn.parentElement;
-                imageDiv.remove();
-                
-                const existingImagesInput = document.getElementById(`existing_images_${sectionIndex}`);
-                let existingImages = [];
-                if (existingImagesInput.value) {
-                    existingImages = JSON.parse(existingImagesInput.value);
-                }
-                
-                const newImages = existingImages.filter(img => img !== imagePath);
-                existingImagesInput.value = JSON.stringify(newImages);
-                
-                const removeInput = document.createElement('input');
-                removeInput.type = 'hidden';
-                removeInput.name = `remove_images_${sectionIndex}[]`;
-                removeInput.value = imagePath;
-                document.querySelector(`.section-item[data-section-index="${sectionIndex}"]`).appendChild(removeInput);
-            }
-        }
-        
-        // Removed unused removeNewImage function
-        
-        function removeSection(sectionId, sectionIndex) {
-            if (confirm('Are you sure you want to remove this section?')) {
-                document.getElementById(sectionId).remove();
-            }
-        }
-        
+        let sectionCounter = 0;
+
         function escapeHtml(text) {
+            if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-        
-        // Featured image preview
-        document.getElementById('featured_image')?.addEventListener('change', function(e) {
-            const preview = document.getElementById('featured-image-preview');
-            preview.innerHTML = '';
-            
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.classList.add('preview-image');
-                    img.style.maxWidth = '200px';
-                    img.style.marginTop = '10px';
-                    img.style.borderRadius = '6px';
-                    img.style.border = '2px solid var(--border)';
-                    preview.appendChild(img);
-                };
-                reader.readAsDataURL(this.files[0]);
+
+        // Apply formatting tags to textarea
+        function applyFormat(btn, prefix, suffix, placeholder) {
+            const container = btn.closest('.section-body');
+            if (!container) return;
+            const textarea = container.querySelector('textarea');
+            if (!textarea) return;
+
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            const selected = text.substring(start, end);
+            const replacement = prefix + (selected || placeholder) + suffix;
+
+            textarea.value = text.substring(0, start) + replacement + text.substring(end);
+            textarea.focus();
+            textarea.setSelectionRange(start + prefix.length, start + replacement.length - suffix.length);
+        }
+
+        // Add Section of specific type
+        function addSection(type = 'text', data = {}) {
+            const list = document.getElementById('sections-list');
+            const secId = 'sec_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            const idx = sectionCounter++;
+
+            let badgeHtml = '';
+            let bodyHtml = '';
+
+            switch (type) {
+                case 'text':
+                    badgeHtml = '<i class="fas fa-paragraph"></i> Text / Story';
+                    bodyHtml = `
+                        <input type="hidden" name="sections[${idx}][type]" value="text">
+                        <div class="form-row" style="margin-bottom: 16px;">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Section Heading (Optional)</label>
+                                <input type="text" name="sections[${idx}][heading]" class="sec-input-title" placeholder="e.g. Majestic Himalayan Architecture..." value="${escapeHtml(data.heading || data.title || '')}" oninput="updateSecTitle(this)">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Heading Hierarchy Level</label>
+                                <select name="sections[${idx}][level]" style="background-color:#162340; color:#fff;">
+                                    <option value="h2" ${(data.level === 'h2' || !data.level) ? 'selected' : ''}>H2 - Major Section Title</option>
+                                    <option value="h3" ${data.level === 'h3' ? 'selected' : ''}>H3 - Subtitle / Subsection</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Content (Generous spacing and clean paragraphs automatically applied)</label>
+                            <div class="fmt-toolbar">
+                                <button type="button" class="fmt-btn" onclick="applyFormat(this, '**', '**', 'bold text')"><b>B</b></button>
+                                <button type="button" class="fmt-btn" onclick="applyFormat(this, '*', '*', 'italic text')"><i>I</i></button>
+                                <button type="button" class="fmt-btn" onclick="applyFormat(this, '## ', '', 'Section Title')">H2</button>
+                                <button type="button" class="fmt-btn" onclick="applyFormat(this, '### ', '', 'Subsection')">H3</button>
+                                <button type="button" class="fmt-btn" onclick="applyFormat(this, '- ', '', 'List item')">• List</button>
+                                <button type="button" class="fmt-btn" onclick="applyFormat(this, '> ', '', 'Quote text')">❝ Quote</button>
+                                <button type="button" class="fmt-btn" onclick="applyFormat(this, '[Link Text](', ')', 'https://')">🔗 Link</button>
+                            </div>
+                            <textarea name="sections[${idx}][content]" rows="6" placeholder="Write paragraphs freely. Blank lines between paragraphs are automatically spaced and styled with luxury typography...">${escapeHtml(data.content || data.body || '')}</textarea>
+                        </div>
+                    `;
+                    break;
+
+                case 'image':
+                    badgeHtml = '<i class="fas fa-image"></i> Single Image';
+                    bodyHtml = `
+                        <input type="hidden" name="sections[${idx}][type]" value="image">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Upload Image File</label>
+                                <input type="file" name="section_image_${idx}" accept="image/*">
+                            </div>
+                            <div class="form-group">
+                                <label>Or Existing Image Path / URL</label>
+                                <input type="text" name="sections[${idx}][image_url]" class="sec-input-title" placeholder="images/room1.jpg or uploads/..." value="${escapeHtml(data.image_url || data.image || '')}" oninput="updateSecTitle(this)">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Image Caption (With camera icon)</label>
+                                <input type="text" name="sections[${idx}][caption]" placeholder="e.g. Scenic mountain view from Presidential Suite balcony" value="${escapeHtml(data.caption || '')}">
+                            </div>
+                            <div class="form-group">
+                                <label>Layout</label>
+                                <select name="sections[${idx}][layout]" style="background-color:#162340; color:#fff;">
+                                    <option value="full" ${data.layout === 'full' ? 'selected' : ''}>Full Width</option>
+                                    <option value="contained" ${data.layout === 'contained' ? 'selected' : ''}>Contained</option>
+                                    <option value="centered" ${data.layout === 'centered' ? 'selected' : ''}>Centered</option>
+                                </select>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'gallery_2col':
+                    badgeHtml = '<i class="fas fa-images"></i> 2-Col Gallery';
+                    bodyHtml = `
+                        <input type="hidden" name="sections[${idx}][type]" value="gallery_2col">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Left Image 1 (File or Path)</label>
+                                <input type="file" name="section_file1_${idx}" accept="image/*" style="margin-bottom:6px;">
+                                <input type="text" name="sections[${idx}][image_url]" placeholder="images/... or uploads/..." value="${escapeHtml(data.image_url || '')}">
+                                <input type="text" name="sections[${idx}][caption]" placeholder="Left photo caption..." value="${escapeHtml(data.caption || '')}" style="margin-top:6px;">
+                            </div>
+                            <div class="form-group">
+                                <label>Right Image 2 (File or Path)</label>
+                                <input type="file" name="section_file2_${idx}" accept="image/*" style="margin-bottom:6px;">
+                                <input type="text" name="sections[${idx}][image_url_2]" placeholder="images/... or uploads/..." value="${escapeHtml(data.image_url_2 || '')}">
+                                <input type="text" name="sections[${idx}][caption_2]" placeholder="Right photo caption..." value="${escapeHtml(data.caption_2 || '')}" style="margin-top:6px;">
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'quote':
+                    badgeHtml = '<i class="fas fa-quote-left"></i> Pull Quote';
+                    bodyHtml = `
+                        <input type="hidden" name="sections[${idx}][type]" value="quote">
+                        <div class="form-group">
+                            <label>Quote Statement (Rendered in Cormorant Garamond Serif)</label>
+                            <textarea name="sections[${idx}][quote]" class="sec-input-title" rows="3" placeholder="Enter an inspiring quote or review snippet..." oninput="updateSecTitle(this)">${escapeHtml(data.quote || '')}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Author / Source Attribution</label>
+                            <input type="text" name="sections[${idx}][author]" placeholder="e.g. Travel & Leisure Magazine, or Guest Reviewer" value="${escapeHtml(data.author || '')}">
+                        </div>
+                    `;
+                    break;
+
+                case 'features':
+                    badgeHtml = '<i class="fas fa-list-check"></i> Key Highlights';
+                    let itemsHtml = '';
+                    const items = Array.isArray(data.items) ? data.items : ['Scenic Dhauladhar Mountain View', 'Complimentary Buffet Breakfast & High Tea', '24-Hour Concierge & Room Service'];
+                    items.forEach(it => {
+                        itemsHtml += `
+                            <div class="checklist-item-row">
+                                <input type="text" name="sections[${idx}][items][]" value="${escapeHtml(it)}" placeholder="Highlight feature point...">
+                                <button type="button" class="btn-remove-item" onclick="this.parentElement.remove()" title="Remove point"><i class="fas fa-times"></i></button>
+                            </div>
+                        `;
+                    });
+
+                    bodyHtml = `
+                        <input type="hidden" name="sections[${idx}][type]" value="features">
+                        <div class="form-group">
+                            <label>Highlights Box Heading</label>
+                            <input type="text" name="sections[${idx}][heading]" class="sec-input-title" placeholder="e.g. Key Features & Inclusions" value="${escapeHtml(data.heading || 'Key Features & Amenities')}" oninput="updateSecTitle(this)">
+                        </div>
+                        <div class="form-group">
+                            <label>Checklist Highlight Points (Styled with cyan checkmarks)</label>
+                            <div class="checklist-builder" id="checklist_${idx}">
+                                ${itemsHtml}
+                            </div>
+                            <button type="button" class="btn-add-item" onclick="addChecklistItem(${idx})"><i class="fas fa-plus"></i> Add Highlight Point</button>
+                        </div>
+                    `;
+                    break;
+
+                case 'callout':
+                    badgeHtml = '<i class="fas fa-lightbulb"></i> Pro Tip / Callout';
+                    bodyHtml = `
+                        <input type="hidden" name="sections[${idx}][type]" value="callout">
+                        <div class="form-group">
+                            <label>Callout Box Title</label>
+                            <input type="text" name="sections[${idx}][title]" class="sec-input-title" placeholder="e.g. Pro Travel Tip: Golden Hour Photos" value="${escapeHtml(data.title || 'Pro Tip / Note')}" oninput="updateSecTitle(this)">
+                        </div>
+                        <div class="form-group">
+                            <label>Callout Message / Recommendation</label>
+                            <textarea name="sections[${idx}][body]" rows="3" placeholder="Write helpful advice or special announcements...">${escapeHtml(data.body || '')}</textarea>
+                        </div>
+                    `;
+                    break;
+
+                case 'faq':
+                    badgeHtml = '<i class="fas fa-circle-question"></i> FAQ Item';
+                    const qVal = data.question || (Array.isArray(data.items) && data.items[0] ? data.items[0].question : '');
+                    const aVal = data.answer || (Array.isArray(data.items) && data.items[0] ? data.items[0].answer : '');
+                    bodyHtml = `
+                        <input type="hidden" name="sections[${idx}][type]" value="faq">
+                        <div class="form-group">
+                            <label>Question</label>
+                            <input type="text" name="sections[${idx}][question]" class="sec-input-title" placeholder="e.g. What is the best time to plan an outdoor lawn wedding?" value="${escapeHtml(qVal)}" oninput="updateSecTitle(this)">
+                        </div>
+                        <div class="form-group">
+                            <label>Answer (Interactive Expand/Collapse on blog page)</label>
+                            <textarea name="sections[${idx}][answer]" rows="3" placeholder="Provide a helpful and thorough answer...">${escapeHtml(aVal)}</textarea>
+                        </div>
+                    `;
+                    break;
+
+                case 'video':
+                    badgeHtml = '<i class="fas fa-video"></i> Video Tour';
+                    bodyHtml = `
+                        <input type="hidden" name="sections[${idx}][type]" value="video">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Video Heading / Title</label>
+                                <input type="text" name="sections[${idx}][heading]" class="sec-input-title" placeholder="e.g. Virtual Resort Tour" value="${escapeHtml(data.heading || 'Resort Video Tour')}" oninput="updateSecTitle(this)">
+                            </div>
+                            <div class="form-group">
+                                <label>YouTube URL / Video Link</label>
+                                <input type="text" name="sections[${idx}][video_url]" placeholder="https://www.youtube.com/watch?v=... or .mp4 URL" value="${escapeHtml(data.video_url || '')}">
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'cta':
+                    badgeHtml = '<i class="fas fa-bullhorn"></i> Booking CTA';
+                    bodyHtml = `
+                        <input type="hidden" name="sections[${idx}][type]" value="cta">
+                        <div class="form-group">
+                            <label>CTA Headline</label>
+                            <input type="text" name="sections[${idx}][heading]" class="sec-input-title" placeholder="e.g. Plan Your Event or Mountain Stay" value="${escapeHtml(data.heading || 'Plan Your Event or Mountain Stay')}" oninput="updateSecTitle(this)">
+                        </div>
+                        <div class="form-group">
+                            <label>CTA Description</label>
+                            <textarea name="sections[${idx}][body]" rows="2" placeholder="Experience panoramic Himalayan luxury, grand banquet halls, and 5-star hospitality in Dharamshala...">${escapeHtml(data.body || 'Experience panoramic Himalayan luxury, banquet halls, and five-star hospitality in Dharamshala.')}</textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Call Direct Phone</label>
+                                <input type="text" name="sections[${idx}][phone]" value="${escapeHtml(data.phone || '+917018841900')}">
+                            </div>
+                            <div class="form-group">
+                                <label>WhatsApp Number</label>
+                                <input type="text" name="sections[${idx}][whatsapp]" value="${escapeHtml(data.whatsapp || '917018841900')}">
+                            </div>
+                        </div>
+                    `;
+                    break;
             }
-        });
-        
-        // Character counters
-        document.querySelectorAll('input[maxlength], textarea[maxlength]').forEach(el => {
-            const counter = el.parentElement.querySelector('.char-counter');
-            if (counter) {
-                const update = () => {
-                    counter.textContent = `${el.value.length}/${el.getAttribute('maxlength')} characters`;
-                    if (el.value.length > el.getAttribute('maxlength') * 0.9) {
-                        counter.style.color = '#dc3545';
-                    } else {
-                        counter.style.color = 'var(--text-muted)';
-                    }
-                };
-                el.addEventListener('input', update);
-                update();
+
+            const initialTitle = data.heading || data.title || data.question || (data.quote ? data.quote.substring(0, 30) + '...' : '') || type.toUpperCase();
+
+            const secCard = document.createElement('div');
+            secCard.className = 'section-item';
+            secCard.id = secId;
+            secCard.innerHTML = `
+                <div class="section-item-header">
+                    <div class="sec-header-left">
+                        <i class="fas fa-grip-vertical sec-drag-icon"></i>
+                        <span class="sec-type-badge">${badgeHtml}</span>
+                        <span class="sec-title-preview">${escapeHtml(initialTitle)}</span>
+                    </div>
+                    <div class="sec-header-actions">
+                        <button type="button" class="btn-sec-ctrl" onclick="moveSectionUp(this)" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+                        <button type="button" class="btn-sec-ctrl" onclick="moveSectionDown(this)" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+                        <button type="button" class="btn-sec-ctrl" onclick="toggleSectionCollapse(this)" title="Collapse / Expand"><i class="fas fa-chevron-down"></i></button>
+                        <button type="button" class="btn-sec-ctrl btn-danger" onclick="removeSection(this)" title="Delete Section"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="section-body">
+                    ${bodyHtml}
+                </div>
+            `;
+
+            list.appendChild(secCard);
+        }
+
+        function updateSecTitle(input) {
+            const card = input.closest('.section-item');
+            if (!card) return;
+            const preview = card.querySelector('.sec-title-preview');
+            if (preview) {
+                preview.textContent = input.value.trim() || 'Untitled Section';
             }
-        });
-        
-        // Category handling
-        const categorySelect = document.getElementById('categorySelect');
-        const categoryCustom = document.getElementById('categoryCustom');
-        
-        if (categorySelect && categoryCustom) {
-            categorySelect.addEventListener('change', function() {
-                if (this.value === 'other') {
-                    categoryCustom.style.display = 'block';
-                } else {
-                    categoryCustom.style.display = 'none';
-                    categoryCustom.value = '';
-                }
-                updateSlugPreview();
-            });
+        }
+
+        function moveSectionUp(btn) {
+            const item = btn.closest('.section-item');
+            const prev = item.previousElementSibling;
+            if (prev) {
+                item.parentNode.insertBefore(item, prev);
+            }
+        }
+
+        function moveSectionDown(btn) {
+            const item = btn.closest('.section-item');
+            const next = item.nextElementSibling;
+            if (next) {
+                item.parentNode.insertBefore(next, item);
+            }
+        }
+
+        function toggleSectionCollapse(btn) {
+            const item = btn.closest('.section-item');
+            item.classList.toggle('collapsed');
+            const icon = btn.querySelector('i');
+            if (item.classList.contains('collapsed')) {
+                icon.className = 'fas fa-chevron-right';
+            } else {
+                icon.className = 'fas fa-chevron-down';
+            }
+        }
+
+        function removeSection(btn) {
+            if (confirm('Are you sure you want to remove this section?')) {
+                const item = btn.closest('.section-item');
+                item.remove();
+            }
+        }
+
+        function addChecklistItem(idx) {
+            const container = document.getElementById(`checklist_${idx}`);
+            if (!container) return;
+            const row = document.createElement('div');
+            row.className = 'checklist-item-row';
+            row.innerHTML = `
+                <input type="text" name="sections[${idx}][items][]" placeholder="New highlight point...">
+                <button type="button" class="btn-remove-item" onclick="this.parentElement.remove()" title="Remove point"><i class="fas fa-times"></i></button>
+            `;
+            container.appendChild(row);
         }
 
         // Live Auto-Slug Generation & Preview
         const titleInput = document.getElementById('titleInput');
         const slugInput = document.getElementById('slugInput');
         const slugPreview = document.getElementById('slugPreview');
+        const categorySelect = document.getElementById('categorySelect');
+        const categoryCustom = document.getElementById('categoryCustom');
         const baseUrl = '<?php echo getBaseUrl(); ?>';
 
         function createCleanSlug(text) {
@@ -662,44 +870,82 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if (titleInput && slugInput) {
             let isManualSlug = false;
-
             slugInput.addEventListener('input', function() {
                 isManualSlug = this.value.trim().length > 0;
                 updateSlugPreview();
             });
-
             titleInput.addEventListener('input', function() {
                 if (!isManualSlug) {
                     slugInput.value = createCleanSlug(this.value);
                 }
                 updateSlugPreview();
             });
-            
             updateSlugPreview();
         }
-        
-        // Add initial section
-        setTimeout(() => {
-            if (document.querySelectorAll('.section-item').length === 0) {
-                addSection();
+
+        if (categorySelect && categoryCustom) {
+            categorySelect.addEventListener('change', function() {
+                if (this.value === 'other') {
+                    categoryCustom.style.display = 'block';
+                } else {
+                    categoryCustom.style.display = 'none';
+                    categoryCustom.value = '';
+                }
+                updateSlugPreview();
+            });
+        }
+
+        // Featured image preview
+        document.getElementById('featured_image')?.addEventListener('change', function(e) {
+            const preview = document.getElementById('featured-image-preview');
+            preview.innerHTML = '';
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.maxWidth = '200px';
+                    img.style.marginTop = '10px';
+                    img.style.borderRadius = '8px';
+                    img.style.border = '2px solid var(--border)';
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(this.files[0]);
             }
-        }, 100);
-        
-        // Form submit handler
+        });
+
+        // Form submit handler - re-index sections so names match order
         document.getElementById('blogForm').addEventListener('submit', function(e) {
             const sections = document.querySelectorAll('.section-item');
             if (sections.length === 0) {
                 e.preventDefault();
-                alert('Please add at least one section to your blog.');
+                alert('Please add at least one section to your blog post.');
                 return false;
             }
-            
-            // Handled natively by input[type="file"] now
+
+            // Re-index all section inputs according to current DOM order
+            sections.forEach((sec, newIdx) => {
+                sec.querySelectorAll('input, select, textarea').forEach(input => {
+                    if (input.name && input.name.startsWith('sections[')) {
+                        input.name = input.name.replace(/^sections\[\d+\]/, `sections[${newIdx}]`);
+                    }
+                });
+            });
             
             const submitBtn = this.querySelector('button[type="submit"]');
             if (submitBtn) {
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing Blog...';
                 submitBtn.disabled = true;
+            }
+        });
+
+        // Initial default section
+        window.addEventListener('DOMContentLoaded', () => {
+            if (document.querySelectorAll('.section-item').length === 0) {
+                addSection('text', {
+                    heading: 'Introduction & Overview',
+                    content: 'Welcome to Resort Dhauladhar. Nestled in the serene foothills of Dharamshala, our resort offers an unparalleled sanctuary of luxury, serenity, and panoramic Himalayan beauty.'
+                });
             }
         });
     </script>
