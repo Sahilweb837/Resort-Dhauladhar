@@ -103,15 +103,7 @@ $extraHead = ob_get_clean();
 include __DIR__ . '/includes/header.php';
 ?>
 
-<!----------------------- hero section ---------------------->
-<div class="common-hero blog" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('<?php echo $featuredImageUrl; ?>'); background-size: cover; background-position: center;">
-    <h1 data-aos="fade-down" data-aos-duration="1200"><?php echo htmlspecialchars($blog['title']); ?></h1>
-    <div class="hero-links" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="300">
-      <a href="<?php echo $baseUrl; ?>/">THE RESORT</a>
-      <a href="<?php echo $baseUrl; ?>/blog.php">/ Blog</a>
-      <a href="#">/ <?php echo htmlspecialchars($blog['category'] ?? 'General'); ?></a>
-    </div>
-</div>
+ 
 
 <main class="blog-detail-wrapper">
     <article class="blog-detail-article" data-aos="fade-up">
