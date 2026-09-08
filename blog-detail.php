@@ -111,104 +111,120 @@ include __DIR__ . '/includes/header.php';
       <a href="<?php echo $baseUrl; ?>/blog.php">/ Blog</a>
       <a href="#">/ <?php echo htmlspecialchars($blog['category'] ?? 'General'); ?></a>
     </div>
-  </div>
+</div>
 
-<section class="blog-detail">
-    <div class="blog-detail-container">
-        <div class="blog-main">
-            <?php 
-            $blogFormattedDate = !empty($blog['created_at']) ? date('F d, Y', strtotime($blog['created_at'])) : date('F d, Y');
-            ?>
-            <div class="blog-header">
-                <h2><?php echo htmlspecialchars($blog['title']); ?></h2>
-                <div class="blog-meta">
-                    <span><i class="fas fa-calendar"></i> <?php echo $blogFormattedDate; ?></span>
-                    <span><i class="fas fa-user"></i> <?php echo htmlspecialchars($blog['author'] ?? 'Admin'); ?></span>
-                    <span><i class="fas fa-tag"></i> <?php echo htmlspecialchars($blog['category'] ?? 'General'); ?></span>
-                 </div>
+<main class="blog-detail-wrapper">
+    <article class="blog-detail-article" data-aos="fade-up">
+        <?php 
+        $blogFormattedDate = !empty($blog['created_at']) ? date('F d, Y', strtotime($blog['created_at'])) : date('F d, Y');
+        ?>
+        <header class="blog-detail-post-header">
+            <span class="blog-detail-category"><?php echo htmlspecialchars($blog['category'] ?? 'General'); ?></span>
+            <h2><?php echo htmlspecialchars($blog['title']); ?></h2>
+            <div class="blog-detail-meta">
+                <span><i class="fa-regular fa-calendar"></i> <?php echo $blogFormattedDate; ?></span>
+                <span><i class="fa-regular fa-user"></i> <?php echo htmlspecialchars($blog['author'] ?? 'Admin'); ?></span>
+                <span><i class="fa-solid fa-location-dot"></i> Dharamshala, Himachal Pradesh</span>
             </div>
-            
-            <?php if (!empty($blog['featured_image'])): ?>
-                <div class="featured-image-container">
-                    <img src="<?php echo $featuredImageUrl; ?>" 
-                         alt="<?php echo htmlspecialchars($blog['title']); ?>" 
-                         class="blog-featured-image"
-                         onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
+        </header>
+        
+        <?php if (!empty($blog['featured_image'])): ?>
+            <div class="blog-featured-image-wrap">
+                <img src="<?php echo $featuredImageUrl; ?>" 
+                     alt="<?php echo htmlspecialchars($blog['title']); ?>" 
+                     class="blog-featured-image"
+                     onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
+            </div>
+        <?php endif; ?>
+
+        <div class="blog-share-row">
+            <a href="<?php echo $baseUrl; ?>/blog.php" class="blog-back-link"><i class="fa-solid fa-arrow-left"></i> Back to Blogs</a>
+            <div class="blog-social-icons" aria-label="Share this blog">
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode($blogCanonicalUrl); ?>" target="_blank" rel="noopener" aria-label="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://www.instagram.com/dhauladhar_heights_resort" target="_blank" rel="noopener" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://wa.me/?text=<?php echo urlencode($blog['title'] . ' ' . $blogCanonicalUrl); ?>" target="_blank" rel="noopener" aria-label="WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=<?php echo urlencode($blogCanonicalUrl); ?>" target="_blank" rel="noopener" aria-label="LinkedIn">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+            </div>
+        </div>
+        
+        <div class="blog-detail-content">
+            <?php if (!empty($sections) && is_array($sections)): ?>
+                <?php foreach ($sections as $index => $section): ?>
+                    <div class="blog-section">
+                        <?php if (!empty($section['title'])): ?>
+                            <h2 class="section-title"><?php echo htmlspecialchars($section['title']); ?></h2>
+                        <?php endif; ?>
+                        
+                        <div class="section-content">
+                            <?php echo $section['content']; ?>
+                        </div>
+                        
+                        <?php if (!empty($section['images']) && is_array($section['images'])): ?>
+                            <div class="section-gallery">
+                                <?php foreach ($section['images'] as $image): ?>
+                                    <?php if (!empty($image)): ?>
+                                        <?php $imageUrl = getBlogImageUrl($image); ?>
+                                        <div class="gallery-item" onclick="openLightbox('<?php echo $imageUrl; ?>')">
+                                            <img src="<?php echo $imageUrl; ?>" 
+                                                 alt="<?php echo htmlspecialchars($section['title'] ?? 'Image'); ?>"
+                                                 onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
+                                            <div class="gallery-overlay">
+                                                <i class="fas fa-search-plus"></i>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ($index < count($sections) - 1): ?>
+                        <div class="section-divider"></div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="blog-section">
+                    <div class="section-content">
+                        <?php echo nl2br($blog['content'] ?? ''); ?>
+                    </div>
                 </div>
             <?php endif; ?>
-            
-            <div class="blog-content">
-                <?php if (!empty($sections) && is_array($sections)): ?>
-                    <?php foreach ($sections as $index => $section): ?>
-                        <div class="blog-section" data-aos="fade-up" data-aos-delay="<?php echo $index * 100; ?>">
-                            <?php if (!empty($section['title'])): ?>
-                                <h2 class="section-title"><?php echo htmlspecialchars($section['title']); ?></h2>
-                            <?php endif; ?>
-                            
-                            <div class="section-content">
-                                <?php echo $section['content']; ?>
-                            </div>
-                            
-                            <?php if (!empty($section['images']) && is_array($section['images'])): ?>
-                                <div class="section-gallery">
-                                    <?php foreach ($section['images'] as $image): ?>
-                                        <?php if (!empty($image)): ?>
-                                            <?php $imageUrl = getBlogImageUrl($image); ?>
-                                            <div class="gallery-item" onclick="openLightbox('<?php echo $imageUrl; ?>')">
-                                                <img src="<?php echo $imageUrl; ?>" 
-                                                     alt="<?php echo htmlspecialchars($section['title'] ?? 'Image'); ?>"
-                                                     onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
-                                                <div class="gallery-overlay">
-                                                    <i class="fas fa-search-plus"></i>
-                                                </div>
-                                            </div>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        <?php if ($index < count($sections) - 1): ?>
-                            <div class="section-divider"></div>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div class="blog-section">
-                        <div class="section-content">
-                            <?php echo nl2br($blog['content']); ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
-            </div>
-            
+
             <?php if (!empty($blog['meta_keywords'])): ?>
-                <div class="blog-tags">
+                <div class="blog-tags" style="margin-top:30px;">
                     <strong>Tags:</strong>
                     <?php foreach (explode(',', $blog['meta_keywords']) as $tag): ?>
                         <span>#<?php echo trim(htmlspecialchars($tag)); ?></span>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
-            
-            <div class="blog-share">
-                <h4>Share this post:</h4>
-                <div class="share-buttons">
-                    <a href="https://www.facebook.com/dhauladharheightsresort" target="_blank" class="share-facebook">
-                        <i class="fab fa-facebook-f"></i> Facebook
-                    </a>
-                  <a href="https://www.instagram.com/dhauladhar_heights_resort" target="_blank" class="share-twitter" rel="noopener noreferrer">
-    <i class="fab fa-instagram"></i> Instagram
-</a>
-                    <a href="https://www.linkedin.com/company/dhauladhar-heights-resort" target="_blank" class="share-linkedin">
-                        <i class="fab fa-linkedin-in"></i> LinkedIn
-                    </a>
+
+            <div class="blog-detail-cta">
+                <div>
+                    <h3>Plan Your Event or Mountain Stay</h3>
+                    <p>Experience panoramic Himalayan luxury, banquet halls, and five-star hospitality in Dharamshala.</p>
+                </div>
+                <div class="cta-btns">
+                    <a href="<?php echo $baseUrl; ?>/contact.html" class="cta-btn-primary"><i class="fa-solid fa-calendar-check"></i> Book Consultation</a>
+                    <a href="https://wa.me/917018841900?text=Hello%20Dhauladhar%20Heights%20Resort,%20I%20am%20interested%20in%20room/event%20booking." target="_blank" class="cta-btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
                 </div>
             </div>
         </div>
-        
-        <aside class="sidebar">
-            <div class="sidebar-card">
-                <h3>Popular Posts</h3>
-                <?php if (!empty($popularBlogs)): ?>
+    </article>
+    
+    <aside class="sidebar">
+        <!-- POPULAR POSTS WIDGET -->
+        <div class="widget">
+            <h2>Recent Posts</h2>
+            <?php if (!empty($popularBlogs)): ?>
+                <ul class="recent-posts">
                     <?php foreach ($popularBlogs as $popular): ?>
                         <?php if ($popular['id'] != $blog['id']): ?>
                             <?php 
@@ -216,66 +232,78 @@ include __DIR__ . '/includes/header.php';
                             $popularUrl = getBlogUrl($popular);
                             $popDate = !empty($popular['created_at']) ? date('M d, Y', strtotime($popular['created_at'])) : date('M d, Y');
                             ?>
-                            <a href="<?php echo $popularUrl; ?>" class="post" style="text-decoration: none; display: flex; gap: 15px;">
-                                <img src="<?php echo $popularImageUrl; ?>" 
-                                     alt="<?php echo htmlspecialchars($popular['title']); ?>"
-                                     onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
-                                <div>
-                                    <p><?php echo htmlspecialchars($popular['title']); ?></p>
-                                    <span><?php echo $popDate; ?></span>
-                                </div>
-                            </a>
+                            <li class="recent-post-item">
+                                <a href="<?php echo $popularUrl; ?>" class="recent-post-link">
+                                    <img src="<?php echo $popularImageUrl; ?>" 
+                                         alt="<?php echo htmlspecialchars($popular['title']); ?>"
+                                         onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
+                                    <div class="recent-post-info">
+                                        <span class="recent-post-title"><?php echo htmlspecialchars($popular['title']); ?></span>
+                                        <span class="recent-post-date"><i class="fa-regular fa-calendar"></i> <?php echo $popDate; ?></span>
+                                    </div>
+                                </a>
+                            </li>
                         <?php endif; ?>
                     <?php endforeach; ?>
-                <?php else: ?>
-                    <p>No popular posts yet.</p>
-                <?php endif; ?>
+                </ul>
+            <?php else: ?>
+                <p style="color:#718096; font-size:14px;">No other posts available.</p>
+            <?php endif; ?>
+        </div>
+        
+        <!-- ROOM CATEGORIES WIDGET -->
+        <div class="widget">
+            <h2><i class="fa-solid fa-bed" style="color:var(--secondary-color, #5DC5E3); margin-right:6px;"></i> Room Categories</h2>
+            <div class="room-category-list">
+                <a href="<?php echo getRoomUrl('executive-room'); ?>" class="room-category-item">
+                    <div class="room-cat-info">
+                        <span class="room-name">Executive Room</span>
+                        <span class="room-sub">Modern Comforts & Mountain View</span>
+                    </div>
+                    <span class="room-count">24 Rooms</span>
+                </a>
+                <a href="<?php echo getRoomUrl('executive-suite'); ?>" class="room-category-item">
+                    <div class="room-cat-info">
+                        <span class="room-name">Executive Suite</span>
+                        <span class="room-sub">Spacious Living & Private Balcony</span>
+                    </div>
+                    <span class="room-count">40 Suites</span>
+                </a>
+                <a href="<?php echo getRoomUrl('presidential-suite'); ?>" class="room-category-item">
+                    <div class="room-cat-info">
+                        <span class="room-name">Presidential Suite</span>
+                        <span class="room-sub">Penthouse Luxury & Panoramic Vista</span>
+                    </div>
+                    <span class="room-count">02 Suites</span>
+                </a>
+                <a href="<?php echo getRoomUrl('twin-bed'); ?>" class="room-category-item">
+                    <div class="room-cat-info">
+                        <span class="room-name">Twin Bedded Room</span>
+                        <span class="room-sub">Shared Stay & Premium Amenities</span>
+                    </div>
+                    <span class="room-count">04 Rooms</span>
+                </a>
+                <a href="<?php echo getRoomUrl('deluxe-room'); ?>" class="room-category-item">
+                    <div class="room-cat-info">
+                        <span class="room-name">Deluxe Room</span>
+                        <span class="room-sub">Cozy Retreat & Elegant Interior</span>
+                    </div>
+                    <span class="room-count">03 Rooms</span>
+                </a>
             </div>
-            
-            <!-- ROOM CATEGORIES - Extended Room Details -->
-            <div class="sidebar-card rooms-sidebar-card">
-                <h3><i class="fa-solid fa-bed"></i> Room Categories</h3>
-                <div class="room-category-list">
-                    <a href="<?php echo getRoomUrl('executive-room'); ?>" class="room-category-item">
-                        <div class="room-cat-info">
-                            <span class="room-name">Executive Room</span>
-                            <span class="room-sub">Modern Comforts & Mountain View</span>
-                        </div>
-                        <span class="room-count">24 Rooms</span>
-                    </a>
-                    <a href="<?php echo getRoomUrl('executive-suite'); ?>" class="room-category-item">
-                        <div class="room-cat-info">
-                            <span class="room-name">Executive Suite</span>
-                            <span class="room-sub">Spacious Living & Private Balcony</span>
-                        </div>
-                        <span class="room-count">40 Suites</span>
-                    </a>
-                    <a href="<?php echo getRoomUrl('presidential-suite'); ?>" class="room-category-item">
-                        <div class="room-cat-info">
-                            <span class="room-name">Presidential Suite</span>
-                            <span class="room-sub">Penthouse Luxury & Panoramic Vista</span>
-                        </div>
-                        <span class="room-count">02 Suites</span>
-                    </a>
-                    <a href="<?php echo getRoomUrl('twin-bed'); ?>" class="room-category-item">
-                        <div class="room-cat-info">
-                            <span class="room-name">Twin Bedded Room</span>
-                            <span class="room-sub">Shared Stay & Premium Amenities</span>
-                        </div>
-                        <span class="room-count">04 Rooms</span>
-                    </a>
-                    <a href="<?php echo getRoomUrl('deluxe-room'); ?>" class="room-category-item">
-                        <div class="room-cat-info">
-                            <span class="room-name">Deluxe Room</span>
-                            <span class="room-sub">Cozy Retreat & Elegant Interior</span>
-                        </div>
-                        <span class="room-count">03 Rooms</span>
-                    </a>
-                </div>
+        </div>
+
+        <!-- CONTACT / BOOKING WIDGET -->
+        <div class="widget blog-contact-widget">
+            <h2>Plan Your Event / Stay</h2>
+            <p>Planning a holiday, corporate retreat, or dream destination wedding in Dharamshala?</p>
+            <div class="contact-widget-buttons">
+                <a href="tel:+917018841900" class="widget-btn call-btn"><i class="fa-solid fa-phone"></i> Call +91 70188-41900</a>
+                <a href="https://wa.me/917018841900?text=Hello%20Dhauladhar%20Heights%20Resort,%20I%20would%20like%20to%20know%20more%20about%20room%20and%20wedding%20booking." target="_blank" class="widget-btn whatsapp-btn"><i class="fa-brands fa-whatsapp"></i> WhatsApp Enquiry</a>
             </div>
-        </aside>
-    </div>
-</section>
+        </div>
+    </aside>
+</main>
 
 <!-- Lightbox Modal -->
 <div id="lightbox" class="lightbox" onclick="closeLightbox()">

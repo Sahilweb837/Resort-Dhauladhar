@@ -34,6 +34,18 @@ $sections = [];
 if (!empty($blog['sections'])) {
     $sections = json_decode($blog['sections'], true);
 }
+// If blog has raw content but no sections JSON (e.g. seeded blogs or legacy format),
+// populate default section from content so it NEVER wipes or displays blank!
+if (empty($sections) && !empty($blog['content'])) {
+    $sections = [
+        [
+            'title' => '',
+            'content' => $blog['content'],
+            'images' => [],
+            'order' => 0
+        ]
+    ];
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Bypass CSRF check if session is unstable on production hosting
@@ -47,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $author = trim($_POST['author'] ?? ($_SESSION['admin_name'] ?? 'Admin'));
         $meta_description = trim($_POST['meta_description'] ?? '');
         $meta_keywords = trim($_POST['meta_keywords'] ?? '');
-        $status = $_POST['status'] ?? 'published';
+        $status = $_POST['status'] ?? ($blog['status'] ?? 'published');
         
         // Handle custom category
         if ($category === 'other' && !empty($_POST['category_custom'])) {
@@ -196,7 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 
                 $data = [
                     'title' => htmlspecialchars($title, ENT_QUOTES, 'UTF-8'),
-                    'slug' => !empty($slugInput) ? createSlug($slugInput) : createSlug($title),
+                    'slug' => !empty($slugInput) ? createSlug($slugInput) : (!empty($blog['slug']) ? $blog['slug'] : createSlug($title)),
                     'content' => $fullContent,
                     'excerpt' => htmlspecialchars($excerpt, ENT_QUOTES, 'UTF-8'),
                     'featured_image' => $featured_image,
@@ -747,7 +759,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
 
         if (titleInput && slugInput) {
-            let isManualSlug = false;
+            let isManualSlug = <?php echo !empty($blog['slug']) ? 'true' : 'false'; ?>;
 
             slugInput.addEventListener('input', function() {
                 isManualSlug = true;

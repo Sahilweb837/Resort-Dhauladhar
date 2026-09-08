@@ -210,13 +210,48 @@ function getAllBlogs($limit = null, $offset = 0, $status = null, $category = nul
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
             $results = $stmt->fetchAll();
-            return is_array($results) ? $results : [];
+            if (!empty($results)) {
+                return $results;
+            }
         }
     } catch (Throwable $e) {
         // Silent catch
     }
 
-    return [];
+    // Fallback to sample blogs when DB is empty, disconnected, or unreachable
+    $sampleBlogs = getDefaultSampleBlogs();
+    $filtered = [];
+    foreach ($sampleBlogs as $b) {
+        if ($status && isset($b['status']) && $b['status'] !== $status) {
+            continue;
+        }
+        if ($category) {
+            $bCat = strtolower(str_replace(' ', '-', $b['category'] ?? ''));
+            $cFilter = strtolower(str_replace(' ', '-', $category));
+            if ($bCat !== $cFilter) continue;
+        }
+        if ($author && isset($b['author'])) {
+            $bAuth = strtolower(str_replace(' ', '-', $b['author']));
+            $aFilter = strtolower(str_replace(' ', '-', $author));
+            if ($bAuth !== $aFilter) continue;
+        }
+        if ($search) {
+            $sLower = strtolower($search);
+            $match = (stripos($b['title'] ?? '', $sLower) !== false) ||
+                     (stripos($b['content'] ?? '', $sLower) !== false) ||
+                     (stripos($b['excerpt'] ?? '', $sLower) !== false);
+            if (!$match) continue;
+        }
+        $filtered[] = $b;
+    }
+
+    if ($offset > 0 || $limit !== null) {
+        $offset = max(0, intval($offset));
+        $limit = $limit !== null ? intval($limit) : null;
+        return array_slice($filtered, $offset, $limit);
+    }
+
+    return $filtered;
 }
 
 function getBlogById($id) {
@@ -230,6 +265,14 @@ function getBlogById($id) {
         }
     } catch (Throwable $e) {
         // Silent catch
+    }
+
+    // Fallback to sample blogs
+    $sampleBlogs = getDefaultSampleBlogs();
+    foreach ($sampleBlogs as $b) {
+        if ((string)$b['id'] === (string)$id) {
+            return $b;
+        }
     }
 
     return false;
@@ -249,6 +292,14 @@ function getBlogBySlug($slug) {
         }
     } catch (Throwable $e) {
         // Silent catch
+    }
+
+    // Fallback to sample blogs
+    $sampleBlogs = getDefaultSampleBlogs();
+    foreach ($sampleBlogs as $b) {
+        if ($b['slug'] === $slug || $b['slug'] === $cleanSlug || (string)$b['id'] === (string)$slug) {
+            return $b;
+        }
     }
 
     return false;
@@ -300,9 +351,17 @@ function updateBlog($id, $data) {
         $pdo = getDB();
         if (!$pdo) return false;
         
-        $rawSlug = !empty($data['slug']) ? $data['slug'] : $data['title'];
+        $oldBlog = getBlogById($id);
+        $oldSlug = $oldBlog ? ($oldBlog['slug'] ?? '') : '';
+        $oldCategory = $oldBlog ? ($oldBlog['category'] ?? '') : '';
+
+        $rawSlug = !empty($data['slug']) ? $data['slug'] : (!empty($oldSlug) ? $oldSlug : $data['title']);
         $slug = generateUniqueSlug($rawSlug, $id);
         
+        // Preserve featured image if empty in $data and not explicitly removed
+        $featured_image = !empty($data['featured_image']) ? $data['featured_image'] : ($oldBlog['featured_image'] ?? '');
+        $status = !empty($data['status']) ? $data['status'] : ($oldBlog['status'] ?? 'published');
+
         $sql = "UPDATE blogs SET 
                 title = ?, slug = ?, content = ?, excerpt = ?, 
                 featured_image = ?, category = ?, author = ?, 
@@ -316,12 +375,12 @@ function updateBlog($id, $data) {
             $slug,
             $data['content'],
             $data['excerpt'] ?? '',
-            $data['featured_image'] ?? '',
+            $featured_image,
             $data['category'] ?? '',
             $data['author'] ?? 'Admin',
             $data['meta_description'] ?? '',
             $data['meta_keywords'] ?? '',
-            $data['status'] ?? 'published',
+            $status,
             $data['sections'] ?? null,
             $data['content_format'] ?? 'html',
             $id
@@ -330,6 +389,10 @@ function updateBlog($id, $data) {
         if ($result) {
             $updatedBlog = getBlogById($id);
             if ($updatedBlog) {
+                // If slug changed, keep old directory redirect so old links don't break
+                if (!empty($oldSlug) && $oldSlug !== $slug) {
+                    preserveOldSlugRedirect($oldSlug, $slug, $oldCategory, $data['category'] ?? $oldCategory);
+                }
                 syncBlogPhysicalPages($updatedBlog);
             }
             generateSitemapXML();
@@ -337,6 +400,32 @@ function updateBlog($id, $data) {
         return $result;
     } catch (Throwable $e) {
         return false;
+    }
+}
+
+function preserveOldSlugRedirect($oldSlug, $newSlug, $oldCategory = '', $newCategory = '') {
+    if (empty($oldSlug) || empty($newSlug) || $oldSlug === $newSlug) return;
+    $projectRoot = rtrim(str_replace('\\', '/', dirname(__DIR__)), '/');
+    $oldCatSlug = !empty($oldCategory) ? createSlug($oldCategory) : 'general';
+    $newCatSlug = !empty($newCategory) ? createSlug($newCategory) : $oldCatSlug;
+    
+    $dirs = [
+        $projectRoot . '/blog/' . $oldSlug,
+        $projectRoot . '/blog/' . $oldCatSlug . '/' . $oldSlug
+    ];
+    
+    foreach ($dirs as $dir) {
+        if (!file_exists($dir)) {
+            @mkdir($dir, 0777, true);
+        }
+        $relativeProjectSubpath = str_replace($projectRoot, '', str_replace('\\', '/', $dir));
+        $depth = substr_count(trim($relativeProjectSubpath, '/'), '/');
+        $relPath = str_repeat('../', max(1, $depth + 1)) . 'blog/' . $newCatSlug . '/' . $newSlug;
+        
+        $redirectCode = "<?php\n";
+        $redirectCode .= "header('Location: " . $relPath . "', true, 301);\n";
+        $redirectCode .= "exit();\n";
+        @file_put_contents($dir . '/index.php', $redirectCode);
     }
 }
 
@@ -400,13 +489,16 @@ function getBlogCount($status = null, $category = null, $author = null, $search 
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
             $count = $stmt->fetchColumn();
-            return $count !== false ? (int)$count : 0;
+            if ($count !== false && (int)$count > 0) {
+                return (int)$count;
+            }
         }
     } catch (Throwable $e) {
         // Silent catch
     }
 
-    return 0;
+    $all = getAllBlogs(null, 0, $status, $category, $author, $search);
+    return count($all);
 }
 
 function getRecentBlogs($limit = 5) {
@@ -416,13 +508,15 @@ function getRecentBlogs($limit = 5) {
             $limit = intval($limit);
             $stmt = $pdo->query("SELECT * FROM blogs WHERE status = 'published' ORDER BY created_at DESC LIMIT $limit");
             $results = $stmt->fetchAll();
-            return is_array($results) ? $results : [];
+            if (!empty($results)) {
+                return $results;
+            }
         }
     } catch (Throwable $e) {
         // Silent catch
     }
 
-    return [];
+    return getAllBlogs($limit, 0, 'published');
 }
 
 function getPopularBlogs($limit = 5) {
@@ -432,13 +526,15 @@ function getPopularBlogs($limit = 5) {
             $limit = intval($limit);
             $stmt = $pdo->query("SELECT * FROM blogs WHERE status = 'published' ORDER BY views DESC LIMIT $limit");
             $results = $stmt->fetchAll();
-            return is_array($results) ? $results : [];
+            if (!empty($results)) {
+                return $results;
+            }
         }
     } catch (Throwable $e) {
         // Silent catch
     }
 
-    return [];
+    return getAllBlogs($limit, 0, 'published');
 }
 
 function createSlug($string) {
@@ -1169,6 +1265,12 @@ function ensureBlogTableColumns() {
             $stmtCol = $pdo->query("SHOW COLUMNS FROM blogs LIKE 'content_format'");
             if ($stmtCol->rowCount() == 0) {
                 $pdo->exec("ALTER TABLE blogs ADD COLUMN content_format VARCHAR(20) DEFAULT 'html' AFTER sections");
+            }
+
+            // If table has 0 blogs, seed default blogs
+            $countStmt = $pdo->query("SELECT COUNT(*) FROM blogs");
+            if ($countStmt && (int)$countStmt->fetchColumn() === 0) {
+                seedDefaultBlogs($pdo);
             }
         }
         
