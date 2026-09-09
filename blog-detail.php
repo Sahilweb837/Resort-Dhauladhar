@@ -152,11 +152,13 @@ include __DIR__ . '/includes/header.php';
             </div>
         </header>
         
-        <?php if (!empty($blog['featured_image'])): ?>
-            <img src="<?php echo $featuredImageUrl; ?>" 
-                 alt="<?php echo htmlspecialchars($blog['title']); ?>" 
-                 class="blog-featured-image"
-                 onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
+        <?php if (!empty($featuredImageUrl)): ?>
+            <div class="blog-featured-image-wrap">
+                <img src="<?php echo $featuredImageUrl; ?>" 
+                     alt="<?php echo htmlspecialchars($blog['title']); ?>" 
+                     class="blog-featured-image"
+                     onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
+            </div>
         <?php endif; ?>
 
         <div class="blog-share-row">
