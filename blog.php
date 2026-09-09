@@ -160,7 +160,7 @@ include __DIR__ . '/includes/header.php';
             </div>
 
             <!-- CATEGORIES WIDGET -->
-            <div class="widget">
+            <!-- <div class="widget">
                 <h2>Categories</h2>
                 <ul class="category-list">
                     <?php foreach ($categories as $cat): 
@@ -175,7 +175,7 @@ include __DIR__ . '/includes/header.php';
                         </li>
                     <?php endforeach; ?>
                 </ul>
-            </div>
+            </div> -->
 
             <!-- RECENT / POPULAR POSTS WIDGET -->
             <div class="widget">
