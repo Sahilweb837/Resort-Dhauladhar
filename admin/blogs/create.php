@@ -404,9 +404,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <!-- Glassmorphism Top Header -->
             <div class="header">
                 <h1><i class="fas fa-plus-circle"></i> Create New Blog</h1>
-                <div class="user-info">
-                    <i class="fas fa-user-circle"></i>
-                    <span>Welcome, <strong><?php echo htmlspecialchars($_SESSION['admin_name'] ?? 'Admin'); ?></strong></span>
+                <div style="display:flex; align-items:center; gap: 12px;">
+                    <a href="builder.php" class="btn btn-primary" style="background:linear-gradient(135deg,#5DC5E3 0%,#1D285C 100%); border:1px solid rgba(93,197,227,0.4);"><i class="fas fa-magic"></i> Live Preview Builder</a>
+                    <div class="user-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span>Welcome, <strong><?php echo htmlspecialchars($_SESSION['admin_name'] ?? 'Admin'); ?></strong></span>
+                    </div>
                 </div>
             </div>
             

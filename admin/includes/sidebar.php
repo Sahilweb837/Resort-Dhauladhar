@@ -22,6 +22,10 @@ $site_base = function_exists('getBaseUrl') ? getBaseUrl() . '/' : '/';
         <a href="<?php echo $admin_base; ?>blogs/create.php" class="<?php echo $current_page == 'create.php' && $current_dir == 'blogs' ? 'active' : ''; ?>">
             <i class="fas fa-pen-fancy"></i> <span>Create Blog</span>
         </a>
+        <a href="<?php echo $admin_base; ?>blogs/builder.php" class="<?php echo $current_page == 'builder.php' && $current_dir == 'blogs' ? 'active' : ''; ?>">
+            <i class="fas fa-magic" style="color:#5DC5E3;"></i> <span>Blog Builder</span>
+            <span style="background:linear-gradient(135deg,#5DC5E3 0%,#1D285C 100%); color:#fff; font-size:9px; font-weight:800; padding:2px 6px; border-radius:10px; margin-left:auto; text-transform:uppercase; letter-spacing:0.5px;">Live</span>
+        </a>
         <a href="<?php echo $admin_base; ?>reviews/index.php" class="<?php echo ($current_page == 'index.php' && $current_dir == 'reviews') || $current_page == 'edit.php' && $current_dir == 'reviews' ? 'active' : ''; ?>">
             <i class="fas fa-star"></i> <span>Reviews</span>
         </a>

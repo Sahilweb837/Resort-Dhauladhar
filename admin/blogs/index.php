@@ -26,8 +26,9 @@ $msg = $_GET['msg'] ?? '';
             <!-- Glassmorphism Top Header -->
             <div class="header">
                 <h1><i class="fas fa-newspaper"></i> Manage Blogs</h1>
-                <div style="display:flex; align-items:center; gap: 15px;">
-                    <a href="create.php" class="btn btn-primary"><i class="fas fa-plus"></i> Create New Blog</a>
+                <div style="display:flex; align-items:center; gap: 12px;">
+                    <a href="builder.php" class="btn btn-primary" style="background:linear-gradient(135deg,#5DC5E3 0%,#1D285C 100%); border:1px solid rgba(93,197,227,0.4);"><i class="fas fa-magic"></i> Live Blog Builder</a>
+                    <a href="create.php" class="btn btn-secondary"><i class="fas fa-plus"></i> Standard Form</a>
                     <div class="user-info">
                         <i class="fas fa-user-circle"></i>
                         <span>Welcome, <strong><?php echo htmlspecialchars($_SESSION['admin_name'] ?? 'Admin'); ?></strong></span>
@@ -83,8 +84,9 @@ $msg = $_GET['msg'] ?? '';
                                 <td style="color: var(--text-muted);"><?php echo date('M d, Y', strtotime($blog['created_at'])); ?></td>
                                 <td style="text-align: right;">
                                     <div style="display: inline-flex; gap: 8px; justify-content: flex-end;">
-                                        <a href="edit.php?id=<?php echo $blog['id']; ?>" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;"><i class="fas fa-edit"></i> Edit</a>
-                                        <a href="delete.php?id=<?php echo $blog['id']; ?>" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="return confirm('Are you sure you want to delete this blog post?')"><i class="fas fa-trash"></i> Delete</a>
+                                        <a href="builder.php?id=<?php echo $blog['id']; ?>" class="btn btn-secondary" style="padding: 6px 10px; font-size: 12px; border-color:var(--primary-light); color:var(--primary-light);" title="Edit in Split-Screen Live Builder"><i class="fas fa-magic"></i> Builder</a>
+                                        <a href="edit.php?id=<?php echo $blog['id']; ?>" class="btn btn-secondary" style="padding: 6px 10px; font-size: 12px;"><i class="fas fa-edit"></i> Edit</a>
+                                        <a href="delete.php?id=<?php echo $blog['id']; ?>" class="btn btn-danger" style="padding: 6px 10px; font-size: 12px;" onclick="return confirm('Are you sure you want to delete this blog post?')"><i class="fas fa-trash"></i> Delete</a>
                                     </div>
                                 </td>
                             </tr>
