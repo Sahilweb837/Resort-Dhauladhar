@@ -94,6 +94,65 @@ function getDefaultSampleBlogs() {
             'excerpt' => 'Exchange your vows surrounded by the majestic Dhauladhar mountains. Discover how our luxury resort makes your dream hill-station wedding unforgettable.',
             'content' => '<p>Planning a destination wedding in the serene hills of Himachal Pradesh? Hotel Dhauladhar Heights Resort offers breathtaking mountain vistas, exquisite banquet halls, open lawn venues, and five-star hospitality for your special day.</p><p>From royal outdoor mandaps overlooking tea gardens to customized catering and lavish guest suites, we turn every wedding celebration into a lifelong memory.</p>',
             'featured_image' => 'images/sangeet1.jpg',
+            'sections' => json_encode([
+                [
+                    'type' => 'text',
+                    'heading' => 'A Royal Himalayan Celebration Above the Clouds',
+                    'level' => 'h2',
+                    'content' => "Planning a destination wedding in the serene hills of Himachal Pradesh? Hotel Dhauladhar Heights Resort offers breathtaking mountain vistas, exquisite banquet halls, open lawn venues, and five-star hospitality for your special day.\n\nFrom royal outdoor mandaps overlooking tea gardens to customized catering and lavish guest suites, we turn every wedding celebration into a lifelong memory."
+                ],
+                [
+                    'type' => 'image',
+                    'image_url' => 'images/hs.jpg',
+                    'caption' => 'Panoramic Mandap Setup & Lawn Banquets Facing the Dhauladhar Peaks',
+                    'layout' => 'full'
+                ],
+                [
+                    'type' => 'gallery_2col',
+                    'image_1' => 'images/bridalshowernew (1).jpg',
+                    'caption_1' => 'Grand Sangeet & Indoor Banquet Hall',
+                    'image_2' => 'images/Copy of IMG_3836 (1).jpg',
+                    'caption_2' => 'Open-Air Lawn & Twilight Ceremonies'
+                ],
+                [
+                    'type' => 'quote',
+                    'quote' => 'Under the shadow of the eternal snow-capped Himalayas, every vow spoken at Dhauladhar Heights carries a timeless grace.',
+                    'author' => 'Wedding Concierge, Resort Dhauladhar'
+                ],
+                [
+                    'type' => 'features',
+                    'heading' => 'Wedding Inclusions & Banquet Highlights',
+                    'items' => [
+                        'Grand Indoor Banquet Hall with 500+ guest capacity',
+                        'Expansive landscaped outdoor lawn with tea-garden horizon views',
+                        'Executive Rooms & Presidential Suites for bridal families and VIP guests',
+                        'Customized multi-cuisine wedding feasts prepared by executive chefs',
+                        'Dedicated on-site decor, lighting and event coordination team',
+                        'Valet parking, high-speed Wi-Fi, and 24/7 guest hospitality'
+                    ]
+                ],
+                [
+                    'type' => 'faq',
+                    'heading' => 'Destination Wedding FAQs',
+                    'items' => [
+                        [
+                            'question' => 'What is the guest capacity for weddings at Dhauladhar Heights Resort?',
+                            'answer' => 'Our banquet hall and adjoining open lawns comfortably host up to 800 guests, with comprehensive dining, stage setups, and buffet stations.'
+                        ],
+                        [
+                            'question' => 'Can the resort arrange catering for traditional Himachali Dham and multi-cuisine menus?',
+                            'answer' => 'Yes! Our executive culinary team specializes in authentic Kangri Dham, North Indian, Mughlai, Continental, and Pan-Asian menus with live food counters.'
+                        ]
+                    ]
+                ],
+                [
+                    'type' => 'cta',
+                    'heading' => 'Plan Your Dream Destination Wedding in Dharamshala',
+                    'body' => 'Let our dedicated wedding planners coordinate your mandap, catering, guest stays, and photography backdrop.',
+                    'phone' => '+917018841900',
+                    'whatsapp' => '917018841900'
+                ]
+            ]),
             'author' => 'Admin',
             'status' => 'published',
             'created_at' => date('Y-m-d H:i:s'),
@@ -107,6 +166,32 @@ function getDefaultSampleBlogs() {
             'excerpt' => 'From Kangra valley tea gardens to McLeod Ganj monasteries, discover the top places to visit during your stay at Dhauladhar Heights Resort.',
             'content' => '<p>Dharamshala is a sanctuary of peace, natural beauty, and vibrant culture. Located at the foothills of the Dhauladhar ranges, it offers everything from tranquil forest walks to historic temples and Tibetan heritage.</p><p>Key highlights include McLeod Ganj, Bhagsu Waterfall, Kunal Pathri Temple, and panoramic tea garden trails right outside our resort doors.</p>',
             'featured_image' => 'images/aboutbanner - Copy.jpg',
+            'sections' => json_encode([
+                [
+                    'type' => 'text',
+                    'heading' => 'Sanctuary of Tranquility & Himalayan Heritage',
+                    'level' => 'h2',
+                    'content' => "Dharamshala is a sanctuary of peace, natural beauty, and vibrant culture. Located at the foothills of the Dhauladhar ranges, it offers everything from tranquil forest walks to historic temples and Tibetan heritage.\n\nKey highlights include McLeod Ganj, Bhagsu Waterfall, Kunal Pathri Temple, and panoramic tea garden trails right outside our resort doors."
+                ],
+                [
+                    'type' => 'image',
+                    'image_url' => 'images/DSC09631-scaled.jpg',
+                    'caption' => 'Resort View and Mountain Slopes Overlooking Dharamshala',
+                    'layout' => 'full'
+                ],
+                [
+                    'type' => 'gallery_2col',
+                    'image_1' => 'images/DSC09149-scaled.jpg',
+                    'caption_1' => 'Hill-View Multi-Cuisine Dining',
+                    'image_2' => 'images/presidentialmain.jpg',
+                    'caption_2' => 'Luxury Himalayan Balcony Living'
+                ],
+                [
+                    'type' => 'quote',
+                    'quote' => 'Dharamshala is not just a place to visit—it is an experience that awakens the senses and restores the soul.',
+                    'author' => 'Himachal Tourism Magazine'
+                ]
+            ]),
             'author' => 'Admin',
             'status' => 'published',
             'created_at' => date('Y-m-d H:i:s', strtotime('-2 days')),
@@ -1686,7 +1771,7 @@ function renderAdvancedBlogSections($sections, $fallbackContent = '') {
                 
                 if (!empty($img)) {
                     $imgUrl = getBlogImageUrl($img);
-                    $output .= '<div class="blog-section-image-card layout-' . htmlspecialchars($layout) . '">';
+                    $output .= '<div class="blog-section-image-card blog-section-img-card layout-' . htmlspecialchars($layout) . '">';
                     $output .= '<div class="img-zoom-wrap" onclick="openLightbox(\'' . htmlspecialchars($imgUrl) . '\')">';
                     $output .= '<img src="' . htmlspecialchars($imgUrl) . '" alt="' . htmlspecialchars($caption ?: 'Resort Dhauladhar') . '" loading="lazy" onerror="this.onerror=null; this.src=\'' . $baseUrl . '/images/default-blog.jpg\';">';
                     $output .= '<div class="gallery-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>';
@@ -1699,9 +1784,9 @@ function renderAdvancedBlogSections($sections, $fallbackContent = '') {
                 break;
                 
             case 'gallery_2col':
-                $img1 = $sec['image_url'] ?? ($sec['image_1'] ?? '');
+                $img1 = $sec['image_url'] ?? ($sec['image_1'] ?? ($sec['images'][0] ?? ''));
                 $cap1 = trim($sec['caption'] ?? ($sec['caption_1'] ?? ''));
-                $img2 = $sec['image_url_2'] ?? ($sec['image_2'] ?? '');
+                $img2 = $sec['image_url_2'] ?? ($sec['image_2'] ?? ($sec['images'][1] ?? ''));
                 $cap2 = trim($sec['caption_2'] ?? '');
                 
                 $output .= '<div class="blog-section-gallery-2col">';

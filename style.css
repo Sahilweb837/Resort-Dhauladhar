@@ -4111,19 +4111,17 @@ button[type="submit"]:hover {
 
 .blog-featured-image-wrap {
   width: 100%;
-  aspect-ratio: 16 / 8;
-  max-height: 520px;
   overflow: hidden;
   position: relative;
-  background: #0b162c;
+  background: #f8fafc;
   display: block;
 }
 
 .blog-featured-image,
 .blog-featured-image-wrap img {
   width: 100%;
-  height: 100%;
-  aspect-ratio: 16 / 8;
+  height: auto;
+  aspect-ratio: 16 / 9;
   max-height: 520px;
   object-fit: cover;
   object-position: center;
@@ -4132,7 +4130,8 @@ button[type="submit"]:hover {
 }
 
 .blog-featured-image-wrap:hover .blog-featured-image,
-.blog-featured-image-wrap:hover img {
+.blog-featured-image-wrap:hover img,
+.blog-featured-image:hover {
   transform: scale(1.02);
 }
 
@@ -4304,48 +4303,76 @@ button[type="submit"]:hover {
   letter-spacing: 1px;
 }
 
-/* Image Card Section */
-.blog-section-image-card {
-  margin: 32px 0;
+/* Standalone & In-text Images inside .blog-detail-content */
+.blog-detail-content > img,
+.blog-detail-content p > img,
+.blog-section-text img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  max-height: 500px;
   border-radius: 12px;
-  overflow: hidden;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  margin: 28px auto;
   box-shadow: 0 8px 25px rgba(29, 40, 92, 0.08);
-  background: #0b162c;
 }
 
-.blog-section-image-card .img-zoom-wrap {
+/* Image Card Section */
+.blog-section-image-card,
+.blog-section-img-card {
+  margin: 32px 0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(29, 40, 92, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  background: #ffffff;
+}
+
+.blog-section-image-card .img-zoom-wrap,
+.blog-section-img-card .img-zoom-wrap {
   overflow: hidden;
   position: relative;
   cursor: pointer;
   width: 100%;
-  aspect-ratio: 16 / 9;
-  max-height: 520px;
-  background: #0b162c;
+  display: block;
+  background: #f8fafc;
 }
 
-.blog-section-image-card img {
+.blog-section-image-card img,
+.blog-section-img-card img,
+.blog-detail-content .blog-section-image-card img,
+.blog-detail-content .blog-section-img-card img {
   width: 100%;
-  height: 100%;
+  height: auto;
   aspect-ratio: 16 / 9;
   max-height: 520px;
   object-fit: cover;
   object-position: center;
   display: block;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   transition: transform 0.4s ease;
 }
 
-.blog-section-image-card .img-zoom-wrap:hover img {
-  transform: scale(1.03);
+.blog-section-image-card .img-zoom-wrap:hover img,
+.blog-section-img-card:hover img {
+  transform: scale(1.025);
 }
 
 .blog-img-caption {
-  padding: 10px 16px;
+  padding: 12px 18px;
   background: #f8fafd;
   font-size: 13.5px;
-  color: #718096;
+  color: #64748b;
   display: flex;
   align-items: center;
   gap: 8px;
+  border-left: 4px solid var(--secondary-color, #5DC5E3);
+  font-style: italic;
   border-top: 1px solid #edf2f7;
 }
 
@@ -4362,10 +4389,11 @@ button[type="submit"]:hover {
 }
 
 .gallery-col-item {
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 6px 20px rgba(29, 40, 92, 0.07);
-  background: #0b162c;
+  box-shadow: 0 8px 24px rgba(29, 40, 92, 0.07);
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
 }
 
 .gallery-col-item .img-zoom-wrap {
@@ -4373,23 +4401,27 @@ button[type="submit"]:hover {
   overflow: hidden;
   cursor: pointer;
   width: 100%;
-  aspect-ratio: 4 / 3;
-  background: #0b162c;
+  display: block;
+  background: #f8fafc;
 }
 
-.gallery-col-item img {
+.gallery-col-item img,
+.blog-detail-content .gallery-col-item img {
   width: 100%;
-  height: 100%;
+  height: auto;
   aspect-ratio: 4 / 3;
-  max-height: 280px;
+  max-height: 300px;
   object-fit: cover;
   object-position: center;
   display: block;
-  transition: transform 0.4s ease;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transition: transform 0.35s ease;
 }
 
 .gallery-col-item:hover img {
-  transform: scale(1.04);
+  transform: scale(1.035);
 }
 
 /* Multi-image Section Gallery */
@@ -4405,18 +4437,21 @@ button[type="submit"]:hover {
   border-radius: 10px;
   overflow: hidden;
   cursor: pointer;
-  aspect-ratio: 4 / 3;
-  background: #0b162c;
+  background: #f8fafc;
   box-shadow: 0 4px 15px rgba(29, 40, 92, 0.08);
 }
 
-.gallery-item img {
+.gallery-item img,
+.blog-detail-content .gallery-item img {
   width: 100%;
-  height: 100%;
+  height: auto;
   aspect-ratio: 4 / 3;
   object-fit: cover;
   object-position: center;
   display: block;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   transition: transform 0.4s ease;
 }
 
@@ -4427,7 +4462,7 @@ button[type="submit"]:hover {
 .gallery-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(11, 22, 44, 0.45);
+  background: rgba(29, 40, 92, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4441,19 +4476,6 @@ button[type="submit"]:hover {
 .gallery-item:hover .gallery-overlay,
 .img-zoom-wrap:hover .gallery-overlay {
   opacity: 1;
-}
-
-.blog-detail-content img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 10px;
-  object-fit: cover;
-  display: block;
-  margin: 20px auto;
-}
-
-.gallery-col-item:hover img {
-  transform: scale(1.04);
 }
 
 /* Features / Highlights Checklist */
@@ -4945,24 +4967,28 @@ button[type="submit"]:hover {
     gap: 18px;
   }
   .blog-featured-image,
-  .blog-featured-image-wrap,
   .blog-featured-image-wrap img {
     aspect-ratio: 16 / 10;
     max-height: 380px;
+    height: auto;
   }
-  .blog-section-image-card .img-zoom-wrap,
-  .blog-section-image-card img {
+  .blog-section-image-card img,
+  .blog-section-img-card img,
+  .blog-detail-content .blog-section-image-card img,
+  .blog-detail-content .blog-section-img-card img {
     aspect-ratio: 16 / 10;
     max-height: 380px;
+    height: auto;
   }
   .blog-section-gallery-2col {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  .gallery-col-item .img-zoom-wrap,
-  .gallery-col-item img {
+  .gallery-col-item img,
+  .blog-detail-content .gallery-col-item img {
     aspect-ratio: 16 / 10;
     max-height: 280px;
+    height: auto;
   }
 }
 
@@ -4976,15 +5002,18 @@ button[type="submit"]:hover {
     max-width: 100%;
   }
   .blog-featured-image,
-  .blog-featured-image-wrap,
   .blog-featured-image-wrap img {
     aspect-ratio: 16 / 10;
     max-height: 260px;
+    height: auto;
   }
-  .blog-section-image-card .img-zoom-wrap,
-  .blog-section-image-card img {
+  .blog-section-image-card img,
+  .blog-section-img-card img,
+  .blog-detail-content .blog-section-image-card img,
+  .blog-detail-content .blog-section-img-card img {
     aspect-ratio: 16 / 10;
     max-height: 260px;
+    height: auto;
   }
   .blog-detail-post-header,
   .blog-share-row,

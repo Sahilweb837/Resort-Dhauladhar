@@ -249,30 +249,45 @@ $publishDateFormatted = $isEdit && !empty($blog['created_at']) ? date('F d, Y', 
         .builder-center-tools {
             display: flex;
             align-items: center;
-            gap: 8px;
-            background: rgba(15, 26, 46, 0.85);
-            padding: 4px;
+            gap: 6px;
+            background: rgba(15, 26, 46, 0.95);
+            padding: 4px 8px;
             border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tool-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tool-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            margin: 0 4px;
         }
 
         .device-btn {
             background: transparent;
             border: none;
             color: #8892b0;
-            padding: 7px 16px;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 7px;
-            transition: all 0.22s ease;
+            gap: 6px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
         }
 
         .device-btn:hover {
             color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .device-btn.active {
@@ -282,10 +297,55 @@ $publishDateFormatted = $isEdit && !empty($blog['created_at']) ? date('F d, Y', 
             box-shadow: 0 2px 10px rgba(93, 197, 227, 0.35);
         }
 
+        /* Mobile Sticky Tabs Bar (for tablet & phone viewports) */
+        .mobile-tabs-bar {
+            display: none;
+            position: sticky;
+            top: 57px;
+            z-index: 999;
+            background: #0c182b;
+            border-bottom: 1px solid rgba(93, 197, 227, 0.25);
+            padding: 8px 14px;
+            gap: 8px;
+        }
+
+        .mobile-tab-btn {
+            flex: 1;
+            padding: 9px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: #8892b0;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-tab-btn.active {
+            background: #5DC5E3;
+            color: #0B162C;
+            border-color: #5DC5E3;
+            box-shadow: 0 2px 10px rgba(93, 197, 227, 0.35);
+        }
+
+        .tab-live-pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00b894;
+            display: inline-block;
+            box-shadow: 0 0 6px #00b894;
+        }
+
         .builder-header-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .btn-builder-save {
@@ -293,7 +353,7 @@ $publishDateFormatted = $isEdit && !empty($blog['created_at']) ? date('F d, Y', 
             color: #ffffff;
             font-weight: 700;
             font-size: 13.5px;
-            padding: 9px 20px;
+            padding: 9px 18px;
             border-radius: 8px;
             border: 1px solid rgba(93, 197, 227, 0.4);
             cursor: pointer;
@@ -301,6 +361,7 @@ $publishDateFormatted = $isEdit && !empty($blog['created_at']) ? date('F d, Y', 
             align-items: center;
             gap: 8px;
             transition: all 0.22s ease;
+            white-space: nowrap;
         }
 
         .btn-builder-save:hover {
@@ -314,13 +375,14 @@ $publishDateFormatted = $isEdit && !empty($blog['created_at']) ? date('F d, Y', 
             color: #cdd6f4;
             font-size: 13px;
             font-weight: 600;
-            padding: 8px 16px;
+            padding: 8px 14px;
             border-radius: 8px;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 6px;
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
 
         .btn-builder-back:hover {
@@ -328,11 +390,26 @@ $publishDateFormatted = $isEdit && !empty($blog['created_at']) ? date('F d, Y', 
             color: #ffffff;
         }
 
-        /* ===== SPLIT SCREEN WORKSPACE ===== */
+        /* ===== SPLIT SCREEN WORKSPACE WITH VIEW MODES ===== */
         .builder-workspace {
             display: grid;
-            grid-template-columns: minmax(480px, 48%) minmax(520px, 52%);
+            grid-template-columns: minmax(420px, 48%) minmax(460px, 52%);
             min-height: calc(100vh - 64px);
+            transition: all 0.3s ease;
+        }
+
+        .builder-workspace.mode-editor-only {
+            grid-template-columns: 1fr !important;
+        }
+        .builder-workspace.mode-editor-only .builder-preview-pane {
+            display: none !important;
+        }
+
+        .builder-workspace.mode-preview-only {
+            grid-template-columns: 1fr !important;
+        }
+        .builder-workspace.mode-preview-only .builder-editor-pane {
+            display: none !important;
         }
 
         /* Left Column: Form & Section Editor */
@@ -388,10 +465,34 @@ $publishDateFormatted = $isEdit && !empty($blog['created_at']) ? date('F d, Y', 
             color: #404650;
         }
 
+        /* ===== TABLET MOCKUP FRAME (768px) ===== */
+        .preview-canvas-tablet {
+            width: min(768px, 100%);
+            min-height: 800px;
+            background: #0b111e;
+            border: 12px solid #1f293d;
+            border-radius: 36px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .preview-canvas-tablet .phone-screen-scroll {
+            background: #ffffff;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            color: #404650;
+        }
+
         /* ===== MOBILE SMARTPHONE MOCKUP FRAME ===== */
         .preview-canvas-mobile {
-            width: 395px;
-            min-height: 820px;
+            width: min(395px, 100%);
+            min-height: 780px;
             background: #0b111e;
             border: 12px solid #1f293d;
             border-radius: 46px;
@@ -401,6 +502,7 @@ $publishDateFormatted = $isEdit && !empty($blog['created_at']) ? date('F d, Y', 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             flex-direction: column;
+            box-sizing: border-box;
         }
 
         /* Phone Notch / Dynamic Island */
@@ -848,12 +950,116 @@ $publishDateFormatted = $isEdit && !empty($blog['created_at']) ? date('F d, Y', 
             color: #55efc4;
         }
 
-        @media (max-width: 1080px) {
-            .builder-workspace {
-                grid-template-columns: 1fr;
+        /* Responsive Layout Overrides */
+        @media (max-width: 1440px) {
+            .builder-workspace:not(.mode-preview-only) .preview-canvas-desktop .blog-detail-wrapper {
+                grid-template-columns: 1fr !important;
+                gap: 25px !important;
             }
-            .builder-editor-pane, .builder-preview-pane {
+        }
+
+        @media (max-width: 1100px) {
+            .mobile-tabs-bar {
+                display: flex;
+            }
+            .layout-group,
+            .tool-divider {
+                display: none !important;
+            }
+            .builder-workspace {
+                grid-template-columns: 1fr !important;
+            }
+            .builder-workspace.tab-show-editor .builder-preview-pane {
+                display: none !important;
+            }
+            .builder-workspace.tab-show-preview .builder-editor-pane {
+                display: none !important;
+            }
+            .builder-editor-pane,
+            .builder-preview-pane {
                 height: auto;
+                min-height: calc(100vh - 120px);
+                padding: 18px 16px 80px;
+            }
+        }
+
+        @media (max-width: 920px) {
+            .builder-header {
+                flex-wrap: wrap;
+                padding: 10px 16px;
+                gap: 10px;
+            }
+            .builder-brand-title span:first-child {
+                font-size: 14px;
+            }
+            .builder-brand-title .badge-live {
+                display: none;
+            }
+            .builder-center-tools {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                background: rgba(15, 26, 46, 0.95);
+            }
+            .builder-header-actions {
+                margin-left: auto;
+                gap: 8px;
+            }
+            .btn-builder-save {
+                padding: 8px 14px;
+                font-size: 12.5px;
+            }
+            .btn-builder-back {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .palette-btn-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            .form-row {
+                grid-template-columns: 1fr !important;
+            }
+            .preview-pane-info-bar {
+                flex-direction: column;
+                gap: 6px;
+                text-align: center;
+            }
+            .builder-section-header {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .builder-sec-controls {
+                margin-left: auto;
+            }
+            .device-btn {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+            .tool-text {
+                display: none;
+            }
+            .sample-template-box {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .sample-template-box button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .palette-btn-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .builder-brand img {
+                height: 28px;
+            }
+            .btn-builder-save span {
+                display: none;
             }
         }
     </style>
@@ -872,34 +1078,63 @@ $publishDateFormatted = $isEdit && !empty($blog['created_at']) ? date('F d, Y', 
             </div>
         </div>
 
-        <!-- CENTER VIEWPORT SWITCHER -->
+        <!-- CENTER VIEWPORT & LAYOUT TOOLS -->
         <div class="builder-center-tools">
-            <button type="button" class="device-btn active" id="btnDesktopView" onclick="switchPreviewDevice('desktop')">
-                <i class="fa-solid fa-laptop"></i> Desktop View
-            </button>
-            <button type="button" class="device-btn" id="btnMobileView" onclick="switchPreviewDevice('mobile')">
-                <i class="fa-solid fa-mobile-screen-button"></i> Mobile View
-            </button>
+            <!-- Layout Switcher (Desktop) -->
+            <div class="tool-group layout-group">
+                <button type="button" class="device-btn btn-layout-mode active" id="btnModeSplit" onclick="switchLayoutMode('split')" title="Split View (Form + Preview)">
+                    <i class="fa-solid fa-columns"></i> <span class="tool-text">Split</span>
+                </button>
+                <button type="button" class="device-btn btn-layout-mode" id="btnModeEditor" onclick="switchLayoutMode('editor')" title="Editor Only">
+                    <i class="fa-solid fa-pen-to-square"></i> <span class="tool-text">Editor</span>
+                </button>
+                <button type="button" class="device-btn btn-layout-mode" id="btnModePreview" onclick="switchLayoutMode('preview')" title="Preview Only">
+                    <i class="fa-solid fa-eye"></i> <span class="tool-text">Preview</span>
+                </button>
+            </div>
+            <div class="tool-divider"></div>
+            <!-- Device Switcher -->
+            <div class="tool-group device-group">
+                <button type="button" class="device-btn active" id="btnDesktopView" onclick="switchPreviewDevice('desktop')" title="Desktop View">
+                    <i class="fa-solid fa-laptop"></i> <span class="tool-text">Desktop</span>
+                </button>
+                <button type="button" class="device-btn" id="btnTabletView" onclick="switchPreviewDevice('tablet')" title="Tablet View (768px)">
+                    <i class="fa-solid fa-tablet-screen-button"></i> <span class="tool-text">Tablet</span>
+                </button>
+                <button type="button" class="device-btn" id="btnMobileView" onclick="switchPreviewDevice('mobile')" title="Mobile Smartphone View (390px)">
+                    <i class="fa-solid fa-mobile-screen-button"></i> <span class="tool-text">Mobile</span>
+                </button>
+            </div>
         </div>
 
         <!-- ACTIONS -->
         <div class="builder-header-actions">
             <?php if ($isEdit && !empty($blog['slug'])): ?>
                 <a href="<?php echo $baseUrl; ?>/blog-detail.php?slug=<?php echo urlencode($blog['slug']); ?>" target="_blank" class="btn-builder-back" title="View live published page">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> View Live
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="btn-text">View Live</span>
                 </a>
             <?php endif; ?>
-            <a href="index.php" class="btn-builder-back">
-                <i class="fa-solid fa-arrow-left"></i> Exit Builder
+            <a href="index.php" class="btn-builder-back" title="Exit to Blogs List">
+                <i class="fa-solid fa-arrow-left"></i> <span class="btn-text">Exit</span>
             </a>
             <button type="button" class="btn-builder-save" onclick="submitBuilderForm()">
-                <i class="fa-solid fa-cloud-arrow-up"></i> <?php echo $isEdit ? 'Update Post' : 'Publish Blog'; ?>
+                <i class="fa-solid fa-cloud-arrow-up"></i> <span><?php echo $isEdit ? 'Update Post' : 'Publish Blog'; ?></span>
             </button>
         </div>
     </header>
 
+    <!-- STICKY MOBILE / TABLET TABS BAR -->
+    <div class="mobile-tabs-bar" id="mobileTabsBar">
+        <button type="button" class="mobile-tab-btn active" id="tabBtnEditor" onclick="switchMobileTab('editor')">
+            <i class="fa-solid fa-pen-to-square"></i> Form Editor
+        </button>
+        <button type="button" class="mobile-tab-btn" id="tabBtnPreview" onclick="switchMobileTab('preview')">
+            <i class="fa-solid fa-eye"></i> Live Preview <span class="tab-live-pulse"></span>
+        </button>
+    </div>
+
     <!-- MAIN DUAL PANE WORKSPACE -->
-    <main class="builder-workspace">
+    <main class="builder-workspace mode-split tab-show-editor" id="builderWorkspace">
         
         <!-- LEFT PANE: FORM & SECTION MANAGER -->
         <section class="builder-editor-pane">
@@ -1068,11 +1303,13 @@ $publishDateFormatted = $isEdit && !empty($blog['created_at']) ? date('F d, Y', 
                         </header>
 
                         <!-- Featured Image -->
-                        <img src="<?php echo !empty($formFeaturedImgUrl) ? htmlspecialchars($formFeaturedImgUrl) : ($baseUrl . '/images/default-blog.jpg'); ?>" 
-                             alt="Featured Blog Cover" 
-                             class="blog-featured-image" 
-                             id="liveFeaturedImage"
-                             onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
+                        <div class="blog-featured-image-wrap">
+                            <img src="<?php echo !empty($formFeaturedImgUrl) ? htmlspecialchars($formFeaturedImgUrl) : ($baseUrl . '/images/default-blog.jpg'); ?>" 
+                                 alt="Featured Blog Cover" 
+                                 class="blog-featured-image" 
+                                 id="liveFeaturedImage"
+                                 onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
+                        </div>
 
                         <!-- Share Row -->
                         <div class="blog-share-row">
@@ -1222,24 +1459,69 @@ $publishDateFormatted = $isEdit && !empty($blog['created_at']) ? date('F d, Y', 
             return div.innerHTML;
         }
 
-        // Toggle Preview Device (Desktop vs Mobile Smartphone View)
+        // Toggle Preview Device (Desktop vs Tablet vs Mobile Smartphone View)
         function switchPreviewDevice(mode) {
             currentDeviceMode = mode;
             const container = document.getElementById('previewViewportContainer');
             const btnDesktop = document.getElementById('btnDesktopView');
+            const btnTablet = document.getElementById('btnTabletView');
             const btnMobile = document.getElementById('btnMobileView');
             const modeLabel = document.getElementById('previewModeLabel');
 
+            [btnDesktop, btnTablet, btnMobile].forEach(b => { if (b) b.classList.remove('active'); });
+
             if (mode === 'mobile') {
                 container.className = 'preview-canvas-mobile';
-                btnMobile.classList.add('active');
-                btnDesktop.classList.remove('active');
-                modeLabel.textContent = 'Mobile Smartphone View (390px)';
+                if (btnMobile) btnMobile.classList.add('active');
+                if (modeLabel) modeLabel.textContent = 'Mobile Smartphone View (390px)';
+            } else if (mode === 'tablet') {
+                container.className = 'preview-canvas-tablet';
+                if (btnTablet) btnTablet.classList.add('active');
+                if (modeLabel) modeLabel.textContent = 'Tablet View (768px)';
             } else {
                 container.className = 'preview-canvas-desktop';
-                btnDesktop.classList.add('active');
-                btnMobile.classList.remove('active');
-                modeLabel.textContent = 'Desktop View';
+                if (btnDesktop) btnDesktop.classList.add('active');
+                if (modeLabel) modeLabel.textContent = 'Desktop View';
+            }
+        }
+
+        // Layout mode switcher (Split / Editor Only / Preview Only)
+        function switchLayoutMode(mode) {
+            const workspace = document.getElementById('builderWorkspace');
+            const btns = document.querySelectorAll('.btn-layout-mode');
+            btns.forEach(b => b.classList.remove('active'));
+
+            const activeBtn = document.getElementById('btnMode' + mode.charAt(0).toUpperCase() + mode.slice(1));
+            if (activeBtn) activeBtn.classList.add('active');
+
+            workspace.classList.remove('mode-editor-only', 'mode-preview-only', 'mode-split');
+            if (mode === 'editor') {
+                workspace.classList.add('mode-editor-only');
+            } else if (mode === 'preview') {
+                workspace.classList.add('mode-preview-only');
+                onLiveUpdate();
+            } else {
+                workspace.classList.add('mode-split');
+            }
+        }
+
+        // Mobile Tab Switcher for tablets and phones
+        function switchMobileTab(tab) {
+            const workspace = document.getElementById('builderWorkspace');
+            const btnEd = document.getElementById('tabBtnEditor');
+            const btnPrev = document.getElementById('tabBtnPreview');
+
+            if (tab === 'preview') {
+                workspace.classList.remove('tab-show-editor');
+                workspace.classList.add('tab-show-preview');
+                if (btnPrev) btnPrev.classList.add('active');
+                if (btnEd) btnEd.classList.remove('active');
+                onLiveUpdate();
+            } else {
+                workspace.classList.remove('tab-show-preview');
+                workspace.classList.add('tab-show-editor');
+                if (btnEd) btnEd.classList.add('active');
+                if (btnPrev) btnPrev.classList.remove('active');
             }
         }
 
@@ -1651,8 +1933,8 @@ $publishDateFormatted = $isEdit && !empty($blog['created_at']) ? date('F d, Y', 
                         const alt = sec.querySelector('.sec-field-img-alt')?.value.trim() || 'Resort Photo';
 
                         renderedHtml += `
-                            <div class="blog-section-block blog-section-image-card" style="margin:28px 0;border-radius:12px;overflow:hidden;box-shadow:0 8px 25px rgba(29,40,92,0.08);">
-                                <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(alt)}" style="width:100%;max-height:460px;object-fit:cover;display:block;" onerror="this.src='${siteBaseUrl}/images/default-blog.jpg';">
+                            <div class="blog-section-block blog-section-image-card blog-section-img-card" style="margin:28px 0;border-radius:12px;overflow:hidden;box-shadow:0 8px 25px rgba(29,40,92,0.08);">
+                                <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(alt)}" style="width:100%;height:auto;aspect-ratio:16/9;max-height:480px;object-fit:cover;display:block;" onerror="this.src='${siteBaseUrl}/images/default-blog.jpg';">
                                 ${caption ? `<div class="blog-img-caption" style="padding:10px 16px;background:#f8fafd;font-size:13.5px;color:#718096;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-camera" style="color:#5DC5E3;"></i> ${escapeHtml(caption)}</div>` : ''}
                             </div>
                         `;
@@ -1665,10 +1947,10 @@ $publishDateFormatted = $isEdit && !empty($blog['created_at']) ? date('F d, Y', 
                         renderedHtml += `
                             <div class="blog-section-block blog-section-gallery-2col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:28px 0;">
                                 <div class="gallery-col-item" style="border-radius:10px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.06);">
-                                    <img src="${escapeHtml(gImg1)}" style="width:100%;height:240px;object-fit:cover;display:block;" onerror="this.src='${siteBaseUrl}/images/default-blog.jpg';">
+                                    <img src="${escapeHtml(gImg1)}" style="width:100%;height:auto;aspect-ratio:4/3;max-height:260px;object-fit:cover;display:block;" onerror="this.src='${siteBaseUrl}/images/default-blog.jpg';">
                                 </div>
                                 <div class="gallery-col-item" style="border-radius:10px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.06);">
-                                    <img src="${escapeHtml(gImg2)}" style="width:100%;height:240px;object-fit:cover;display:block;" onerror="this.src='${siteBaseUrl}/images/default-blog.jpg';">
+                                    <img src="${escapeHtml(gImg2)}" style="width:100%;height:auto;aspect-ratio:4/3;max-height:260px;object-fit:cover;display:block;" onerror="this.src='${siteBaseUrl}/images/default-blog.jpg';">
                                 </div>
                             </div>
                         `;
