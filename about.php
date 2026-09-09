@@ -390,107 +390,103 @@ $googleReviewsUrl = 'https://www.google.com/travel/hotels/entity/CgsI7_2S5eW34JL
  
 
   <!--------------------------------- blog section---------------------------- -->
-     <section class="blog-section">
-        <section class="title-section">
-            <div class="title-wrapper">
-                <span class="line" data-aos="fade-up" data-aos-duration="3000"></span>
-                <div class="logo-circle" data-aos="fade-up" data-aos-duration="3000">
-                    <img src="./images/dhr_logo_icon.png" alt="logo">
-                </div>
-                <span class="line" data-aos="fade-up" data-aos-duration="3000"></span>
-            </div>
-              <h2 data-aos="fade-up" data-aos-duration="3000">Latest Travel Stories & Resort Experiences in Dharamshala</h2>
-            <p class="utilitesp" data-aos="fade-up" data-aos-duration="3000">
-               Discover the best of Dharamshala with insights from Dhauladhar Heights Resort. From travel guides and local attractions to luxury stay experiences and hidden gems near the Dhauladhar mountain range, explore everything you need to plan a perfect Himachal getaway. Stay updated with expert tips, seasonal travel ideas, and unforgettable experiences.
+    <!-- BLOG SECTION (KD TENT HOUSE STYLE) -->
+    <section class="blog-section">
+        <div class="section-header" data-aos="fade-up">
+            <span class="sub-title">LATEST BLOGS</span>
+            <h2>Stories, Travel Guides & Mountain Experiences</h2>
+            <p class="section-description">
+                Discover the best of Dharamshala with insights from Dhauladhar Heights Resort. From travel guides and local attractions to luxury stay experiences and hidden gems near the Dhauladhar mountain range.
             </p>
-        </section>
+        </div>
         
-        <div class="blog-grid-3">
+        <div class="blog-grid">
             <?php if (!empty($latestBlogs)): ?>
                 <?php foreach ($latestBlogs as $blog): ?>
-                    <?php $imageUrl = getBlogImageUrl($blog['featured_image']); ?>
-                    <article class="blog-card" data-aos="fade-up" data-aos-duration="1000">
-                        <div class="blog-img">
-                            <img src="<?php echo $imageUrl; ?>" 
-                                 alt="<?php echo htmlspecialchars($blog['title']); ?>"
-                                 onerror="this.onerror=null; this.src='./images/default-blog.jpg';">
+                    <?php 
+                    $imageUrl = getBlogImageUrl($blog['featured_image']);
+                    $blogUrl = getBlogUrl($blog);
+                    $catName = $blog['category'] ?? 'General';
+                    ?>
+                    <article class="blog-card" data-aos="fade-up">
+                        <div class="img-container">
+                            <a href="<?php echo $blogUrl; ?>" aria-label="Read <?php echo htmlspecialchars($blog['title']); ?>">
+                                <img src="<?php echo $imageUrl; ?>" 
+                                     alt="<?php echo htmlspecialchars($blog['title']); ?>"
+                                     onerror="this.onerror=null; this.src='./images/default-blog.jpg';">
+                            </a>
                         </div>
-                        <div class="blog-content">
-                            <div class="meta">
-                                <span><?php echo date('F d, Y', strtotime($blog['created_at'])); ?></span>
-                                <span><?php echo htmlspecialchars($blog['category'] ?? 'General'); ?></span>
-                            </div>
-                            <h4><?php echo htmlspecialchars($blog['title']); ?></h4>
-                            <div class="blog-excerpt">
-                                <?php echo htmlspecialchars($blog['excerpt'] ?? substr(strip_tags($blog['content']), 0, 100) . '...'); ?>
-                            </div>
-                        </div>
-                        <div class="blog-footer">
-                            <a href="blog-detail.php?slug=<?php echo urlencode($blog['slug']); ?>">Read More</a>
-                            <span class="tag">
-                                <a href="blog-detail.php?slug=<?php echo urlencode($blog['slug']); ?>">
-                                    <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                        <div class="card-content">
+                            <span class="category"><?php echo htmlspecialchars($catName); ?></span>
+                            <h3 class="post-title">
+                                <a href="<?php echo $blogUrl; ?>">
+                                    <?php echo htmlspecialchars($blog['title']); ?>
                                 </a>
-                            </span>
+                            </h3>
+                            <div class="post-meta">
+                                <span class="date"><i class="fa-regular fa-calendar"></i> <?php echo date('F d, Y', strtotime($blog['created_at'])); ?></span>
+                            </div>
                         </div>
                     </article>
                 <?php endforeach; ?>
             <?php else: ?>
-                <!-- Fallback static content if no blogs in database -->
-                <article class="blog-card" data-aos="fade-right" data-aos-duration="1000">
-                    <div class="blog-img">
-                        <img src="./images/DSC09810.jpg" alt="blog-1">
+                <!-- Fallback static content matching KD Tent layout -->
+                <article class="blog-card" data-aos="fade-up">
+                    <div class="img-container">
+                        <a href="blog.php">
+                            <img src="./images/DSC09810.jpg" alt="Dharamshala Travel Guide">
+                        </a>
                     </div>
-                    <div class="blog-content">
-                        <div class="meta">
-                            <span>August 10, 2023</span>
-                            <span>Interior</span>
+                    <div class="card-content">
+                        <span class="category">TRAVEL GUIDE</span>
+                        <h3 class="post-title">
+                            <a href="blog.php">Top 10 Hidden Gems to Visit in Dharamshala in 2026</a>
+                        </h3>
+                        <div class="post-meta">
+                            <span class="date"><i class="fa-regular fa-calendar"></i> April 21, 2026</span>
                         </div>
-                        <h3>Indian Wedding In Malta</h3>
-                    </div>
-                    <div class="blog-footer">
-                        <a href="blog-detail.html?slug=indian-wedding-malta">Read More</a>
-                        <span class="tag"><a href="blog-detail.html?slug=indian-wedding-malta"><i class="fa fa-arrow-right" aria-hidden="true"></i></a></span>
                     </div>
                 </article>
 
-                <article class="blog-card" data-aos="zoom-in" data-aos-duration="1000">
-                    <div class="blog-img">
-                        <img src="./images/DSC00496-HDR-Enhanced-NR-Edit.jpg" alt="blog-2">
+                <article class="blog-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="img-container">
+                        <a href="blog.php">
+                            <img src="./images/DSC00496-HDR-Enhanced-NR-Edit.jpg" alt="Tea Garden Luxury Stay">
+                        </a>
                     </div>
-                    <div class="blog-content">
-                        <div class="meta">
-                            <span>August 10, 2023</span>
-                            <span>Interior</span>
+                    <div class="card-content">
+                        <span class="category">EXPERIENCES</span>
+                        <h3 class="post-title">
+                            <a href="blog.php">Why Staying Amidst Tea Gardens is the Ultimate Mountain Retreat</a>
+                        </h3>
+                        <div class="post-meta">
+                            <span class="date"><i class="fa-regular fa-calendar"></i> May 12, 2026</span>
                         </div>
-                        <h3>Indian Wedding Venues In Barcelona</h3>
-                    </div>
-                    <div class="blog-footer active">
-                        <a href="blog-detail.html?slug=indian-wedding-barcelona">Read More</a>
-                        <span><a href="blog-detail.html?slug=indian-wedding-barcelona"><i class="fa fa-arrow-right" aria-hidden="true"></i></a></span>
                     </div>
                 </article>
 
-                <article class="blog-card" data-aos="fade-left" data-aos-duration="1000">
-                    <div class="blog-img">
-                        <img src="./images/hs.jpg" alt="blog-3">
+                <article class="blog-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="img-container">
+                        <a href="blog.php">
+                            <img src="./images/hs.jpg" alt="Destination Wedding in Kangra">
+                        </a>
                     </div>
-                    <div class="blog-content">
-                        <div class="meta">
-                            <span>August 10, 2023</span>
-                            <span>Interior</span>
+                    <div class="card-content">
+                        <span class="category">WEDDINGS</span>
+                        <h3 class="post-title">
+                            <a href="blog.php">Planning a Dream Himalayan Destination Wedding at Dhauladhar</a>
+                        </h3>
+                        <div class="post-meta">
+                            <span class="date"><i class="fa-regular fa-calendar"></i> June 08, 2026</span>
                         </div>
-                        <h3>Indian Wedding In Switzerland</h3>
-                    </div>
-                    <div class="blog-footer">
-                        <a href="blog-detail.html?slug=indian-wedding-switzerland">Read More</a>
-                        <span><a href="blog-detail.html?slug=indian-wedding-switzerland"><i class="fa fa-arrow-right" aria-hidden="true"></i></a></span>
                     </div>
                 </article>
             <?php endif; ?>
         </div>
         
-      
+        <div class="view-all-btn" data-aos="fade-up">
+            <a href="blog.php" class="theme-btn">View All Blogs <i class="fas fa-arrow-right"></i></a>
+        </div>
     </section>
 
   <!----------------------------------footer---------------------- -->

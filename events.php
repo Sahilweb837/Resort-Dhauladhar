@@ -1,3 +1,13 @@
+<?php
+require_once __DIR__ . '/includes/functions.php';
+
+// Get latest 3 blogs for events page
+$latestBlogs = getRecentBlogs(3);
+$popularBlogs = getPopularBlogs(3);
+$categories = getCategories();
+
+$baseUrl = getBaseUrl();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -558,6 +568,105 @@
   </div>
 
 </section>
+
+    <!-- BLOG SECTION (KD TENT HOUSE STYLE) -->
+    <section class="blog-section">
+        <div class="section-header" data-aos="fade-up">
+            <span class="sub-title">LATEST BLOGS</span>
+            <h2>Stories, Event Ideas & Mountain Experiences</h2>
+            <p class="section-description">
+                Discover event decoration guides, destination wedding trends, and hospitality insights from Dhauladhar Heights Resort.
+            </p>
+        </div>
+        
+        <div class="blog-grid">
+            <?php if (!empty($latestBlogs)): ?>
+                <?php foreach ($latestBlogs as $blog): ?>
+                    <?php 
+                    $imageUrl = getBlogImageUrl($blog['featured_image']);
+                    $blogUrl = getBlogUrl($blog);
+                    $catName = $blog['category'] ?? 'General';
+                    ?>
+                    <article class="blog-card" data-aos="fade-up">
+                        <div class="img-container">
+                            <a href="<?php echo $blogUrl; ?>" aria-label="Read <?php echo htmlspecialchars($blog['title']); ?>">
+                                <img src="<?php echo $imageUrl; ?>" 
+                                     alt="<?php echo htmlspecialchars($blog['title']); ?>"
+                                     onerror="this.onerror=null; this.src='./images/default-blog.jpg';">
+                            </a>
+                        </div>
+                        <div class="card-content">
+                            <span class="category"><?php echo htmlspecialchars($catName); ?></span>
+                            <h3 class="post-title">
+                                <a href="<?php echo $blogUrl; ?>">
+                                    <?php echo htmlspecialchars($blog['title']); ?>
+                                </a>
+                            </h3>
+                            <div class="post-meta">
+                                <span class="date"><i class="fa-regular fa-calendar"></i> <?php echo date('F d, Y', strtotime($blog['created_at'])); ?></span>
+                            </div>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <!-- Fallback static content matching KD Tent layout -->
+                <article class="blog-card" data-aos="fade-up">
+                    <div class="img-container">
+                        <a href="blog.php">
+                            <img src="./images/DSC09810.jpg" alt="Dharamshala Travel Guide">
+                        </a>
+                    </div>
+                    <div class="card-content">
+                        <span class="category">TRAVEL GUIDE</span>
+                        <h3 class="post-title">
+                            <a href="blog.php">Top 10 Hidden Gems to Visit in Dharamshala in 2026</a>
+                        </h3>
+                        <div class="post-meta">
+                            <span class="date"><i class="fa-regular fa-calendar"></i> April 21, 2026</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="blog-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="img-container">
+                        <a href="blog.php">
+                            <img src="./images/DSC00496-HDR-Enhanced-NR-Edit.jpg" alt="Tea Garden Luxury Stay">
+                        </a>
+                    </div>
+                    <div class="card-content">
+                        <span class="category">EXPERIENCES</span>
+                        <h3 class="post-title">
+                            <a href="blog.php">Why Staying Amidst Tea Gardens is the Ultimate Mountain Retreat</a>
+                        </h3>
+                        <div class="post-meta">
+                            <span class="date"><i class="fa-regular fa-calendar"></i> May 12, 2026</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="blog-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="img-container">
+                        <a href="blog.php">
+                            <img src="./images/hs.jpg" alt="Destination Wedding in Kangra">
+                        </a>
+                    </div>
+                    <div class="card-content">
+                        <span class="category">WEDDINGS</span>
+                        <h3 class="post-title">
+                            <a href="blog.php">Planning a Dream Himalayan Destination Wedding at Dhauladhar</a>
+                        </h3>
+                        <div class="post-meta">
+                            <span class="date"><i class="fa-regular fa-calendar"></i> June 08, 2026</span>
+                        </div>
+                    </div>
+                </article>
+            <?php endif; ?>
+        </div>
+        
+        <div class="view-all-btn" data-aos="fade-up">
+            <a href="blog.php" class="theme-btn">View All Blogs <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </section>
 
     <!-- Footer -->
    <footer class="hf-footer">

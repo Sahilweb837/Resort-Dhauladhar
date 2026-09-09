@@ -36,6 +36,37 @@ incrementBlogViews($blog['id']);
 
 $popularBlogs = getPopularBlogs(5);
 
+// Calculate read time
+$wordCount = str_word_count(strip_tags($blog['content'] ?? ''));
+$readTime = max(1, ceil($wordCount / 200)) . ' min read';
+
+// Fetch related blogs (same category first, excluding current blog)
+$relatedBlogs = [];
+if (!empty($blog['category'])) {
+    $catBlogs = getAllBlogs(4, 0, 'published', $blog['category']);
+    foreach ($catBlogs as $cb) {
+        if ($cb['id'] != $blog['id']) {
+            $relatedBlogs[] = $cb;
+        }
+        if (count($relatedBlogs) >= 3) break;
+    }
+}
+if (count($relatedBlogs) < 3) {
+    $recents = getRecentBlogs(6);
+    foreach ($recents as $rb) {
+        if ($rb['id'] != $blog['id']) {
+            $already = false;
+            foreach ($relatedBlogs as $existing) {
+                if ($existing['id'] == $rb['id']) { $already = true; break; }
+            }
+            if (!$already) {
+                $relatedBlogs[] = $rb;
+            }
+        }
+        if (count($relatedBlogs) >= 3) break;
+    }
+}
+
 // Decode sections from JSON
 $sections = [];
 if (!empty($blog['sections'])) {
