@@ -140,39 +140,42 @@ include __DIR__ . '/includes/header.php';
     <article class="blog-detail-article" data-aos="fade-up">
         <?php 
         $blogFormattedDate = !empty($blog['created_at']) ? date('F d, Y', strtotime($blog['created_at'])) : date('F d, Y');
+        $blogCategoryName = !empty($blog['category']) ? htmlspecialchars($blog['category']) : 'Resort & Travel';
         ?>
         <header class="blog-detail-post-header">
-            <span class="blog-detail-category"><?php echo htmlspecialchars($blog['category'] ?? 'General'); ?></span>
+            <span class="blog-detail-category"><?php echo $blogCategoryName; ?></span>
             <h2><?php echo htmlspecialchars($blog['title']); ?></h2>
             <div class="blog-detail-meta">
                 <span><i class="fa-regular fa-calendar"></i> <?php echo $blogFormattedDate; ?></span>
-                <span><i class="fa-regular fa-user"></i> <?php echo htmlspecialchars($blog['author'] ?? 'Admin'); ?></span>
+                <span><i class="fa-regular fa-clock"></i> <?php echo $readTime; ?></span>
                 <span><i class="fa-solid fa-location-dot"></i> Dharamshala, Himachal Pradesh</span>
             </div>
         </header>
         
         <?php if (!empty($blog['featured_image'])): ?>
-            <div class="blog-featured-image-wrap">
-                <img src="<?php echo $featuredImageUrl; ?>" 
-                     alt="<?php echo htmlspecialchars($blog['title']); ?>" 
-                     class="blog-featured-image"
-                     onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
-            </div>
+            <img src="<?php echo $featuredImageUrl; ?>" 
+                 alt="<?php echo htmlspecialchars($blog['title']); ?>" 
+                 class="blog-featured-image"
+                 onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
         <?php endif; ?>
 
         <div class="blog-share-row">
             <a href="<?php echo $baseUrl; ?>/blog.php" class="blog-back-link"><i class="fa-solid fa-arrow-left"></i> Back to Blogs</a>
             <div class="blog-social-icons" aria-label="Share this blog">
-                <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode($blogCanonicalUrl); ?>" target="_blank" rel="noopener" aria-label="Facebook">
+                <!-- Facebook -->
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode($blogCanonicalUrl); ?>" target="_blank" rel="noopener" aria-label="Share on Facebook">
                     <i class="fab fa-facebook-f"></i>
                 </a>
-                <a href="https://www.instagram.com/dhauladhar_heights_resort" target="_blank" rel="noopener" aria-label="Instagram">
+                <!-- Instagram -->
+                <a href="https://www.instagram.com/dhauladhar_heights_resort" target="_blank" rel="noopener" aria-label="Visit Resort on Instagram">
                     <i class="fab fa-instagram"></i>
                 </a>
-                <a href="https://wa.me/?text=<?php echo urlencode($blog['title'] . ' ' . $blogCanonicalUrl); ?>" target="_blank" rel="noopener" aria-label="WhatsApp">
+                <!-- WhatsApp -->
+                <a href="https://wa.me/?text=<?php echo urlencode($blog['title'] . ' ' . $blogCanonicalUrl); ?>" target="_blank" rel="noopener" aria-label="Share on WhatsApp">
                     <i class="fab fa-whatsapp"></i>
                 </a>
-                <a href="https://www.linkedin.com/sharing/share-offsite/?url=<?php echo urlencode($blogCanonicalUrl); ?>" target="_blank" rel="noopener" aria-label="LinkedIn">
+                <!-- LinkedIn -->
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=<?php echo urlencode($blogCanonicalUrl); ?>" target="_blank" rel="noopener" aria-label="Share on LinkedIn">
                     <i class="fab fa-linkedin-in"></i>
                 </a>
             </div>
@@ -189,105 +192,147 @@ include __DIR__ . '/includes/header.php';
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
+        </div>
 
-            <div class="blog-detail-cta">
-                <div>
-                    <h3>Plan Your Event or Mountain Stay</h3>
-                    <p>Experience panoramic Himalayan luxury, banquet halls, and five-star hospitality in Dharamshala.</p>
-                </div>
-                <div class="cta-btns">
-                    <a href="<?php echo $baseUrl; ?>/contact.html" class="cta-btn-primary"><i class="fa-solid fa-calendar-check"></i> Book Consultation</a>
-                    <a href="https://wa.me/917018841900?text=Hello%20Dhauladhar%20Heights%20Resort,%20I%20am%20interested%20in%20room/event%20booking." target="_blank" class="cta-btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
-                </div>
+        <div class="blog-detail-cta">
+            <div>
+                <span>Planning a celebration or mountain stay?</span>
+                <h2>Let Dhauladhar Heights Resort host your stay, banquet, wedding and dining experience.</h2>
             </div>
+            <a href="<?php echo $baseUrl; ?>/contact.html" class="cta-btn-primary"><i class="fa-solid fa-calendar-check"></i> Book Consultation</a>
         </div>
     </article>
     
-    <aside class="sidebar">
-        <!-- POPULAR POSTS WIDGET -->
-        <div class="widget">
-            <h2>Recent Posts</h2>
-            <?php if (!empty($popularBlogs)): ?>
-                <ul class="recent-posts">
-                    <?php foreach ($popularBlogs as $popular): ?>
-                        <?php if ($popular['id'] != $blog['id']): ?>
-                            <?php 
-                            $popularImageUrl = getBlogImageUrl($popular['featured_image']); 
-                            $popularUrl = getBlogUrl($popular);
-                            $popDate = !empty($popular['created_at']) ? date('M d, Y', strtotime($popular['created_at'])) : date('M d, Y');
-                            ?>
-                            <li class="recent-post-item">
-                                <a href="<?php echo $popularUrl; ?>" class="recent-post-link">
-                                    <img src="<?php echo $popularImageUrl; ?>" 
-                                         alt="<?php echo htmlspecialchars($popular['title']); ?>"
-                                         onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
-                                    <div class="recent-post-info">
-                                        <span class="recent-post-title"><?php echo htmlspecialchars($popular['title']); ?></span>
-                                        <span class="recent-post-date"><i class="fa-regular fa-calendar"></i> <?php echo $popDate; ?></span>
-                                    </div>
-                                </a>
-                            </li>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                </ul>
-            <?php else: ?>
-                <p style="color:#718096; font-size:14px;">No other posts available.</p>
-            <?php endif; ?>
-        </div>
-        
-        <!-- ROOM CATEGORIES WIDGET -->
-        <div class="widget">
-            <h2><i class="fa-solid fa-bed" style="color:var(--secondary-color, #5DC5E3); margin-right:6px;"></i> Room Categories</h2>
-            <div class="room-category-list">
-                <a href="<?php echo getRoomUrl('executive-room'); ?>" class="room-category-item">
-                    <div class="room-cat-info">
-                        <span class="room-name">Executive Room</span>
-                        <span class="room-sub">Modern Comforts & Mountain View</span>
-                    </div>
-                    <span class="room-count">24 Rooms</span>
-                </a>
-                <a href="<?php echo getRoomUrl('executive-suite'); ?>" class="room-category-item">
-                    <div class="room-cat-info">
-                        <span class="room-name">Executive Suite</span>
-                        <span class="room-sub">Spacious Living & Private Balcony</span>
-                    </div>
-                    <span class="room-count">40 Suites</span>
-                </a>
-                <a href="<?php echo getRoomUrl('presidential-suite'); ?>" class="room-category-item">
-                    <div class="room-cat-info">
-                        <span class="room-name">Presidential Suite</span>
-                        <span class="room-sub">Penthouse Luxury & Panoramic Vista</span>
-                    </div>
-                    <span class="room-count">02 Suites</span>
-                </a>
-                <a href="<?php echo getRoomUrl('twin-bed'); ?>" class="room-category-item">
-                    <div class="room-cat-info">
-                        <span class="room-name">Twin Bedded Room</span>
-                        <span class="room-sub">Shared Stay & Premium Amenities</span>
-                    </div>
-                    <span class="room-count">04 Rooms</span>
-                </a>
-                <a href="<?php echo getRoomUrl('deluxe-room'); ?>" class="room-category-item">
-                    <div class="room-cat-info">
-                        <span class="room-name">Deluxe Room</span>
-                        <span class="room-sub">Cozy Retreat & Elegant Interior</span>
-                    </div>
-                    <span class="room-count">03 Rooms</span>
-                </a>
-            </div>
+    <!-- SIDEBAR (KD TENT HOUSE LAYOUT) -->
+    <aside class="sidebar blog-detail-sidebar">
+        <!-- SEARCH WIDGET -->
+        <div class="widget search-box">
+            <h2>Search</h2>
+            <input type="text" id="blogSearchInput" placeholder="Search blog topics..." onkeyup="filterSidebarPosts(this.value)">
         </div>
 
-        <!-- CONTACT / BOOKING WIDGET -->
+        <!-- RECENT POSTS WIDGET -->
+        <div class="widget">
+            <h2>Recent Posts</h2>
+            <ul class="detail-recent-posts" id="sidebarRecentPosts">
+                <?php if (!empty($popularBlogs)): ?>
+                    <?php foreach ($popularBlogs as $popular): ?>
+                        <?php if ($popular['id'] != $blog['id']): ?>
+                            <?php $popularUrl = getBlogUrl($popular); ?>
+                            <li><a href="<?php echo $popularUrl; ?>"><?php echo htmlspecialchars($popular['title']); ?></a></li>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <li><span style="color:#718096; font-size:13.5px;">No other posts available.</span></li>
+                <?php endif; ?>
+            </ul>
+        </div>
+        
+        <!-- ACCOMMODATIONS & EXPERIENCES WIDGET -->
+        <div class="widget">
+            <h2>Accommodations & Experiences</h2>
+            <ul>
+                <li><a href="<?php echo getRoomUrl('executive-room'); ?>">Executive Room</a></li>
+                <li><a href="<?php echo getRoomUrl('executive-suite'); ?>">Executive Suite</a></li>
+                <li><a href="<?php echo getRoomUrl('presidential-suite'); ?>">Presidential Suite</a></li>
+                <li><a href="<?php echo getRoomUrl('twin-bed'); ?>">Twin Bedded Room</a></li>
+                <li><a href="<?php echo getRoomUrl('deluxe-room'); ?>">Deluxe Room</a></li>
+                <li><a href="<?php echo $baseUrl; ?>/events.php">Destination Weddings & Banquets</a></li>
+                <li><a href="<?php echo $baseUrl; ?>/about.php">Tea Garden Mountain View</a></li>
+                <li><a href="<?php echo $baseUrl; ?>/contact.html">Private Dining & Events</a></li>
+            </ul>
+        </div>
+
+        <!-- QUICK CONTACT WIDGET -->
         <div class="widget blog-contact-widget">
-            <h2>Plan Your Event / Stay</h2>
-            <p>Planning a holiday, corporate retreat, or dream destination wedding in Dharamshala?</p>
-            <div class="contact-widget-buttons">
-                <a href="tel:+917018841900" class="widget-btn call-btn"><i class="fa-solid fa-phone"></i> Call +91 70188-41900</a>
-                <a href="https://wa.me/917018841900?text=Hello%20Dhauladhar%20Heights%20Resort,%20I%20would%20like%20to%20know%20more%20about%20room%20and%20wedding%20booking." target="_blank" class="widget-btn whatsapp-btn"><i class="fa-brands fa-whatsapp"></i> WhatsApp Enquiry</a>
-            </div>
+            <h2>Quick Contact</h2>
+            <p><i class="fa-solid fa-phone"></i> +91 70188-41900</p>
+            <p><i class="fa-solid fa-envelope"></i> reservation@dhauladharheightsresort.com</p>
+            <a href="<?php echo $baseUrl; ?>/contact.html" class="send-enquiry-btn">Send Enquiry</a>
         </div>
     </aside>
 </main>
+
+<!-- RELATED IDEAS / STORIES SECTION (KD TENT HOUSE STYLE) -->
+<section class="related-blog-section">
+    <div class="common-header">
+        <h2>Related <span>Stories</span></h2>
+        <p>More destination guides, travel tips and luxury retreat ideas in Dharamshala.</p>
+    </div>
+    <div class="related-blog-grid">
+        <?php if (!empty($relatedBlogs)): ?>
+            <?php foreach ($relatedBlogs as $rel): ?>
+                <?php 
+                $relImageUrl = getBlogImageUrl($rel['featured_image']);
+                $relUrl = getBlogUrl($rel);
+                $relDate = !empty($rel['created_at']) ? date('F d, Y', strtotime($rel['created_at'])) : date('F d, Y');
+                $relCat = !empty($rel['category']) ? htmlspecialchars($rel['category']) : 'Resort & Travel';
+                ?>
+                <article class="blog-card" data-aos="fade-up">
+                    <div class="img-container">
+                        <a href="<?php echo $relUrl; ?>" aria-label="<?php echo htmlspecialchars($rel['title']); ?>">
+                            <img src="<?php echo $relImageUrl; ?>" 
+                                 alt="<?php echo htmlspecialchars($rel['title']); ?>"
+                                 onerror="this.onerror=null; this.src='<?php echo $baseUrl; ?>/images/default-blog.jpg';">
+                        </a>
+                    </div>
+                    <div class="card-content">
+                        <span class="category"><?php echo $relCat; ?></span>
+                        <h3 class="post-title">
+                            <a href="<?php echo $relUrl; ?>"><?php echo htmlspecialchars($rel['title']); ?></a>
+                        </h3>
+                        <div class="post-meta">
+                            <span class="date"><i class="fa-regular fa-calendar"></i> <?php echo $relDate; ?></span>
+                        </div>
+                    </div>
+                </article>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <article class="blog-card" data-aos="fade-up">
+                <div class="img-container">
+                    <a href="<?php echo $baseUrl; ?>/blog.php">
+                        <img src="<?php echo $baseUrl; ?>/images/DSC09810.jpg" alt="Dharamshala Travel Guide">
+                    </a>
+                </div>
+                <div class="card-content">
+                    <span class="category">TRAVEL GUIDE</span>
+                    <h3 class="post-title"><a href="<?php echo $baseUrl; ?>/blog.php">Top 10 Hidden Gems to Visit in Dharamshala in 2026</a></h3>
+                    <div class="post-meta">
+                        <span class="date"><i class="fa-regular fa-calendar"></i> April 21, 2026</span>
+                    </div>
+                </div>
+            </article>
+            <article class="blog-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="img-container">
+                    <a href="<?php echo $baseUrl; ?>/blog.php">
+                        <img src="<?php echo $baseUrl; ?>/images/DSC00496-HDR-Enhanced-NR-Edit.jpg" alt="Tea Garden Luxury Stay">
+                    </a>
+                </div>
+                <div class="card-content">
+                    <span class="category">EXPERIENCES</span>
+                    <h3 class="post-title"><a href="<?php echo $baseUrl; ?>/blog.php">Why Staying Amidst Tea Gardens is the Ultimate Mountain Retreat</a></h3>
+                    <div class="post-meta">
+                        <span class="date"><i class="fa-regular fa-calendar"></i> May 12, 2026</span>
+                    </div>
+                </div>
+            </article>
+            <article class="blog-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="img-container">
+                    <a href="<?php echo $baseUrl; ?>/blog.php">
+                        <img src="<?php echo $baseUrl; ?>/images/hs.jpg" alt="Destination Wedding in Kangra">
+                    </a>
+                </div>
+                <div class="card-content">
+                    <span class="category">WEDDINGS</span>
+                    <h3 class="post-title"><a href="<?php echo $baseUrl; ?>/blog.php">Planning a Dream Himalayan Destination Wedding at Dhauladhar</a></h3>
+                    <div class="post-meta">
+                        <span class="date"><i class="fa-regular fa-calendar"></i> June 08, 2026</span>
+                    </div>
+                </div>
+            </article>
+        <?php endif; ?>
+    </div>
+</section>
 
 <!-- Lightbox Modal -->
 <div id="lightbox" class="lightbox" onclick="closeLightbox()">
@@ -389,6 +434,17 @@ include __DIR__ . '/includes/header.php';
             closeLightbox();
         }
     });
+    
+    function filterSidebarPosts(query) {
+        var q = query.toLowerCase();
+        var list = document.getElementById('sidebarRecentPosts');
+        if (!list) return;
+        var items = list.getElementsByTagName('li');
+        for (var i = 0; i < items.length; i++) {
+            var txt = items[i].textContent || items[i].innerText;
+            items[i].style.display = txt.toLowerCase().indexOf(q) > -1 ? '' : 'none';
+        }
+    }
     
     // Mobile Menu Toggle
     document.addEventListener('DOMContentLoaded', function() {
