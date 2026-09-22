@@ -330,7 +330,7 @@ $baseUrl = getBaseUrl();
        <h2 class="room-heading">Discover Dhauladhar Heights Brochure</h2>
 
         <p class="room-description">
-          Get an in-depth look at Dhauladhar Heights Resort, one of the best luxury hotels in Dharamshala, Himachal
+          Get an in-depth look at Dhauladhar Heights Resort, one of the best luxury Resorts in Dharamshala, Himachal
           Pradesh. Surrounded by the breathtaking Dhauladhar mountain range, our resort offers a perfect blend of
           natural beauty, modern comfort, and premium hospitality. Our detailed brochure showcases everything you need
           to know about planning your perfect stay in the hills.
@@ -621,7 +621,7 @@ Begin your journey to an unforgettable celebration with bespoke wedding experien
 
    <!-- COPYRIGHT -->
         <div class="hf-bottom">
-                      © 2026, Hotel Dhauladhar Heights Resort. All Rights Reserved. <br><small>A Unit of NASV Warehouses & Constructions Pvt. Ltd.</small> 
+                      © 2026,Dhauladhar Heights Resort. All Rights Reserved. <br><small>A Unit of NASV Warehouses & Constructions Pvt. Ltd.</small> 
 
         </div>
 

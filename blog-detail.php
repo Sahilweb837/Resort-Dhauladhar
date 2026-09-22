@@ -78,7 +78,7 @@ $blogCanonicalUrl = getBlogUrl($blog);
 $metaDesc = !empty($blog['meta_description']) ? $blog['meta_description'] : (!empty($blog['excerpt']) ? $blog['excerpt'] : substr(strip_tags($blog['content']), 0, 160));
 $metaKeys = !empty($blog['meta_keywords']) ? $blog['meta_keywords'] : 'Dhauladhar Heights Resort, Dharamshala, ' . ($blog['category'] ?? 'Blog');
 
-$pageTitle = $blog['title'] . ' - Hotel Dhauladhar Heights Resort';
+$pageTitle = $blog['title'] . ' - Resort Dhauladhar Heights Resort';
 $pageMetaDescription = $metaDesc;
 $pageMetaKeywords = $metaKeys;
 
@@ -118,7 +118,7 @@ ob_start();
       },
       "publisher": {
         "@type": "Organization",
-        "name": "Hotel Dhauladhar Heights Resort",
+        "name": "Dhauladhar Heights Resort",
         "logo": {
           "@type": "ImageObject",
           "url": "<?php echo $baseUrl; ?>/images/dhr_logo_full_white_720.png"
@@ -169,7 +169,7 @@ include __DIR__ . '/includes/header.php';
                     <i class="fab fa-facebook-f"></i>
                 </a>
                 <!-- Instagram -->
-                <a href="https://www.instagram.com/dhauladhar_heights_resort" target="_blank" rel="noopener" aria-label="Visit Resort on Instagram">
+                <a href="https://www.instagram.com/dhauladhar_heights_Resort" target="_blank" rel="noopener" aria-label="Visit Resort on Instagram">
                     <i class="fab fa-instagram"></i>
                 </a>
                 <!-- WhatsApp -->
@@ -249,7 +249,7 @@ include __DIR__ . '/includes/header.php';
         <div class="widget blog-contact-widget">
             <h2>Quick Contact</h2>
             <p><i class="fa-solid fa-phone"></i> +91 70188-41900</p>
-            <p><i class="fa-solid fa-envelope"></i> reservation@dhauladharheightsresort.com</p>
+            <p><i class="fa-solid fa-envelope"></i> reservation@dhauladharheightsResort.com</p>
             <a href="<?php echo $baseUrl; ?>/contact.html" class="send-enquiry-btn">Send Enquiry</a>
         </div>
     </aside>

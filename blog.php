@@ -66,7 +66,7 @@ include __DIR__ . '/includes/header.php';
 
 <!-- BLOG HEADER (KD TENT HOUSE STYLE) -->
 <div class="blog-header" data-aos="fade-up">
-    <span class="sub-title">HOTEL DHAULADHAR HEIGHTS RESORT BLOG</span>
+    <span class="sub-title"> DHAULADHAR HEIGHTS RESORT BLOG</span>
     <h2 class="main-title"><?php echo $categoryFilter ? 'Category: ' . htmlspecialchars(ucwords(str_replace('-', ' ', $categoryFilter))) : ($searchFilter ? 'Search: ' . htmlspecialchars($searchFilter) : 'Stories, Travel Guides & Himalayan Experiences'); ?></h2>
 </div>
 

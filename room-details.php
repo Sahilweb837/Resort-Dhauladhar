@@ -27,27 +27,27 @@ exit();
 $roomDataMap = [
     'executive-room' => [
         'name' => 'Executive Room',
-        'title' => 'Executive Room with Modern Comforts - Hotel Dhauladhar Heights',
+        'title' => 'Executive Room with Modern Comforts - Resort Dhauladhar Heights',
         'desc' => 'A perfect blend of comfort and functionality, our Executive Rooms are ideal for business and leisure travelers. Enjoy modern interiors, premium amenities, and a relaxing atmosphere after a day exploring Dharamshala.'
     ],
     'executive-suite' => [
         'name' => 'Executive Suite',
-        'title' => 'Executive Suite with Spacious Living Area - Hotel Dhauladhar Heights',
+        'title' => 'Executive Suite with Spacious Living Area - Resort Dhauladhar Heights',
         'desc' => 'Designed for those who prefer extra space and luxury, the Executive Suite offers a separate living area, elegant décor, and scenic views, making your stay both comfortable and memorable.'
     ],
     'presidential-suite' => [
         'name' => 'Presidential Suite',
-        'title' => 'Presidential Suite Offering Ultimate Luxury - Hotel Dhauladhar Heights',
+        'title' => 'Presidential Suite Offering Ultimate Luxury - Resort Dhauladhar Heights',
         'desc' => 'Experience the finest luxury in Dharamshala with our Presidential Suite. Featuring spacious living areas, premium furnishings, and unmatched comfort, it’s perfect for guests seeking an exclusive and indulgent stay.'
     ],
     'twin-bed' => [
         'name' => 'Twin Bedded Room',
-        'title' => 'Twin Bedded Room for Shared Stay - Hotel Dhauladhar Heights',
+        'title' => 'Twin Bedded Room for Shared Stay - Resort Dhauladhar Heights',
         'desc' => 'Our Twin Bedded Rooms are ideal for friends or colleagues traveling together. With two comfortable beds, modern amenities, and a peaceful ambiance, these rooms ensure a restful stay.'
     ],
     'deluxe-room' => [
         'name' => 'Deluxe Room',
-        'title' => 'Deluxe Room with Elegant Interior - Hotel Dhauladhar Heights',
+        'title' => 'Deluxe Room with Elegant Interior - Resort Dhauladhar Heights',
         'desc' => 'Relax in style in our Deluxe Rooms, thoughtfully designed with warm interiors and modern comforts. Perfect for couples and families, these rooms offer a cozy retreat with beautiful surroundings.'
     ]
 ];

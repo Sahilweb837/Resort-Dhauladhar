@@ -300,8 +300,8 @@ $baseUrl = getBaseUrl();
         </section>
     </div>
 
-    <!----------------------------Hotel facility-------------------------  -->
-    <div class="hotel-Utilities" data-aos="fade-up">
+    <!----------------------------Resort facility-------------------------  -->
+    <div class="Resort-Utilities" data-aos="fade-up">
         <section class="title-section">
 
             <div class="title-wrapper">
@@ -353,7 +353,7 @@ $baseUrl = getBaseUrl();
     </div>
 
 
-    <!----------------------  luxury hotel and room ------------------- -->
+    <!----------------------  luxury Resort and room ------------------- -->
     <section class="split-section two" data-aos="fade-up" data-aos-duration="3000">
         <div class="split-wrapper">
 
@@ -682,7 +682,7 @@ $baseUrl = getBaseUrl();
 
         <!-- COPYRIGHT -->
         <div class="hf-bottom">
-                      © 2026, Hotel Dhauladhar Heights Resort. All Rights Reserved. <br><small>A Unit of NASV Warehouses & Constructions Pvt. Ltd.</small> 
+                      © 2026, Resort Dhauladhar Heights Resort. All Rights Reserved. <br><small>A Unit of NASV Warehouses & Constructions Pvt. Ltd.</small> 
 
         </div>
 

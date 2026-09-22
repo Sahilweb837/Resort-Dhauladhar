@@ -8,7 +8,7 @@ $categories = getCategories();
 
 // Get base URL for assets
 $baseUrl = getBaseUrl();
-$googleReviewsUrl = 'https://www.google.com/travel/hotels/entity/CgsI7_2S5eW34JLyARAB/reviews?q=hotel%20dhauladhar%20dharamshala%20tea%20garden&g2lb=4965990%2C72471280%2C72560029%2C72573224%2C72647020%2C72686036%2C72803964%2C72882230%2C73059275%2C73064764%2C121608705&hl=en-IN&gl=in&cs=1&ssta=1&ts=CAESCgoCCAMKAggDEAAaIAoCGgASGhIUCgcI6g8QBRgTEgcI6g8QBRgUGAEyAhAAKgkKBToDSU5SGgA&rp=OAFAAEgCePPAgqeB_cqLowF427jXrprkkIfHAXiE983FlLfM9p0BwAEDygJtqgFqCggvbS8wN2NseBABKg4iCnRlYSBnYXJkZW4oADIfEAEiG4Oo_nPMDLigun9r2AzW96JjgUj-QoWYoNaf4TIrEAIiJ2hvdGVsIGRoYXVsYWRoYXIgZGhhcmFtc2hhbGEgdGVhIGdhcmRlbg&ap=ugEHcmV2aWV3cw&ictx=111&utm_campaign=sharing&utm_medium=link&utm_source=htls&ved=0CAAQ5JsGahcKEwiY3-_LiMeUAxUAAAAAHQAAAAAQBA';
+$googleReviewsUrl = 'https://www.google.com/travel/Resorts/entity/CgsI7_2S5eW34JLyARAB/reviews?q=Resort%20dhauladhar%20dharamshala%20tea%20garden&g2lb=4965990%2C72471280%2C72560029%2C72573224%2C72647020%2C72686036%2C72803964%2C72882230%2C73059275%2C73064764%2C121608705&hl=en-IN&gl=in&cs=1&ssta=1&ts=CAESCgoCCAMKAggDEAAaIAoCGgASGhIUCgcI6g8QBRgTEgcI6g8QBRgUGAEyAhAAKgkKBToDSU5SGgA&rp=OAFAAEgCePPAgqeB_cqLowF427jXrprkkIfHAXiE983FlLfM9p0BwAEDygJtqgFqCggvbS8wN2NseBABKg4iCnRlYSBnYXJkZW4oADIfEAEiG4Oo_nPMDLigun9r2AzW96JjgUj-QoWYoNaf4TIrEAIiJ2hvdGVsIGRoYXVsYWRoYXIgZGhhcmFtc2hhbGEgdGVhIGdhcmRlbg&ap=ugEHcmV2aWV3cw&ictx=111&utm_campaign=sharing&utm_medium=link&utm_source=htls&ved=0CAAQ5JsGahcKEwiY3-_LiMeUAxUAAAAAHQAAAAAQBA';
 ?><!DOCTYPE html>
 <html lang="en">
 
@@ -35,7 +35,7 @@ $googleReviewsUrl = 'https://www.google.com/travel/hotels/entity/CgsI7_2S5eW34JL
   <!-- AOS CSS -->
   <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
   <link rel="icon" type="image/png" href="<?php echo $baseUrl; ?>/images/dhr_logo_icon.png">
-  <title>Hotel Dhauladhar</title>
+  <title>Resort Dhauladhar</title>
 </head>
 <body>
 
@@ -219,7 +219,7 @@ $googleReviewsUrl = 'https://www.google.com/travel/hotels/entity/CgsI7_2S5eW34JL
 
         <div class="room-image gm-image">
           <div class="image-overlay-text">
-            <img src="./images/HotelManager.jpeg" alt="HotelManager" class="HotelManager">
+            <img src="./images/ResortManager.jpeg" alt="ResortManager" class="ResortManager">
           </div>
         </div>
       </section>
@@ -581,7 +581,7 @@ $googleReviewsUrl = 'https://www.google.com/travel/hotels/entity/CgsI7_2S5eW34JL
      
         <!-- COPYRIGHT -->
         <div class="hf-bottom">
-                      © 2026, Hotel Dhauladhar Heights Resort. All Rights Reserved. <br><small>A Unit of NASV Warehouses & Constructions Pvt. Ltd.</small> 
+                      © 2026,Dhauladhar Heights Resort. All Rights Reserved. <br><small>A Unit of NASV Warehouses & Constructions Pvt. Ltd.</small> 
 
         </div>
 
