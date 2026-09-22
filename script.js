@@ -214,18 +214,80 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ------------------------------- CONTACT FORM -------------------------------
-  if (window.emailjs) {
-    emailjs.init("YOUR_PUBLIC_KEY"); 
+if (window.emailjs) {
+    emailjs.init("KWfyzx9eYKtFBBsFI"); 
     const form = document.getElementById("contactForm");
+    const successPopup = document.getElementById("contactSuccessPopup");
+    const successClose = document.getElementById("contactSuccessClose");
+    const successDone = document.getElementById("contactSuccessDone");
+    const openSuccessPopup = () => {
+      if (!successPopup) return;
+      successPopup.classList.add("is-visible");
+      successPopup.setAttribute("aria-hidden", "false");
+    };
+    const closeSuccessPopup = () => {
+      if (!successPopup) return;
+      successPopup.classList.remove("is-visible");
+      successPopup.setAttribute("aria-hidden", "true");
+    };
     if (form) {
       form.addEventListener("submit", function (e) {
         e.preventDefault();
-        emailjs.sendForm("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", this)
-          .then(() => { alert("Message sent successfully!"); form.reset(); },
+        emailjs.sendForm("service_z9h61fa", "template_59la8b5", this)
+          .then(() => { form.reset(); openSuccessPopup(); },
             err => alert("FAILED... " + err.text));
       });
     }
+    if (successClose) successClose.addEventListener("click", closeSuccessPopup);
+    if (successDone) successDone.addEventListener("click", closeSuccessPopup);
+    if (successPopup) {
+      successPopup.addEventListener("click", function (e) {
+        if (e.target === successPopup) closeSuccessPopup();
+      });
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeSuccessPopup();
+    });
   }
+
+
+  // destination wedding email js
+    if (window.emailjs) {
+    emailjs.init("KWfyzx9eYKtFBBsFI"); 
+    const form = document.getElementById("destinationcontactForm");
+    const successPopup = document.getElementById("destinationSuccessPopup");
+    const successClose = document.getElementById("destinationSuccessClose");
+    const successDone = document.getElementById("destinationSuccessDone");
+    const openSuccessPopup = () => {
+      if (!successPopup) return;
+      successPopup.classList.add("is-visible");
+      successPopup.setAttribute("aria-hidden", "false");
+    };
+    const closeSuccessPopup = () => {
+      if (!successPopup) return;
+      successPopup.classList.remove("is-visible");
+      successPopup.setAttribute("aria-hidden", "true");
+    };
+    if (form) {
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        emailjs.sendForm("service_z9h61fa", "template_onfy9zs", this)
+          .then(() => { form.reset(); openSuccessPopup(); },
+            err => alert("FAILED... " + err.text));
+      });
+    }
+    if (successClose) successClose.addEventListener("click", closeSuccessPopup);
+    if (successDone) successDone.addEventListener("click", closeSuccessPopup);
+    if (successPopup) {
+      successPopup.addEventListener("click", function (e) {
+        if (e.target === successPopup) closeSuccessPopup();
+      });
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeSuccessPopup();
+    });
+  }
+
 
   // ------------------------------- DESTINATION WEDDING SLIDER -------------------------------
   // const weddingSlidesData = [
