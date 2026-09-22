@@ -467,8 +467,7 @@ $baseUrl = getBaseUrl();
         </p>
     </div>
 </div>
-    <!-- BLOG SECTION (KD TENT HOUSE STYLE) -->
-    <section class="blog-section">
+     <section class="blog-section">
         <div class="section-header" data-aos="fade-up">
             <span class="sub-title">LATEST BLOGS</span>
             <h2>Stories, Travel Guides & Mountain Experiences</h2>

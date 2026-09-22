@@ -3158,8 +3158,11 @@
    max-height: 400px;
  }
 
+ .hotel-map,
  .Resort-map {
    width: 100%;
+   display: block;
+   min-height: 320px;
    aspect-ratio: 16 / 9;
    border: none;
  }
@@ -5016,6 +5019,41 @@
 
    .blog-card {
      max-width: 100%;
+   }
+
+   .blog-card .card-content,
+   .blog-card .blog-content {
+     padding: 18px;
+   }
+
+   .blog-card .post-title,
+   .blog-card .blog-content h4 {
+     font-size: 1.2rem;
+     overflow-wrap: anywhere;
+   }
+
+   .blog-card .blog-excerpt {
+     overflow-wrap: anywhere;
+   }
+
+   .blog-card .post-meta {
+     align-items: flex-start;
+     flex-wrap: wrap;
+     gap: 10px;
+   }
+
+   .blog-card .read-more-btn {
+     margin-left: 0;
+   }
+
+   .map-wrapper {
+     width: 100%;
+     border-radius: 12px;
+   }
+
+   .hotel-map,
+   .Resort-map {
+     min-height: 280px;
    }
 
    .blog-featured-image,
