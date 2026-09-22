@@ -92,14 +92,14 @@ function getDefaultSampleBlogs() {
             'slug' => 'destination-wedding-in-dharamshala',
             'category' => 'Wedding',
             'excerpt' => 'Exchange your vows surrounded by the majestic Dhauladhar mountains. Discover how our luxury resort makes your dream hill-station wedding unforgettable.',
-            'content' => '<p>Planning a destination wedding in the serene hills of Himachal Pradesh? Hotel Dhauladhar Heights Resort offers breathtaking mountain vistas, exquisite banquet halls, open lawn venues, and five-star hospitality for your special day.</p><p>From royal outdoor mandaps overlooking tea gardens to customized catering and lavish guest suites, we turn every wedding celebration into a lifelong memory.</p>',
+            'content' => '<p>Planning a destination wedding in the serene hills of Himachal Pradesh? Resort Dhauladhar Heights Resort offers breathtaking mountain vistas, exquisite banquet halls, open lawn venues, and five-star hospitality for your special day.</p><p>From royal outdoor mandaps overlooking tea gardens to customized catering and lavish guest suites, we turn every wedding celebration into a lifelong memory.</p>',
             'featured_image' => 'images/sangeet1.jpg',
             'sections' => json_encode([
                 [
                     'type' => 'text',
                     'heading' => 'A Royal Himalayan Celebration Above the Clouds',
                     'level' => 'h2',
-                    'content' => "Planning a destination wedding in the serene hills of Himachal Pradesh? Hotel Dhauladhar Heights Resort offers breathtaking mountain vistas, exquisite banquet halls, open lawn venues, and five-star hospitality for your special day.\n\nFrom royal outdoor mandaps overlooking tea gardens to customized catering and lavish guest suites, we turn every wedding celebration into a lifelong memory."
+                    'content' => "Planning a destination wedding in the serene hills of Himachal Pradesh? Resort Dhauladhar Heights Resort offers breathtaking mountain vistas, exquisite banquet halls, open lawn venues, and five-star hospitality for your special day.\n\nFrom royal outdoor mandaps overlooking tea gardens to customized catering and lavish guest suites, we turn every wedding celebration into a lifelong memory."
                 ],
                 [
                     'type' => 'image',
@@ -242,7 +242,7 @@ function getDefaultSampleBlogs() {
             'slug' => 'world-environment-day-2026-dhauladhar-heights-resort-leads-a-cleanliness-drive-for-a-greener-dharamshala',
             'category' => 'Events',
             'excerpt' => 'Celebrating World Environment Day 2026 with an inspiring eco-drive across Dharamshala and tea garden trails surrounding Dhauladhar Heights Resort.',
-            'content' => '<p>In celebration of World Environment Day 2026, Hotel Dhauladhar Heights Resort organized a major eco-cleanliness drive and tree plantation campaign across Kangra valley tea gardens and local trail routes in Dharamshala.</p><p>Guests, resort team members, and local volunteers gathered to spread awareness on eco-tourism, plastic waste reduction, and preserving the serene Himalayan ecosystem for future generations.</p>',
+            'content' => '<p>In celebration of World Environment Day 2026, Resort Dhauladhar Heights Resort organized a major eco-cleanliness drive and tree plantation campaign across Kangra valley tea gardens and local trail routes in Dharamshala.</p><p>Guests, resort team members, and local volunteers gathered to spread awareness on eco-tourism, plastic waste reduction, and preserving the serene Himalayan ecosystem for future generations.</p>',
             'featured_image' => 'images/DSC09631-scaled.jpg',
             'author' => 'Admin',
             'status' => 'published',
@@ -1250,7 +1250,7 @@ function seedDefaultBlogs($pdo) {
                 'slug' => 'destination-wedding-in-dharamshala',
                 'category' => 'Wedding',
                 'excerpt' => 'Exchange your vows surrounded by the majestic Dhauladhar mountains. Discover how our luxury resort makes your dream hill-station wedding unforgettable.',
-                'content' => '<p>Planning a destination wedding in the serene hills of Himachal Pradesh? Hotel Dhauladhar Heights Resort offers breathtaking mountain vistas, exquisite banquet halls, open lawn venues, and five-star hospitality for your special day.</p><p>From royal outdoor mandaps overlooking tea gardens to customized catering and lavish guest suites, we turn every wedding celebration into a lifelong memory.</p>',
+                'content' => '<p>Planning a destination wedding in the serene hills of Himachal Pradesh? Resort Dhauladhar Heights Resort offers breathtaking mountain vistas, exquisite banquet halls, open lawn venues, and five-star hospitality for your special day.</p><p>From royal outdoor mandaps overlooking tea gardens to customized catering and lavish guest suites, we turn every wedding celebration into a lifelong memory.</p>',
                 'featured_image' => 'images/sangeet1.jpg'
             ],
             [
@@ -1290,7 +1290,7 @@ function seedDefaultBlogs($pdo) {
                 'slug' => 'world-environment-day-2026-dhauladhar-heights-resort-leads-a-cleanliness-drive-for-a-greener-dharamshala',
                 'category' => 'Events',
                 'excerpt' => 'Celebrating World Environment Day 2026 with an inspiring eco-drive across Dharamshala and tea garden trails surrounding Dhauladhar Heights Resort.',
-                'content' => '<p>In celebration of World Environment Day 2026, Hotel Dhauladhar Heights Resort organized a major eco-cleanliness drive and tree plantation campaign across Kangra valley tea gardens and local trail routes in Dharamshala.</p><p>Guests, resort team members, and local volunteers gathered to spread awareness on eco-tourism, plastic waste reduction, and preserving the serene Himalayan ecosystem for future generations.</p>',
+                'content' => '<p>In celebration of World Environment Day 2026, Resort Dhauladhar Heights Resort organized a major eco-cleanliness drive and tree plantation campaign across Kangra valley tea gardens and local trail routes in Dharamshala.</p><p>Guests, resort team members, and local volunteers gathered to spread awareness on eco-tourism, plastic waste reduction, and preserving the serene Himalayan ecosystem for future generations.</p>',
                 'featured_image' => 'images/DSC09631-scaled.jpg'
             ]
         ];
@@ -1400,7 +1400,7 @@ function ensureReviewsTable() {
 
             $seed->execute([
                 'Karan M.', '', 5,
-                'The hotel has a great location and the rooms were very clean and spacious. It has an old English charm and the staff is very cooperative.',
+                'The Resort has a great location and the rooms were very clean and spacious. It has an old English charm and the staff is very cooperative.',
                 'Google', date('Y-m-d', strtotime('-2 weeks')), 'Holiday | Family', 1
             ]);
             $seed->execute([
@@ -1415,12 +1415,12 @@ function ensureReviewsTable() {
             ]);
             $seed->execute([
                 'Neha G.', '', 5,
-                'Hotel Dhauladhar Dharamshala is one of the best accommodations when visiting Dharamshala. Situated near the market, very convenient and peaceful.',
+                'Resort Dhauladhar Dharamshala is one of the best accommodations when visiting Dharamshala. Situated near the market, very convenient and peaceful.',
                 'Google', date('Y-m-d', strtotime('-3 months')), 'Business | Solo', 4
             ]);
             $seed->execute([
                 'Vikram J.', '', 5,
-                'Overall I had a very good and pleasant stay. The hotel staff and services were all convenient, and the location near the tea gardens is perfect for a morning walk.',
+                'Overall I had a very good and pleasant stay. The Resort staff and services were all convenient, and the location near the tea gardens is perfect for a morning walk.',
                 'Google', date('Y-m-d', strtotime('-4 months')), 'Holiday | Family', 5
             ]);
         }
@@ -1819,7 +1819,7 @@ function renderAdvancedBlogSections($sections, $fallbackContent = '') {
                 
             case 'quote':
                 $quote = trim($sec['quote'] ?? ($sec['content'] ?? ''));
-                $author = trim($sec['author'] ?? 'Hotel Dhauladhar Heights Team');
+                $author = trim($sec['author'] ?? 'Resort Dhauladhar Heights Team');
                 
                 $output .= '<div class="blog-section-quote">';
                 $output .= '<div class="quote-icon"><i class="fa-solid fa-quote-left"></i></div>';
@@ -2047,7 +2047,7 @@ function processSubmittedBlogSections($rawSections, $filesArray = null) {
                 
             case 'quote':
                 $item['quote'] = trim($sec['quote'] ?? '');
-                $item['author'] = trim($sec['author'] ?? 'Hotel Dhauladhar Heights Team');
+                $item['author'] = trim($sec['author'] ?? 'Resort Dhauladhar Heights Team');
                 break;
                 
             case 'features':

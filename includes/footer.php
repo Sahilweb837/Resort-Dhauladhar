@@ -89,7 +89,7 @@
 
         <!-- COPYRIGHT -->
         <div class="hf-bottom">
-                      © 2026, Hotel Dhauladhar Heights Resort. All Rights Reserved. <br><small>A Unit of NASV Warehouses & Constructions Pvt. Ltd.</small> 
+                      © 2026,Dhauladhar Heights Resort. All Rights Reserved. <br><small>A Unit of NASV Warehouses & Constructions Pvt. Ltd.</small> 
 
         </div>
 
