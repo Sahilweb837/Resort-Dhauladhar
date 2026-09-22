@@ -219,7 +219,7 @@ $googleReviewsUrl = 'https://www.google.com/travel/Resorts/entity/CgsI7_2S5eW34J
 
         <div class="room-image gm-image">
           <div class="image-overlay-text">
-            <img src="./images/ResortManager.jpeg" alt="ResortManager" class="ResortManager">
+            <img src="./images/HotelManager.jpeg" alt="ResortManager" class="ResortManager">
           </div>
         </div>
       </section>
